@@ -19,6 +19,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
 
 const navItems = [
     { href: "/dashboard", label: "Today", icon: Home },
@@ -40,10 +41,11 @@ export function Navbar() {
                 {/* Logo */}
                 <div className="p-6">
                     <Link href="/" className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                            <span className="text-xl">🏆</span>
-                        </div>
-                        <span className="text-xl font-bold text-gradient">Day Win</span>
+                        <DailyWinLogo
+                            label="DAILY WIN"
+                            iconClassName="h-10 w-10 rounded-lg"
+                            textClassName="text-sm font-bold tracking-[0.14em] text-surface-900 dark:text-white"
+                        />
                     </Link>
                 </div>
 
@@ -195,3 +197,4 @@ export function Navbar() {
         </>
     );
 }
+
