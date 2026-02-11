@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#e8d774" />
+  <g fill="none" stroke="#000" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(45 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(90 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(135 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(180 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(225 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(270 32 32)" />
+    <path d="M32 6v12c0 3.9-3.1 7-7 7H13" transform="rotate(315 32 32)" />
+  </g>
+</svg>
