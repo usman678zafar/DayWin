@@ -20,12 +20,20 @@ export function Hero() {
                             <a href="#habit-technology" className="hover:text-black">Habit Technology</a>
                             <a href="#streak-manifesto" className="hover:text-black">Streak Manifesto</a>
                         </nav>
-                        <a
-                            href="#"
-                            className="border border-black px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-black hover:bg-black hover:text-white"
-                        >
-                            Access App
-                        </a>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <a
+                                href="/login"
+                                className="border border-black/25 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-black hover:border-black"
+                            >
+                                Login
+                            </a>
+                            <a
+                                href="/signup"
+                                className="border border-black bg-black px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white hover:bg-white hover:text-black"
+                            >
+                                Sign Up
+                            </a>
+                        </div>
                     </div>
 
                     <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">

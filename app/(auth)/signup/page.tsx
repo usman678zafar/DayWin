@@ -4,11 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { motion } from "framer-motion";
 import { User, Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
+import toast from "react-hot-toast";
+import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import toast from "react-hot-toast";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -44,13 +44,11 @@ export default function SignupPage() {
             });
 
             const data = await response.json();
-
             if (!response.ok) {
                 toast.error(data.error || "Something went wrong");
                 return;
             }
 
-            // Auto sign in after registration
             const result = await signIn("credentials", {
                 email: formData.email,
                 password: formData.password,
@@ -61,11 +59,11 @@ export default function SignupPage() {
                 toast.error("Account created but failed to sign in");
                 router.push("/login");
             } else {
-                toast.success("Welcome to Day Win! 🎉");
+                toast.success("Account created successfully");
                 router.push("/dashboard");
                 router.refresh();
             }
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong");
         } finally {
             setIsLoading(false);
@@ -76,47 +74,59 @@ export default function SignupPage() {
         setIsLoading(true);
         try {
             await signIn("google", { callbackUrl: "/dashboard" });
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong");
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-surface-50 dark:bg-surface-950">
-            <div className="fixed inset-0 bg-mesh-gradient opacity-30 pointer-events-none" />
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative w-full max-w-md"
-            >
-                {/* Logo */}
-                <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                            <span className="text-2xl">🏆</span>
-                        </div>
-                        <span className="text-2xl font-bold text-gradient">Day Win</span>
-                    </Link>
-                    <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-                        Create your account
-                    </h1>
-                    <p className="text-surface-600 dark:text-surface-200/50 mt-2">
-                        Start building better habits today
+        <div className="min-h-screen bg-white text-black">
+            <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 py-10 md:grid-cols-2 md:px-8">
+                <section className="hidden rounded-2xl border border-black/10 bg-black p-10 text-white md:block">
+                    <DailyWinLogo
+                        className="mb-8"
+                        label="DAILY WIN"
+                        textClassName="text-sm tracking-[0.15em] text-white"
+                    />
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
+                        Start Today
                     </p>
-                </div>
+                    <h1 className="text-5xl font-black uppercase leading-[0.9]">
+                        Build Better
+                        <br />
+                        Habits
+                        <br />
+                        Daily
+                    </h1>
+                    <p className="mt-6 max-w-md text-lg text-white/75">
+                        Create your account to track routines, maintain streaks, and improve every day.
+                    </p>
+                </section>
 
-                {/* Form */}
-                <div className="card p-8">
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+                    <div className="mb-8 flex items-center justify-between">
+                        <DailyWinLogo
+                            label="DAILY WIN"
+                            iconClassName="h-7 w-7 rounded-sm"
+                            textClassName="text-[11px] tracking-[0.14em] text-black"
+                        />
+                        <Link href="/login" className="text-xs font-semibold uppercase tracking-[0.12em] text-black/60 hover:text-black">
+                            Already a member
+                        </Link>
+                    </div>
+
+                    <h2 className="text-3xl font-black uppercase">Sign Up</h2>
+                    <p className="mt-2 text-sm text-black/60">Create your account and start tracking your habits.</p>
+
+                    <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                         <Input
                             label="Full Name"
                             type="text"
                             placeholder="John Doe"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            leftIcon={<User className="w-5 h-5" />}
+                            leftIcon={<User className="h-5 w-5" />}
                             required
                         />
 
@@ -126,7 +136,7 @@ export default function SignupPage() {
                             placeholder="you@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            leftIcon={<Mail className="w-5 h-5" />}
+                            leftIcon={<Mail className="h-5 w-5" />}
                             required
                         />
 
@@ -137,50 +147,31 @@ export default function SignupPage() {
                                 placeholder="Create a strong password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                leftIcon={<Lock className="w-5 h-5" />}
+                                leftIcon={<Lock className="h-5 w-5" />}
                                 rightIcon={
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="hover:text-primary-500 transition-colors"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="w-5 h-5" />
-                                        ) : (
-                                            <Eye className="w-5 h-5" />
-                                        )}
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="hover:text-black">
+                                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                     </button>
                                 }
                                 required
                             />
 
-                            {/* Password requirements */}
                             {formData.password && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    className="mt-3 space-y-2"
-                                >
+                                <div className="mt-3 space-y-2">
                                     {passwordRequirements.map((req) => (
                                         <div
                                             key={req.text}
-                                            className={`flex items-center gap-2 text-sm ${req.met
-                                                    ? "text-success-600 dark:text-success-400"
-                                                    : "text-surface-200/50"
-                                                }`}
+                                            className={`flex items-center gap-2 text-sm ${req.met ? "text-black" : "text-black/45"}`}
                                         >
-                                            <div
-                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${req.met
-                                                        ? "bg-success-500"
-                                                        : "border border-surface-300 dark:border-surface-800"
-                                                    }`}
+                                            <span
+                                                className={`flex h-4 w-4 items-center justify-center rounded-full ${req.met ? "bg-black text-white" : "border border-black/25"}`}
                                             >
-                                                {req.met && <Check className="w-3 h-3 text-white" />}
-                                            </div>
+                                                {req.met && <Check className="h-3 w-3" />}
+                                            </span>
                                             {req.text}
                                         </div>
                                     ))}
-                                </motion.div>
+                                </div>
                             )}
                         </div>
 
@@ -189,67 +180,23 @@ export default function SignupPage() {
                         </Button>
                     </form>
 
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-surface-200 dark:border-surface-800" />
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-white dark:bg-surface-900 text-surface-200/50">
-                                Or continue with
-                            </span>
-                        </div>
+                    <div className="my-6 flex items-center gap-3">
+                        <span className="h-px flex-1 bg-black/15" />
+                        <span className="text-xs uppercase tracking-[0.12em] text-black/50">or continue with</span>
+                        <span className="h-px flex-1 bg-black/15" />
                     </div>
 
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={handleGoogleSignIn}
-                        disabled={isLoading}
-                        className="w-full"
-                    >
-                        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                            <path
-                                fill="currentColor"
-                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            />
-                            <path
-                                fill="currentColor"
-                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            />
-                            <path
-                                fill="currentColor"
-                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                            />
-                            <path
-                                fill="currentColor"
-                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            />
-                        </svg>
+                    <Button type="button" variant="secondary" onClick={handleGoogleSignIn} disabled={isLoading} className="w-full">
                         Continue with Google
                     </Button>
 
-                    <p className="text-xs text-center text-surface-200/50 mt-6">
+                    <p className="mt-6 text-center text-xs text-black/50">
                         By creating an account, you agree to our{" "}
-                        <Link href="/terms" className="text-primary-500 hover:underline">
-                            Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link href="/privacy" className="text-primary-500 hover:underline">
-                            Privacy Policy
-                        </Link>
+                        <Link href="/terms" className="text-black hover:underline">Terms</Link> and{" "}
+                        <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>.
                     </p>
-                </div>
-
-                <p className="text-center mt-6 text-surface-600 dark:text-surface-200/50">
-                    Already have an account?{" "}
-                    <Link
-                        href="/login"
-                        className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium"
-                    >
-                        Sign in
-                    </Link>
-                </p>
-            </motion.div>
+                </section>
+            </div>
         </div>
     );
 }
