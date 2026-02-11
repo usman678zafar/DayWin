@@ -33,7 +33,7 @@ export function Hero() {
                             <p className="mb-4 inline-flex border border-black/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/70">
                                 Mobile Habit Tracker
                             </p>
-                            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-[clamp(2rem,8.5vw,5.6rem)]">
+                            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-[clamp(1.65rem,6.8vw,4.6rem)]">
                                 Track Every
                                 <br />
                                 <span className="text-black/65">Mobile Habit</span>
@@ -67,21 +67,10 @@ export function Hero() {
                                     width={1200}
                                     height={900}
                                     priority
-                                    className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[520px]"
+                                    className="h-[290px] w-full object-cover sm:h-[390px] lg:h-[480px]"
                                 />
                             </div>
 
-                            <div className="mt-4 rounded-xl border border-black/15 bg-white p-4 shadow-sm">
-                                <div className="mb-3 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.12em] text-black/70">
-                                    <span>Tracker Sync</span>
-                                    <span className="h-2 w-2 rounded-full bg-black" />
-                                </div>
-                                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-black/60">Weekly Streak</div>
-                                <div className="mb-1 h-1.5 bg-black/10">
-                                    <div className="h-1.5 w-[88%] bg-black" />
-                                </div>
-                                <div className="text-right text-xs font-bold text-black">88%</div>
-                            </div>
                         </div>
                     </div>
                 </div>
