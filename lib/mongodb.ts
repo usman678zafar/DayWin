@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { type Mongoose } from "mongoose";
 
 declare global {
-    var mongoose: {
-        conn: typeof mongoose | null;
-        promise: Promise<typeof mongoose> | null;
+    var mongooseCache: {
+        conn: Mongoose | null;
+        promise: Promise<Mongoose> | null;
     };
 }
 
@@ -13,13 +13,13 @@ if (!MONGODB_URI) {
     throw new Error("Please define the MONGODB_URI environment variable");
 }
 
-let cached = global.mongoose;
+let cached = global.mongooseCache;
 
 if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
+    cached = global.mongooseCache = { conn: null, promise: null };
 }
 
-async function dbConnect(): Promise<typeof mongoose> {
+async function dbConnect(): Promise<Mongoose> {
     if (cached.conn) {
         return cached.conn;
     }
