@@ -7,7 +7,7 @@ interface FeatureRowProps {
     category: string;
     title: string;
     description: string;
-    imageSrc: string;
+    imageSrc: string | import("next/image").StaticImageData;
     reverse?: boolean;
 }
 
@@ -49,14 +49,6 @@ export function FeatureRow({ category, title, description, imageSrc, reverse = f
                                 height={1000}
                                 className="mx-auto"
                             />
-                            {/* Optional checkmark bubble for the first feature */}
-                            {!reverse && (
-                                <div className="absolute top-1/4 -right-4 bg-[#ff8a8a] text-white p-4 rounded-full shadow-2xl animate-bounce">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" className="fill-current">
-                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                                    </svg>
-                                </div>
-                            )}
                         </motion.div>
                     </div>
                 </div>
@@ -64,3 +56,4 @@ export function FeatureRow({ category, title, description, imageSrc, reverse = f
         </section>
     );
 }
+

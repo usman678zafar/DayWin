@@ -4,6 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { FeatureRow } from "@/components/landing/FeatureRow";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { CtaFooter } from "@/components/landing/CtaFooter";
+import winTheDayImage from "@/assets/win-the-day.jpg";
 
 export default async function LandingPage() {
     const session = await auth();
@@ -20,7 +21,7 @@ export default async function LandingPage() {
                 category="WIN THE DAY"
                 title="Transform Your Habits. Transform Your Life."
                 description="Day Win helps you build lasting consistency through visual progress, smart notifications, and streak milestones. Turn your goals into effortless everyday actions."
-                imageSrc="/hero-phone.png"
+                imageSrc={winTheDayImage}
             />
 
             <FeatureRow
@@ -37,3 +38,4 @@ export default async function LandingPage() {
         </main>
     );
 }
+
