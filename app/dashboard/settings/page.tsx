@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {
-    const { data: session, update } = useSession();
+    const { data: session } = useSession();
     const { theme, setTheme } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState(session?.user?.name || "");
@@ -53,7 +53,7 @@ export default function SettingsPage() {
         <div className="page-container max-w-3xl">
             <div className="page-header">
                 <h1 className="page-title">Settings</h1>
-                <p className="page-subtitle">Manage your account and preferences</p>
+                <p className="page-subtitle">Control profile, theme, notifications, and data in one place.</p>
             </div>
 
             <div className="space-y-6">
@@ -248,3 +248,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+

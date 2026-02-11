@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -16,143 +15,142 @@ import {
     Sun,
     Moon,
     User,
-    ChevronDown,
+    Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
 
 const navItems = [
-    { href: "/dashboard", label: "Today", icon: Home },
+    { href: "/dashboard", label: "Overview", icon: Home },
     { href: "/dashboard/habits", label: "Habits", icon: LayoutGrid },
     { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
-    { href: "/dashboard/stats", label: "Stats", icon: BarChart3 },
+    { href: "/dashboard/stats", label: "Analytics", icon: BarChart3 },
 ];
 
 export function Navbar() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const { theme, setTheme } = useTheme();
-    const [showUserMenu, setShowUserMenu] = useState(false);
 
     return (
         <>
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 z-40">
-                {/* Logo */}
-                <div className="p-6">
-                    <Link href="/" className="flex items-center gap-3">
-                        <DailyWinLogo
-                            label="DAILY WIN"
-                            iconClassName="h-10 w-10 rounded-lg"
-                            textClassName="text-sm font-bold tracking-[0.14em] text-surface-900 dark:text-white"
-                        />
-                    </Link>
+            <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-72 flex-col border-r border-black/10 bg-white/85 px-5 py-5 backdrop-blur-xl dark:border-white/10 dark:bg-[#070b14]/85 z-40">
+                <Link href="/" className="mb-7">
+                    <DailyWinLogo
+                        label="DAILY WIN"
+                        iconClassName="h-10 w-10 rounded-lg"
+                        textClassName="text-sm font-bold tracking-[0.14em] text-black dark:text-white"
+                    />
+                </Link>
+
+                <div className="mb-6 rounded-2xl border border-black/10 bg-black px-4 py-4 text-white dark:border-white/10">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">Daily System</p>
+                    <p className="mt-2 text-xl font-bold leading-tight">Consistency Wins</p>
+                    <p className="mt-2 text-sm text-white/70">Track habits, build streaks, and review trends faster.</p>
                 </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 px-4">
-                    <ul className="space-y-2">
-                        {navItems.map((item) => {
-                            const isActive = pathname === item.href;
-                            return (
-                                <li key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={cn(
-                                            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
-                                            isActive
-                                                ? "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
-                                                : "text-surface-600 dark:text-surface-200/50 hover:bg-surface-100 dark:hover:bg-surface-800"
-                                        )}
-                                    >
-                                        <item.icon className="w-5 h-5" />
-                                        <span className="font-medium">{item.label}</span>
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="activeNav"
-                                                className="absolute left-0 w-1 h-8 bg-primary-500 rounded-r-full"
-                                            />
-                                        )}
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                <nav className="flex-1 space-y-2">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition",
+                                    isActive
+                                        ? "bg-black text-white dark:bg-white dark:text-black"
+                                        : "text-black/65 hover:bg-black/5 hover:text-black dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white"
+                                )}
+                            >
+                                <item.icon className="h-4.5 w-4.5" />
+                                <span>{item.label}</span>
+                                {isActive && (
+                                    <motion.span
+                                        layoutId="nav-active-pill"
+                                        className="absolute right-3 h-2 w-2 rounded-full bg-[#e8d774] dark:bg-black"
+                                    />
+                                )}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
-                {/* User Section */}
-                <div className="p-4 border-t border-surface-200 dark:border-surface-800">
-                    {/* Theme Toggle */}
-                    <button
-                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-surface-600 dark:text-surface-200/50 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors mb-2"
-                    >
-                        {theme === "dark" ? (
-                            <Sun className="w-5 h-5" />
-                        ) : (
-                            <Moon className="w-5 h-5" />
-                        )}
-                        <span className="font-medium">
-                            {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                        </span>
-                    </button>
+                <div className="mt-5 rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+                    <div className="mb-3 flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-sm font-bold text-white dark:bg-white dark:text-black">
+                            {session?.user?.name?.[0] || "U"}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-black dark:text-white">
+                                {session?.user?.name || "User"}
+                            </p>
+                            <p className="truncate text-xs text-black/50 dark:text-white/50">
+                                {session?.user?.email || "user@example.com"}
+                            </p>
+                        </div>
+                    </div>
 
-                    {/* User Menu */}
-                    <div className="relative">
+                    <div className="mb-3 grid grid-cols-3 gap-2">
                         <button
-                            onClick={() => setShowUserMenu(!showUserMenu)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                            onClick={() => setTheme("light")}
+                            className={cn(
+                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
+                                theme === "light"
+                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
+                            )}
+                            aria-label="Light mode"
                         >
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white font-semibold text-sm">
-                                {session?.user?.name?.[0] || "U"}
-                            </div>
-                            <div className="flex-1 text-left">
-                                <p className="text-sm font-medium text-surface-900 dark:text-white truncate">
-                                    {session?.user?.name || "User"}
-                                </p>
-                                <p className="text-xs text-surface-200/50 truncate">
-                                    {session?.user?.email}
-                                </p>
-                            </div>
-                            <ChevronDown className="w-4 h-4 text-surface-200/50" />
+                            <Sun className="h-4 w-4" />
                         </button>
+                        <button
+                            onClick={() => setTheme("dark")}
+                            className={cn(
+                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
+                                theme === "dark"
+                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
+                            )}
+                            aria-label="Dark mode"
+                        >
+                            <Moon className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setTheme("system")}
+                            className={cn(
+                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
+                                theme === "system"
+                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
+                            )}
+                            aria-label="System mode"
+                        >
+                            <Monitor className="h-4 w-4" />
+                        </button>
+                    </div>
 
-                        {showUserMenu && (
-                            <>
-                                <div
-                                    className="fixed inset-0 z-10"
-                                    onClick={() => setShowUserMenu(false)}
-                                />
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-surface-900 rounded-xl shadow-xl border border-surface-200 dark:border-surface-800 overflow-hidden z-20"
-                                >
-                                    <Link
-                                        href="/dashboard/settings"
-                                        onClick={() => setShowUserMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
-                                    >
-                                        <Settings className="w-4 h-4 text-surface-200/50" />
-                                        <span className="text-surface-900 dark:text-white">Settings</span>
-                                    </Link>
-                                    <button
-                                        onClick={() => signOut()}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        <span>Sign Out</span>
-                                    </button>
-                                </motion.div>
-                            </>
-                        )}
+                    <div className="flex gap-2">
+                        <Link
+                            href="/dashboard/settings"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-black/70 transition hover:border-black hover:text-black dark:border-white/15 dark:text-white/70 dark:hover:border-white dark:hover:text-white"
+                        >
+                            <Settings className="h-3.5 w-3.5" />
+                            Settings
+                        </Link>
+                        <button
+                            onClick={() => signOut({ callbackUrl: "/" })}
+                            className="flex items-center justify-center rounded-lg border border-red-500/40 px-3 py-2 text-red-600 transition hover:bg-red-500 hover:text-white"
+                            aria-label="Sign out"
+                        >
+                            <LogOut className="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
             </aside>
 
-            {/* Mobile Bottom Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-surface-900/90 backdrop-blur-xl border-t border-surface-200 dark:border-surface-800 z-40 safe-area-bottom">
-                <ul className="flex items-center justify-around px-4 py-2">
+            <nav className="md:hidden fixed bottom-2 left-2 right-2 z-40 rounded-2xl border border-black/10 bg-white/92 px-2 py-2 shadow-xl backdrop-blur dark:border-white/10 dark:bg-[#0a0f19]/92">
+                <ul className="grid grid-cols-5 items-center gap-1">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -160,20 +158,14 @@ export function Navbar() {
                                 <Link
                                     href={item.href}
                                     className={cn(
-                                        "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-300",
+                                        "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-semibold transition",
                                         isActive
-                                            ? "text-primary-600 dark:text-primary-400"
-                                            : "text-surface-200/50"
+                                            ? "bg-black text-white dark:bg-white dark:text-black"
+                                            : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
                                     )}
                                 >
-                                    <item.icon className="w-6 h-6" />
-                                    <span className="text-xs font-medium">{item.label}</span>
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="activeMobileNav"
-                                            className="absolute bottom-0 w-12 h-1 bg-primary-500 rounded-t-full"
-                                        />
-                                    )}
+                                    <item.icon className="h-4.5 w-4.5" />
+                                    <span>{item.label}</span>
                                 </Link>
                             </li>
                         );
@@ -182,14 +174,14 @@ export function Navbar() {
                         <Link
                             href="/dashboard/settings"
                             className={cn(
-                                "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-300",
+                                "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-semibold transition",
                                 pathname === "/dashboard/settings"
-                                    ? "text-primary-600 dark:text-primary-400"
-                                    : "text-surface-200/50"
+                                    ? "bg-black text-white dark:bg-white dark:text-black"
+                                    : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
                             )}
                         >
-                            <User className="w-6 h-6" />
-                            <span className="text-xs font-medium">Profile</span>
+                            <User className="h-4.5 w-4.5" />
+                            <span>Profile</span>
                         </Link>
                     </li>
                 </ul>
@@ -197,4 +189,3 @@ export function Navbar() {
         </>
     );
 }
-

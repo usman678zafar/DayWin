@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -177,7 +177,7 @@ export default function CalendarPage() {
         <div className="page-container">
             <div className="page-header">
                 <h1 className="page-title">Calendar</h1>
-                <p className="page-subtitle">View your habit history at a glance</p>
+                <p className="page-subtitle">Track completion patterns across every day and spot streak trends.</p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
@@ -207,7 +207,7 @@ export default function CalendarPage() {
                 </div>
 
                 {/* Selected Date Details */}
-                <div className="card p-6 h-fit">
+                <div className="card p-6 h-fit sticky top-6">
                     <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
                         {format(selectedDate, "EEEE, MMMM d")}
                     </h3>
@@ -259,3 +259,5 @@ export default function CalendarPage() {
         </div>
     );
 }
+
+

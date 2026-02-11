@@ -21,10 +21,10 @@ export function Modal({
     size = "md",
 }: ModalProps) {
     const sizes = {
-        sm: "max-w-sm",
-        md: "max-w-md",
-        lg: "max-w-lg",
-        xl: "max-w-xl",
+        sm: "sm:max-w-sm",
+        md: "sm:max-w-md",
+        lg: "sm:max-w-lg",
+        xl: "sm:max-w-xl",
     };
 
     return (
@@ -41,23 +41,23 @@ export function Modal({
                     />
 
                     {/* Modal */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             transition={{ type: "spring", duration: 0.5 }}
                             className={cn(
-                                "w-full bg-white dark:bg-surface-900 rounded-2xl shadow-2xl",
+                                "w-full bg-white dark:bg-surface-900 shadow-2xl",
                                 "border border-surface-200 dark:border-surface-800",
-                                "overflow-hidden",
+                                "max-h-[92svh] overflow-hidden rounded-t-2xl sm:rounded-2xl",
                                 sizes[size]
                             )}
                         >
                             {/* Header */}
                             {title && (
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-surface-200 dark:border-surface-800">
-                                    <h2 className="text-xl font-semibold text-surface-900 dark:text-white">
+                                <div className="flex items-center justify-between border-b border-surface-200 px-4 py-3 dark:border-surface-800 sm:px-6 sm:py-4">
+                                    <h2 className="text-lg font-semibold text-surface-900 dark:text-white sm:text-xl">
                                         {title}
                                     </h2>
                                     <button
@@ -70,7 +70,9 @@ export function Modal({
                             )}
 
                             {/* Content */}
-                            <div className="p-6">{children}</div>
+                            <div className="max-h-[calc(92svh-72px)] overflow-y-auto p-4 sm:max-h-[calc(92svh-88px)] sm:p-6">
+                                {children}
+                            </div>
                         </motion.div>
                     </div>
                 </Fragment>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -20,8 +20,6 @@ import {
 import { TrendingUp, Award, Target, Flame, Calendar, Zap } from "lucide-react";
 import { QuickStats } from "@/components/dashboard/QuickStats";
 import { cn } from "@/lib/utils";
-
-const COLORS = ["#a855f7", "#06b6d4", "#22c55e", "#f97316", "#ef4444", "#eab308"];
 
 export default function StatsPage() {
     const [stats, setStats] = useState<any>(null);
@@ -69,7 +67,7 @@ export default function StatsPage() {
         <div className="page-container">
             <div className="page-header">
                 <h1 className="page-title">Statistics</h1>
-                <p className="page-subtitle">Track your progress and insights</p>
+                <p className="page-subtitle">Deep performance metrics across habits, streaks, and consistency.</p>
             </div>
 
             {/* Overview Stats */}
@@ -213,25 +211,25 @@ export default function StatsPage() {
                     <div className="grid grid-cols-2 gap-4">
                         {[
                             {
-                                icon: "🔥",
+                                icon: "ðŸ”¥",
                                 title: "On Fire",
                                 description: "7 day streak",
                                 unlocked: (stats?.overview?.currentStreak || 0) >= 7,
                             },
                             {
-                                icon: "⚡",
+                                icon: "âš¡",
                                 title: "Momentum",
                                 description: "30 day streak",
                                 unlocked: (stats?.overview?.longestStreak || 0) >= 30,
                             },
                             {
-                                icon: "🎯",
+                                icon: "ðŸŽ¯",
                                 title: "Focused",
                                 description: "100% weekly",
                                 unlocked: (stats?.overview?.weeklyCompletionRate || 0) === 100,
                             },
                             {
-                                icon: "🏆",
+                                icon: "ðŸ†",
                                 title: "Champion",
                                 description: "100 completions",
                                 unlocked: (stats?.overview?.totalCompletions || 0) >= 100,
@@ -261,3 +259,5 @@ export default function StatsPage() {
         </div>
     );
 }
+
+
