@@ -70,16 +70,6 @@ export default function SignupPage() {
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        setIsLoading(true);
-        try {
-            await signIn("google", { callbackUrl: "/dashboard" });
-        } catch {
-            toast.error("Something went wrong");
-            setIsLoading(false);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-white text-black">
             <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 py-10 md:grid-cols-2 md:px-8">
@@ -179,16 +169,6 @@ export default function SignupPage() {
                             Create account
                         </Button>
                     </form>
-
-                    <div className="my-6 flex items-center gap-3">
-                        <span className="h-px flex-1 bg-black/15" />
-                        <span className="text-xs uppercase tracking-[0.12em] text-black/50">or continue with</span>
-                        <span className="h-px flex-1 bg-black/15" />
-                    </div>
-
-                    <Button type="button" variant="secondary" onClick={handleGoogleSignIn} disabled={isLoading} className="w-full">
-                        Continue with Google
-                    </Button>
 
                     <p className="mt-6 text-center text-xs text-black/50">
                         By creating an account, you agree to our{" "}

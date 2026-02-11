@@ -25,7 +25,7 @@ export default function LoginPage() {
 
         try {
             const result = await signIn("credentials", {
-                email: formData.email,
+                email: formData.email.trim().toLowerCase(),
                 password: formData.password,
                 redirect: false,
             });
@@ -40,16 +40,6 @@ export default function LoginPage() {
         } catch {
             toast.error("Something went wrong");
         } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        setIsLoading(true);
-        try {
-            await signIn("google", { callbackUrl: "/dashboard" });
-        } catch {
-            toast.error("Something went wrong");
             setIsLoading(false);
         }
     };
@@ -130,15 +120,6 @@ export default function LoginPage() {
                         </Button>
                     </form>
 
-                    <div className="my-6 flex items-center gap-3">
-                        <span className="h-px flex-1 bg-black/15" />
-                        <span className="text-xs uppercase tracking-[0.12em] text-black/50">or continue with</span>
-                        <span className="h-px flex-1 bg-black/15" />
-                    </div>
-
-                    <Button type="button" variant="secondary" onClick={handleGoogleSignIn} disabled={isLoading} className="w-full">
-                        Continue with Google
-                    </Button>
                 </section>
             </div>
         </div>

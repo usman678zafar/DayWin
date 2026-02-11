@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import clientPromise from "./mongodb-client";
@@ -16,10 +15,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: "/login",
     },
     providers: [
-        Google({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        }),
         Credentials({
             name: "credentials",
             credentials: {
@@ -27,27 +22,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
-                    throw new Error("Invalid credentials");
+                const rawEmail = credentials?.email as string | undefined;
+                const rawPassword = credentials?.password as string | undefined;
+
+                if (!rawEmail || !rawPassword) {
+                    return null;
                 }
 
                 await dbConnect();
 
-                const user = await User.findOne({ email: credentials.email }).select(
+                const email = rawEmail.trim().toLowerCase();
+
+                const user = await User.findOne({ email }).select(
                     "+password"
                 );
 
                 if (!user || !user.password) {
-                    throw new Error("Invalid credentials");
+                    return null;
                 }
 
                 const isCorrectPassword = await bcrypt.compare(
-                    credentials.password as string,
+                    rawPassword,
                     user.password
                 );
 
                 if (!isCorrectPassword) {
-                    throw new Error("Invalid credentials");
+                    return null;
                 }
 
                 return {
