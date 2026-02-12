@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
 
@@ -12,7 +12,7 @@ export function CtaFooter() {
                     <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
                         <div>
                             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-white/70">
-                                DAILY WIN MOBILE TRACKER
+                                DAY WIN MOBILE TRACKER
                             </p>
                             <h2 className="max-w-2xl text-4xl font-black uppercase leading-[0.95] text-white md:text-6xl">
                                 Keep Every Habit
@@ -22,18 +22,12 @@ export function CtaFooter() {
                             <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">
                                 Track routines, protect streaks, and get daily clarity with a focused mobile dashboard built for consistency.
                             </p>
-                            <div className="mt-8 flex flex-wrap gap-4">
+                            <div className="mt-8">
                                 <a
-                                    href="#"
+                                    href="/signup"
                                     className="inline-flex items-center rounded-md border border-white bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-black transition hover:bg-black hover:text-white"
                                 >
-                                    Download App
-                                </a>
-                                <a
-                                    href="#"
-                                    className="inline-flex items-center rounded-md border border-white/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:border-white"
-                                >
-                                    Product Roadmap
+                                    Get Started
                                 </a>
                             </div>
                         </div>
@@ -67,7 +61,7 @@ export function CtaFooter() {
                     <div className="mt-10 border-t border-white/20 pt-6">
                         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                             <DailyWinLogo
-                                label="DAILY WIN"
+                                label="DAY WIN"
                                 iconClassName="h-9 w-9 rounded-md"
                                 textClassName="text-xs font-semibold uppercase tracking-[0.14em] text-white"
                             />
@@ -76,7 +70,7 @@ export function CtaFooter() {
                                 <a href="#" className="transition hover:text-white">X</a>
                                 <a href="#" className="transition hover:text-white">YouTube</a>
                             </div>
-                            <p className="text-xs text-white/60">© 2026 Daily Win. All rights reserved.</p>
+                            <p className="text-xs text-white/60">Â© 2026 DAY WIN. All rights reserved.</p>
                         </div>
                     </div>
                 </div>
@@ -84,3 +78,4 @@ export function CtaFooter() {
         </footer>
     );
 }
+

@@ -11,7 +11,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, error, leftIcon, rightIcon, ...props }, ref) => {
+    ({ className, label, error, leftIcon, rightIcon, style, ...props }, ref) => {
+        const inputStyle: React.CSSProperties = {
+            ...(leftIcon ? { paddingLeft: "3.5rem" } : {}),
+            ...(rightIcon ? { paddingRight: "3.5rem" } : {}),
+            ...style,
+        };
+
         return (
             <div className="w-full">
                 {label && (
@@ -21,7 +27,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 )}
                 <div className="relative">
                     {leftIcon && (
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-200/50">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-center text-surface-200/50">
                             {leftIcon}
                         </div>
                     )}
@@ -29,15 +35,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         className={cn(
                             "input-field",
-                            leftIcon && "pl-12",
-                            rightIcon && "pr-12",
                             error && "border-red-500 focus:border-red-500 focus:ring-red-500/50",
                             className
                         )}
+                        style={inputStyle}
                         {...props}
                     />
                     {rightIcon && (
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-200/50">
+                        <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-center text-surface-200/50">
                             {rightIcon}
                         </div>
                     )}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -76,7 +76,7 @@ export default function SignupPage() {
                 <section className="hidden rounded-2xl border border-black/10 bg-black p-10 text-white md:block">
                     <DailyWinLogo
                         className="mb-8"
-                        label="DAILY WIN"
+                        label="DAY WIN"
                         textClassName="text-sm tracking-[0.15em] text-white"
                     />
                     <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
@@ -97,7 +97,7 @@ export default function SignupPage() {
                 <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8">
                     <div className="mb-8 flex items-center justify-between">
                         <DailyWinLogo
-                            label="DAILY WIN"
+                            label="DAY WIN"
                             iconClassName="h-7 w-7 rounded-sm"
                             textClassName="text-[11px] tracking-[0.14em] text-black"
                         />
@@ -113,7 +113,7 @@ export default function SignupPage() {
                         <Input
                             label="Full Name"
                             type="text"
-                            placeholder="John Doe"
+                            placeholder="Enter your full name"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             leftIcon={<User className="h-5 w-5" />}
@@ -123,7 +123,7 @@ export default function SignupPage() {
                         <Input
                             label="Email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder="Enter your email address"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             leftIcon={<Mail className="h-5 w-5" />}
@@ -134,7 +134,7 @@ export default function SignupPage() {
                             <Input
                                 label="Password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Create a strong password"
+                                placeholder="Create a password (8+ characters)"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 leftIcon={<Lock className="h-5 w-5" />}
@@ -180,3 +180,4 @@ export default function SignupPage() {
         </div>
     );
 }
+

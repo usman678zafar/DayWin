@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ export function Navbar() {
             <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-72 flex-col border-r border-black/10 bg-white/85 px-5 py-5 backdrop-blur-xl dark:border-white/10 dark:bg-[#070b14]/85 z-40">
                 <Link href="/" className="mb-7">
                     <DailyWinLogo
-                        label="DAILY WIN"
+                        label="DAY WIN"
                         iconClassName="h-10 w-10 rounded-lg"
                         textClassName="text-sm font-bold tracking-[0.14em] text-black dark:text-white"
                     />
@@ -189,3 +189,4 @@ export function Navbar() {
         </>
     );
 }
+

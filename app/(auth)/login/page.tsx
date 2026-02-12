@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -50,7 +50,7 @@ export default function LoginPage() {
                 <section className="hidden rounded-2xl border border-black/10 bg-black p-10 text-white md:block">
                     <DailyWinLogo
                         className="mb-8"
-                        label="DAILY WIN"
+                        label="DAY WIN"
                         textClassName="text-sm tracking-[0.15em] text-white"
                     />
                     <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8">
                     <div className="mb-8 flex items-center justify-between">
                         <DailyWinLogo
-                            label="DAILY WIN"
+                            label="DAY WIN"
                             iconClassName="h-7 w-7 rounded-sm"
                             textClassName="text-[11px] tracking-[0.14em] text-black"
                         />
@@ -87,7 +87,7 @@ export default function LoginPage() {
                         <Input
                             label="Email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder="Enter your email address"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             leftIcon={<Mail className="h-5 w-5" />}
@@ -97,7 +97,7 @@ export default function LoginPage() {
                         <Input
                             label="Password"
                             type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
+                            placeholder="Enter your account password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             leftIcon={<Lock className="h-5 w-5" />}
@@ -125,3 +125,4 @@ export default function LoginPage() {
         </div>
     );
 }
+

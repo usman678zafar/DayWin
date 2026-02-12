@@ -11,7 +11,7 @@ export function DailyWinLogo({
     className,
     textClassName,
     iconClassName,
-    label = "DAILY WIN",
+    label = "DAY WIN",
 }: DailyWinLogoProps) {
     return (
         <div className={cn("inline-flex items-center gap-2.5", className)}>

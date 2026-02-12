@@ -11,7 +11,7 @@ export function Hero() {
                 <div className="rounded-2xl border border-black/10 bg-white p-4 sm:p-6 md:p-8">
                     <div className="mb-8 flex items-center justify-between">
                         <DailyWinLogo
-                            label="DAILY WIN"
+                            label="DAY WIN"
                             iconClassName="h-7 w-7 rounded-sm"
                             textClassName="text-[11px] tracking-[0.14em] text-black"
                         />
@@ -51,18 +51,12 @@ export function Hero() {
                             <p className="mt-5 max-w-[560px] text-base leading-relaxed text-black/70 md:text-xl">
                                 Build streaks, log routines, and view your progress in one focused mobile-first dashboard.
                             </p>
-                            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <div className="mt-7">
                                 <a
-                                    href="#"
-                                    className="w-full border border-black bg-black px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-white hover:bg-white hover:text-black sm:w-auto"
+                                    href="/signup"
+                                    className="inline-flex w-full items-center justify-center border border-black bg-black px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black sm:w-auto"
                                 >
-                                    Start Tracking
-                                </a>
-                                <a
-                                    href="#"
-                                    className="w-full border border-black/30 px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-black hover:border-black sm:w-auto"
-                                >
-                                    View Demo
+                                    Get Started
                                 </a>
                             </div>
                         </div>
