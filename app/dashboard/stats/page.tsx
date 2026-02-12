@@ -1,10 +1,10 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-    BarChart,
-    Bar,
+    AreaChart,
+    Area,
     XAxis,
     YAxis,
     Tooltip,
@@ -12,26 +12,36 @@ import {
     PieChart,
     Pie,
     Cell,
-    LineChart,
-    Line,
-    Area,
-    AreaChart,
 } from "recharts";
-import { TrendingUp, Award, Target, Flame, Calendar, Zap } from "lucide-react";
+import { Flame } from "lucide-react";
+import { subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { QuickStats } from "@/components/dashboard/QuickStats";
+import { DateRangePicker, DateRange } from "@/components/habits/DateRangePicker";
 import { cn } from "@/lib/utils";
+
+const defaultRange: DateRange = {
+    startDate: subDays(new Date(), 29),
+    endDate: new Date(),
+    label: "Last 30 Days",
+};
 
 export default function StatsPage() {
     const [stats, setStats] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [dateRange, setDateRange] = useState<DateRange>(defaultRange);
 
     useEffect(() => {
         fetchStats();
-    }, []);
+    }, [dateRange]);
 
     const fetchStats = async () => {
+        setIsLoading(true);
         try {
-            const response = await fetch("/api/stats");
+            const params = new URLSearchParams({
+                startDate: dateRange.startDate.toISOString(),
+                endDate: dateRange.endDate.toISOString(),
+            });
+            const response = await fetch(`/api/stats?${params}`);
             const data = await response.json();
             setStats(data);
         } catch (error) {
@@ -66,8 +76,13 @@ export default function StatsPage() {
     return (
         <div className="page-container">
             <div className="page-header">
-                <h1 className="page-title">Statistics</h1>
-                <p className="page-subtitle">Deep performance metrics across habits, streaks, and consistency.</p>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 className="page-title">Statistics</h1>
+                        <p className="page-subtitle">Deep performance metrics across habits, streaks, and consistency.</p>
+                    </div>
+                    <DateRangePicker value={dateRange} onChange={setDateRange} />
+                </div>
             </div>
 
             {/* Overview Stats */}
@@ -80,7 +95,7 @@ export default function StatsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="card p-6"
                 >
-                    <h3 className="card-title mb-6">Weekly Progress</h3>
+                    <h3 className="card-title mb-6">Progress Over Time</h3>
                     <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={stats?.dailyData || []}>
@@ -117,8 +132,8 @@ export default function StatsPage() {
                     transition={{ delay: 0.1 }}
                     className="card p-6"
                 >
-                    <h3 className="card-title mb-6">Completion Rate</h3>
-                    <div className="h-64 flex items-center justify-center">
+                    <h3 className="card-title mb-6">Completion Rate ({dateRange.label})</h3>
+                    <div className="h-64 flex items-center justify-center relative">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -142,7 +157,7 @@ export default function StatsPage() {
                             <div className="text-4xl font-bold text-surface-900 dark:text-white">
                                 {stats?.overview?.weeklyCompletionRate || 0}%
                             </div>
-                            <div className="text-sm text-surface-200/50">This week</div>
+                            <div className="text-sm text-surface-200/50">Completion</div>
                         </div>
                     </div>
                 </motion.div>
@@ -211,25 +226,25 @@ export default function StatsPage() {
                     <div className="grid grid-cols-2 gap-4">
                         {[
                             {
-                                icon: "ðŸ”¥",
+                                icon: "🔥",
                                 title: "On Fire",
                                 description: "7 day streak",
                                 unlocked: (stats?.overview?.currentStreak || 0) >= 7,
                             },
                             {
-                                icon: "âš¡",
+                                icon: "⚡",
                                 title: "Momentum",
                                 description: "30 day streak",
                                 unlocked: (stats?.overview?.longestStreak || 0) >= 30,
                             },
                             {
-                                icon: "ðŸŽ¯",
+                                icon: "🎯",
                                 title: "Focused",
                                 description: "100% weekly",
                                 unlocked: (stats?.overview?.weeklyCompletionRate || 0) === 100,
                             },
                             {
-                                icon: "ðŸ†",
+                                icon: "🏆",
                                 title: "Champion",
                                 description: "100 completions",
                                 unlocked: (stats?.overview?.totalCompletions || 0) >= 100,
@@ -259,5 +274,3 @@ export default function StatsPage() {
         </div>
     );
 }
-
-

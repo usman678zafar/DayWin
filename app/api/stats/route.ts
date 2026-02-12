@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import Habit from "@/models/Habit";
 import HabitLog from "@/models/HabitLog";
-import { startOfDay, endOfDay, subDays, format } from "date-fns";
+import { startOfDay, endOfDay, subDays, format, differenceInDays } from "date-fns";
 
 export async function GET(req: NextRequest) {
     try {
@@ -15,9 +15,14 @@ export async function GET(req: NextRequest) {
 
         await dbConnect();
 
+        const { searchParams } = new URL(req.url);
+        const startDateParam = searchParams.get("startDate");
+        const endDateParam = searchParams.get("endDate");
+
         const today = new Date();
-        const thirtyDaysAgo = subDays(today, 30);
-        const sevenDaysAgo = subDays(today, 7);
+        const endDate = endDateParam ? new Date(endDateParam) : today;
+        const startDate = startDateParam ? new Date(startDateParam) : subDays(today, 30);
+        const daysDiff = differenceInDays(endDate, startDate) + 1;
 
         // Get all habits
         const habits = await Habit.find({
@@ -25,12 +30,12 @@ export async function GET(req: NextRequest) {
             isArchived: false,
         });
 
-        // Get logs for the last 30 days
+        // Get logs for the selected date range
         const logs = await HabitLog.find({
             userId: session.user.id,
             date: {
-                $gte: startOfDay(thirtyDaysAgo),
-                $lte: endOfDay(today),
+                $gte: startOfDay(startDate),
+                $lte: endOfDay(endDate),
             },
         });
 
@@ -66,21 +71,21 @@ export async function GET(req: NextRequest) {
             0
         );
 
-        // Total completions
+        // Total completions in range
         const totalCompletions = logs.filter((log) => log.completed).length;
 
-        // Weekly completion rate
-        const weeklyLogs = logs.filter((log) => log.date >= startOfDay(sevenDaysAgo));
-        const weeklyCompleted = weeklyLogs.filter((log) => log.completed).length;
-        const weeklyTotal = habits.length * 7;
-        const weeklyCompletionRate = weeklyTotal > 0
-            ? Math.round((weeklyCompleted / weeklyTotal) * 100)
+        // Completion rate for the selected range
+        const rangeCompletedCount = logs.filter((log) => log.completed).length;
+        const rangeTotalPossible = habits.length * daysDiff;
+        const weeklyCompletionRate = rangeTotalPossible > 0
+            ? Math.round((rangeCompletedCount / rangeTotalPossible) * 100)
             : 0;
 
-        // Daily completion data for chart
+        // Daily completion data for chart (last 7 days or based on range)
+        const chartDays = Math.min(daysDiff, 14); // Max 14 days for chart
         const dailyData = [];
-        for (let i = 6; i >= 0; i--) {
-            const date = subDays(today, i);
+        for (let i = chartDays - 1; i >= 0; i--) {
+            const date = subDays(endDate, i);
             const dayLogs = logs.filter(
                 (log) =>
                     log.date >= startOfDay(date) &&
@@ -88,7 +93,7 @@ export async function GET(req: NextRequest) {
             );
             const completed = dayLogs.filter((log) => log.completed).length;
             dailyData.push({
-                date: format(date, "EEE"),
+                date: format(date, "MMM d"),
                 completed,
                 total: habits.length,
                 percentage: habits.length > 0 ? Math.round((completed / habits.length) * 100) : 0,
@@ -102,13 +107,14 @@ export async function GET(req: NextRequest) {
                     (log) => log.habitId.toString() === habit._id.toString()
                 );
                 const completed = habitLogs.filter((log) => log.completed).length;
+                const totalDays = daysDiff;
                 return {
                     id: habit._id,
                     title: habit.title,
                     icon: habit.icon,
                     color: habit.color,
-                    completionRate: habitLogs.length > 0
-                        ? Math.round((completed / habitLogs.length) * 100)
+                    completionRate: totalDays > 0
+                        ? Math.round((completed / totalDays) * 100)
                         : 0,
                     streak: habit.streak.current,
                 };

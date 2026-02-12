@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MoreVertical, Flame, Edit, Trash2, RotateCcw } from "lucide-react";
+import { Check, MoreVertical, Flame, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HabitWithLog, habitColors } from "@/types";
+import { HabitIcon } from "./HabitIcon";
 import { fireSmallConfetti, fireStreakConfetti } from "@/lib/confetti";
 
 interface HabitCardProps {
@@ -13,6 +14,8 @@ interface HabitCardProps {
     onEdit: () => void;
     onDelete: () => void;
     index: number;
+    disabled?: boolean;
+    isCompleted?: boolean;
 }
 
 export function HabitCard({
@@ -21,8 +24,10 @@ export function HabitCard({
     onEdit,
     onDelete,
     index,
+    disabled = false,
+    isCompleted: isCompletedProp,
 }: HabitCardProps) {
-    const [isCompleted, setIsCompleted] = useState(habit.todayLog?.completed ?? false);
+    const [isCompleted, setIsCompleted] = useState(isCompletedProp ?? habit.todayLog?.completed ?? false);
     const [isLoading, setIsLoading] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [showStreak, setShowStreak] = useState(false);
@@ -30,7 +35,7 @@ export function HabitCard({
     const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
     const handleComplete = async () => {
-        if (isLoading) return;
+        if (isLoading || disabled) return;
 
         setIsLoading(true);
         const newCompleted = !isCompleted;
@@ -39,10 +44,9 @@ export function HabitCard({
         try {
             const result = await onComplete(newCompleted);
 
-            if (newCompleted) {
+            if (newCompleted && !disabled) {
                 fireSmallConfetti();
 
-                // Check for streak milestone
                 if (result.streak?.current && result.streak.current % 7 === 0) {
                     fireStreakConfetti();
                     setShowStreak(true);
@@ -61,7 +65,7 @@ export function HabitCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="habit-card group"
+            className={cn("habit-card group", disabled && "opacity-60")}
         >
             {/* Streak celebration overlay */}
             <AnimatePresence>
@@ -70,17 +74,16 @@ export function HabitCard({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-orange-500/90 to-red-500/90 rounded-2xl z-10"
+                        className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500/90 to-red-500/90"
                     >
                         <div className="text-center text-white">
                             <motion.div
                                 animate={{ scale: [1, 1.2, 1] }}
                                 transition={{ repeat: Infinity, duration: 0.5 }}
-                                className="text-5xl mb-2"
                             >
-                                🔥
+                                <Flame className="mx-auto h-12 w-12" />
                             </motion.div>
-                            <p className="text-xl font-bold">{habit.streak.current} Day Streak!</p>
+                            <p className="mt-2 text-xl font-bold">{habit.streak.current} Day Streak!</p>
                         </div>
                     </motion.div>
                 )}
@@ -89,16 +92,17 @@ export function HabitCard({
             <div className="flex items-center gap-4">
                 {/* Checkbox */}
                 <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={!disabled ? { scale: 1.1 } : undefined}
+                    whileTap={!disabled ? { scale: 0.9 } : undefined}
                     onClick={handleComplete}
-                    disabled={isLoading}
+                    disabled={isLoading || disabled}
                     className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
+                        "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl",
                         "border-2 transition-all duration-300",
                         isCompleted
                             ? `bg-gradient-to-br ${colors.gradient} border-transparent shadow-lg`
-                            : "border-surface-300 dark:border-surface-800 hover:border-primary-400"
+                            : "border-surface-300 hover:border-primary-400 dark:border-surface-800",
+                        disabled && "cursor-not-allowed"
                     )}
                 >
                     <AnimatePresence mode="wait">
@@ -109,7 +113,7 @@ export function HabitCard({
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
                             >
-                                <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                                <Check className="h-6 w-6 text-white" strokeWidth={3} />
                             </motion.div>
                         ) : (
                             <motion.div
@@ -117,7 +121,7 @@ export function HabitCard({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
-                                className="w-6 h-6"
+                                className="h-6 w-6"
                             />
                         )}
                     </AnimatePresence>
@@ -126,33 +130,31 @@ export function HabitCard({
                 {/* Icon */}
                 <div
                     className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
+                        "flex h-12 w-12 items-center justify-center rounded-xl",
                         colors.bg
                     )}
                 >
-                    {habit.icon}
+                    <HabitIcon icon={habit.icon} size="lg" className={colors.text} />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                     <h3
                         className={cn(
-                            "font-semibold text-surface-900 dark:text-white transition-all duration-300",
+                            "font-semibold text-surface-900 transition-all duration-300 dark:text-white",
                             isCompleted && "line-through opacity-60"
                         )}
                     >
                         {habit.title}
                     </h3>
-                    <div className="flex items-center gap-3 mt-1">
-                        {/* Category badge */}
+                    <div className="mt-1 flex items-center gap-3">
                         <span className={cn("text-xs font-medium", colors.text)}>
                             {habit.category}
                         </span>
 
-                        {/* Streak */}
                         {habit.streak.current > 0 && (
                             <div className="flex items-center gap-1 text-orange-500">
-                                <Flame className="w-3.5 h-3.5" />
+                                <Flame className="h-3.5 w-3.5" />
                                 <span className="text-xs font-semibold">{habit.streak.current}</span>
                             </div>
                         )}
@@ -163,9 +165,9 @@ export function HabitCard({
                 <div className="relative">
                     <button
                         onClick={() => setShowMenu(!showMenu)}
-                        className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-surface-100 dark:hover:bg-surface-800 transition-all"
+                        className="rounded-lg p-2 opacity-0 transition-all hover:bg-surface-100 group-hover:opacity-100 dark:hover:bg-surface-800"
                     >
-                        <MoreVertical className="w-5 h-5 text-surface-200/50" />
+                        <MoreVertical className="h-5 w-5 text-surface-400" />
                     </button>
 
                     <AnimatePresence>
@@ -179,16 +181,16 @@ export function HabitCard({
                                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-surface-900 rounded-xl shadow-xl border border-surface-200 dark:border-surface-800 z-20 overflow-hidden"
+                                    className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900"
                                 >
                                     <button
                                         onClick={() => {
                                             setShowMenu(false);
                                             onEdit();
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                                        className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-100 dark:hover:bg-surface-800"
                                     >
-                                        <Edit className="w-4 h-4 text-surface-200/50" />
+                                        <Edit className="h-4 w-4 text-surface-400" />
                                         <span className="text-surface-900 dark:text-white">Edit</span>
                                     </button>
                                     <button
@@ -196,9 +198,9 @@ export function HabitCard({
                                             setShowMenu(false);
                                             onDelete();
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors"
+                                        className="flex w-full items-center gap-3 px-4 py-3 text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash2 className="h-4 w-4" />
                                         <span>Delete</span>
                                     </button>
                                 </motion.div>
@@ -211,13 +213,13 @@ export function HabitCard({
             {/* Progress bar for target count > 1 */}
             {habit.targetCount > 1 && (
                 <div className="mt-4">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-surface-200/50">Progress</span>
+                    <div className="mb-2 flex items-center justify-between text-sm">
+                        <span className="text-surface-400">Progress</span>
                         <span className={colors.text}>
                             {habit.todayLog?.count ?? 0} / {habit.targetCount}
                         </span>
                     </div>
-                    <div className="h-2 bg-surface-100 dark:bg-surface-800 rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{
