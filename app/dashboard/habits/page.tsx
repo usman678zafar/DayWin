@@ -30,26 +30,18 @@ import {
     Trash2,
     Loader2,
     CalendarDays,
-    LayoutGrid,
-    CalendarRange,
+    Calendar,
+    Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
-import { HabitWithLog, Habit, habitColors } from "@/types";
+import { HabitWithLog, Habit, habitColors, HabitType } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
 import toast from "react-hot-toast";
 
 // Types
-type ViewMode = "weekly" | "monthly" | "custom";
-
-interface DateRange {
-    startDate: Date;
-    endDate: Date;
-    label: string;
-}
-
 interface DayLog {
     date: Date;
     completed: boolean;
@@ -61,63 +53,21 @@ interface HabitData {
     completionRate: number;
 }
 
-// Preset ranges for custom view
-const presetRanges: { label: string; getRange: () => DateRange }[] = [
-    {
-        label: "Last 7 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 6),
-            endDate: new Date(),
-            label: "Last 7 Days",
-        }),
-    },
-    {
-        label: "Last 14 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 13),
-            endDate: new Date(),
-            label: "Last 14 Days",
-        }),
-    },
-    {
-        label: "Last 30 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 29),
-            endDate: new Date(),
-            label: "Last 30 Days",
-        }),
-    },
-    {
-        label: "This Week",
-        getRange: () => ({
-            startDate: startOfWeek(new Date(), { weekStartsOn: 0 }),
-            endDate: endOfWeek(new Date(), { weekStartsOn: 0 }),
-            label: "This Week",
-        }),
-    },
-    {
-        label: "This Month",
-        getRange: () => ({
-            startDate: startOfMonth(new Date()),
-            endDate: endOfMonth(new Date()),
-            label: "This Month",
-        }),
-    },
+// Habit type tabs configuration
+const habitTypeTabs: { value: HabitType; label: string; icon: React.ElementType; periodDays: number }[] = [
+    { value: "weekly", label: "Weekly", icon: CalendarDays, periodDays: 7 },
+    { value: "monthly", label: "Monthly", icon: Calendar, periodDays: 30 },
+    { value: "custom", label: "Custom", icon: Settings, periodDays: 0 },
 ];
 
 export default function HabitsPage() {
     const { habits, fetchHabits, addHabit, updateHabit, deleteHabit } = useHabits();
 
-    // View mode state
-    const [viewMode, setViewMode] = useState<ViewMode>("weekly");
+    // Active habit type tab
+    const [activeType, setActiveType] = useState<HabitType>("weekly");
 
     // Date navigation state
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [customRange, setCustomRange] = useState<DateRange>({
-        startDate: subDays(new Date(), 6),
-        endDate: new Date(),
-        label: "Last 7 Days",
-    });
 
     // Data state
     const [habitsData, setHabitsData] = useState<HabitData[]>([]);
@@ -129,11 +79,24 @@ export default function HabitsPage() {
     const [editingHabit, setEditingHabit] = useState<HabitWithLog | null>(null);
     const [deletingHabit, setDeletingHabit] = useState<HabitWithLog | null>(null);
     const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
-    const [showRangePicker, setShowRangePicker] = useState(false);
 
-    // Calculate date range based on view mode
+    // Filter habits by active type
+    const filteredHabits = useMemo(() => {
+        return habits.filter((h) => (h.habitType || "weekly") === activeType);
+    }, [habits, activeType]);
+
+    // Count habits by type
+    const habitCounts = useMemo(() => {
+        return {
+            weekly: habits.filter((h) => (h.habitType || "weekly") === "weekly").length,
+            monthly: habits.filter((h) => h.habitType === "monthly").length,
+            custom: habits.filter((h) => h.habitType === "custom").length,
+        };
+    }, [habits]);
+
+    // Calculate date range based on active type
     const dateRange = useMemo(() => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 return {
                     start: startOfWeek(currentDate, { weekStartsOn: 0 }),
@@ -145,11 +108,18 @@ export default function HabitsPage() {
                     end: endOfMonth(currentDate),
                 };
             case "custom":
-                return { start: customRange.startDate, end: customRange.endDate };
+                // For custom, show last 14 days by default (can be adjusted per habit)
+                return {
+                    start: subDays(currentDate, 13),
+                    end: currentDate,
+                };
             default:
-                return { start: currentDate, end: currentDate };
+                return {
+                    start: startOfWeek(currentDate, { weekStartsOn: 0 }),
+                    end: endOfWeek(currentDate, { weekStartsOn: 0 }),
+                };
         }
-    }, [viewMode, currentDate, customRange]);
+    }, [activeType, currentDate]);
 
     // Generate array of dates
     const days = useMemo(() => {
@@ -166,14 +136,14 @@ export default function HabitsPage() {
         fetchHabits().finally(() => setIsLoading(false));
     }, [fetchHabits]);
 
-    // Fetch logs when date range or habits change
+    // Fetch logs when date range or filtered habits change
     useEffect(() => {
-        if (habits.length > 0) {
+        if (filteredHabits.length > 0) {
             fetchLogs();
         } else {
             setHabitsData([]);
         }
-    }, [dateRange, habits]);
+    }, [dateRange, filteredHabits]);
 
     const fetchLogs = async () => {
         setIsLoadingLogs(true);
@@ -184,7 +154,7 @@ export default function HabitsPage() {
             const data = await response.json();
             const logs = data.logs || [];
 
-            const habitsWithData: HabitData[] = habits.map((habit) => {
+            const habitsWithData: HabitData[] = filteredHabits.map((habit) => {
                 const habitLogs: DayLog[] = days.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
@@ -217,27 +187,33 @@ export default function HabitsPage() {
 
     // Navigation handlers
     const goToPrevious = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 setCurrentDate(subWeeks(currentDate, 1));
                 break;
             case "monthly":
                 setCurrentDate(subMonths(currentDate, 1));
                 break;
-            default:
+            case "custom":
+                setCurrentDate(subDays(currentDate, 14));
                 break;
         }
     };
 
     const goToNext = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 setCurrentDate(addWeeks(currentDate, 1));
                 break;
             case "monthly":
                 setCurrentDate(addMonths(currentDate, 1));
                 break;
-            default:
+            case "custom":
+                const nextDate = new Date(currentDate);
+                nextDate.setDate(nextDate.getDate() + 14);
+                if (nextDate <= new Date()) {
+                    setCurrentDate(nextDate);
+                }
                 break;
         }
     };
@@ -326,15 +302,15 @@ export default function HabitsPage() {
         }
     };
 
-    // Get title based on view mode
+    // Get title based on active type
     const getTitle = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 return `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d, yyyy")}`;
             case "monthly":
                 return format(currentDate, "MMMM yyyy");
             case "custom":
-                return customRange.label;
+                return `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d, yyyy")}`;
             default:
                 return format(currentDate, "MMMM d, yyyy");
         }
@@ -346,12 +322,6 @@ export default function HabitsPage() {
         if (days.length <= 14) return "w-10";
         return "w-8";
     };
-
-    const viewModes = [
-        { value: "weekly" as ViewMode, label: "Weekly", icon: CalendarDays },
-        { value: "monthly" as ViewMode, label: "Monthly", icon: LayoutGrid },
-        { value: "custom" as ViewMode, label: "Custom", icon: CalendarRange },
-    ];
 
     if (isLoading) {
         return (
@@ -369,7 +339,7 @@ export default function HabitsPage() {
                     <div>
                         <h1 className="page-title">Habit Tracker</h1>
                         <p className="page-subtitle">
-                            Track your habits across days, weeks, or custom date ranges.
+                            Organize habits by weekly, monthly, or custom periods.
                         </p>
                     </div>
                     <Button onClick={() => setShowForm(true)}>
@@ -379,117 +349,81 @@ export default function HabitsPage() {
                 </div>
             </div>
 
-            {/* View Mode Selector */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Habit Type Tabs */}
+            <div className="mb-6">
                 <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-white p-1 dark:border-white/10 dark:bg-white/5">
-                    {viewModes.map((mode) => (
+                    {habitTypeTabs.map((tab) => (
                         <button
-                            key={mode.value}
-                            onClick={() => setViewMode(mode.value)}
+                            key={tab.value}
+                            onClick={() => {
+                                setActiveType(tab.value);
+                                setCurrentDate(new Date());
+                            }}
                             className={cn(
-                                "flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition",
-                                viewMode === mode.value
+                                "relative flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition",
+                                activeType === tab.value
                                     ? "bg-black text-white dark:bg-white dark:text-black"
                                     : "text-black/60 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
                             )}
                         >
-                            <mode.icon className="h-4 w-4" />
-                            <span className="hidden sm:inline">{mode.label}</span>
+                            <tab.icon className="h-4 w-4" />
+                            <span>{tab.label}</span>
+                            {habitCounts[tab.value] > 0 && (
+                                <span
+                                    className={cn(
+                                        "ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold",
+                                        activeType === tab.value
+                                            ? "bg-white/20 dark:bg-black/20"
+                                            : "bg-black/10 dark:bg-white/10"
+                                    )}
+                                >
+                                    {habitCounts[tab.value]}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </div>
+            </div>
 
-                {/* Date Navigation */}
-                {viewMode !== "custom" ? (
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={goToPrevious}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </button>
+            {/* Date Navigation */}
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={goToPrevious}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </button>
 
-                        <div className="min-w-[200px] text-center">
-                            <span className="text-lg font-bold text-black dark:text-white">
-                                {getTitle()}
-                            </span>
-                        </div>
-
-                        <button
-                            onClick={goToNext}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
-                        >
-                            <ChevronRight className="h-5 w-5" />
-                        </button>
-
-                        <button
-                            onClick={goToToday}
-                            className="rounded-xl bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
-                        >
-                            Today
-                        </button>
+                    <div className="min-w-[200px] text-center">
+                        <span className="text-lg font-bold text-black dark:text-white">
+                            {getTitle()}
+                        </span>
                     </div>
-                ) : (
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowRangePicker(!showRangePicker)}
-                            className="flex items-center gap-2 rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
-                        >
-                            <CalendarRange className="h-4 w-4" />
-                            <span>{customRange.label}</span>
-                            <ChevronRight
-                                className={cn(
-                                    "h-4 w-4 transition",
-                                    showRangePicker && "rotate-90"
-                                )}
-                            />
-                        </button>
 
-                        <AnimatePresence>
-                            {showRangePicker && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-40"
-                                        onClick={() => setShowRangePicker(false)}
-                                    />
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-surface-900"
-                                    >
-                                        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                            Quick Select
-                                        </p>
-                                        <div className="space-y-2">
-                                            {presetRanges.map((preset) => (
-                                                <button
-                                                    key={preset.label}
-                                                    onClick={() => {
-                                                        setCustomRange(preset.getRange());
-                                                        setShowRangePicker(false);
-                                                    }}
-                                                    className={cn(
-                                                        "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition",
-                                                        customRange.label === preset.label
-                                                            ? "bg-black text-white dark:bg-white dark:text-black"
-                                                            : "bg-black/5 text-black/70 hover:bg-black/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10"
-                                                    )}
-                                                >
-                                                    {preset.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
+                    <button
+                        onClick={goToNext}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        <ChevronRight className="h-5 w-5" />
+                    </button>
+
+                    <button
+                        onClick={goToToday}
+                        className="rounded-xl bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
+                    >
+                        Today
+                    </button>
+                </div>
+
+                {/* Period info */}
+                <div className="text-sm text-black/60 dark:text-white/60">
+                    Tracking {days.length} days
+                </div>
             </div>
 
             {/* Habit Matrix View */}
-            {habits.length > 0 ? (
+            {filteredHabits.length > 0 ? (
                 <>
                     <div className="card overflow-hidden">
                         {isLoadingLogs ? (
@@ -607,14 +541,21 @@ export default function HabitsPage() {
                                                                     <p className="truncate font-semibold text-black dark:text-white">
                                                                         {habit.title}
                                                                     </p>
-                                                                    {habit.streak.current > 0 && (
-                                                                        <div className="flex items-center gap-1 text-orange-500">
-                                                                            <Flame className="h-3 w-3" />
-                                                                            <span className="text-xs font-semibold">
-                                                                                {habit.streak.current}d streak
+                                                                    <div className="flex items-center gap-2">
+                                                                        {habit.streak.current > 0 && (
+                                                                            <div className="flex items-center gap-1 text-orange-500">
+                                                                                <Flame className="h-3 w-3" />
+                                                                                <span className="text-xs font-semibold">
+                                                                                    {habit.streak.current}d
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                        {habit.customPeriodDays && (
+                                                                            <span className="text-[10px] text-black/40 dark:text-white/40">
+                                                                                {habit.customPeriodDays}d period
                                                                             </span>
-                                                                        </div>
-                                                                    )}
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -805,7 +746,7 @@ export default function HabitsPage() {
                                 {habitsData.length}
                             </p>
                             <p className="text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                Total Habits
+                                {activeType} Habits
                             </p>
                         </div>
                         <div className="card p-4 text-center">
@@ -853,17 +794,20 @@ export default function HabitsPage() {
                     className="card py-16 text-center"
                 >
                     <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
-                        <span className="text-4xl">🌱</span>
+                        {activeType === "weekly" && <CalendarDays className="h-10 w-10 text-black/30 dark:text-white/30" />}
+                        {activeType === "monthly" && <Calendar className="h-10 w-10 text-black/30 dark:text-white/30" />}
+                        {activeType === "custom" && <Settings className="h-10 w-10 text-black/30 dark:text-white/30" />}
                     </div>
                     <h3 className="mb-2 text-xl font-bold text-black dark:text-white">
-                        No habits yet
+                        No {activeType} habits yet
                     </h3>
                     <p className="mx-auto mb-6 max-w-sm text-black/60 dark:text-white/60">
-                        Create your first habit and start building daily consistency.
+                        Create a {activeType} habit to track your progress over{" "}
+                        {activeType === "weekly" ? "7" : activeType === "monthly" ? "30" : "custom"} days.
                     </p>
                     <Button onClick={() => setShowForm(true)}>
                         <Plus className="h-5 w-5" />
-                        Create First Habit
+                        Create {activeType.charAt(0).toUpperCase() + activeType.slice(1)} Habit
                     </Button>
                 </motion.div>
             )}

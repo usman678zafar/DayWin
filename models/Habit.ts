@@ -7,6 +7,10 @@ export interface IHabit extends Document {
     icon: string;
     color: string;
     category: string;
+    // NEW: Habit type for grouping
+    habitType: "weekly" | "monthly" | "custom";
+    // NEW: Custom period in days
+    customPeriodDays?: number;
     frequency: {
         type: "daily" | "weekly" | "custom";
         daysOfWeek?: number[];
@@ -55,7 +59,7 @@ const HabitSchema = new Schema<IHabit>(
         },
         icon: {
             type: String,
-            default: "⭐",
+            default: "Star",
         },
         color: {
             type: String,
@@ -64,6 +68,18 @@ const HabitSchema = new Schema<IHabit>(
         category: {
             type: String,
             default: "other",
+        },
+        // NEW: Habit type field
+        habitType: {
+            type: String,
+            enum: ["weekly", "monthly", "custom"],
+            default: "weekly",
+        },
+        // NEW: Custom period days
+        customPeriodDays: {
+            type: Number,
+            min: 1,
+            max: 365,
         },
         frequency: {
             type: {
@@ -118,6 +134,7 @@ const HabitSchema = new Schema<IHabit>(
 
 // Indexes for better query performance
 HabitSchema.index({ userId: 1, isArchived: 1 });
+HabitSchema.index({ userId: 1, habitType: 1 });
 HabitSchema.index({ userId: 1, createdAt: -1 });
 
 export default mongoose.models.Habit || mongoose.model<IHabit>("Habit", HabitSchema);

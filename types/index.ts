@@ -30,6 +30,9 @@ export interface UserStats {
 
 export type HabitFrequency = "daily" | "weekly" | "custom";
 
+// NEW: Habit tracking type
+export type HabitType = "weekly" | "monthly" | "custom";
+
 export type HabitCategory =
     | "health"
     | "fitness"
@@ -49,6 +52,10 @@ export interface Habit {
     icon: string;
     color: HabitColor;
     category: HabitCategory;
+    // NEW: Habit type for grouping
+    habitType: HabitType;
+    // NEW: Custom period in days (for custom type)
+    customPeriodDays?: number;
     frequency: {
         type: HabitFrequency;
         daysOfWeek?: number[];
@@ -172,7 +179,7 @@ export const habitColors: Record<HabitColor, { bg: string; text: string; gradien
     },
 };
 
-// Color options with actual hex values for inline styles (fixes dynamic Tailwind issue)
+// Color options with actual hex values for inline styles
 export const habitColorOptions: {
     value: HabitColor;
     label: string;
@@ -186,167 +193,73 @@ export const habitColorOptions: {
         {
             value: "violet",
             label: "Violet",
-            colors: {
-                from: "#8b5cf6",
-                to: "#7c3aed",
-                bg: "#ede9fe",
-                text: "#7c3aed",
-            },
+            colors: { from: "#8b5cf6", to: "#7c3aed", bg: "#ede9fe", text: "#7c3aed" },
         },
         {
             value: "purple",
             label: "Purple",
-            colors: {
-                from: "#a855f7",
-                to: "#9333ea",
-                bg: "#f3e8ff",
-                text: "#9333ea",
-            },
+            colors: { from: "#a855f7", to: "#9333ea", bg: "#f3e8ff", text: "#9333ea" },
         },
         {
             value: "blue",
             label: "Blue",
-            colors: {
-                from: "#3b82f6",
-                to: "#2563eb",
-                bg: "#dbeafe",
-                text: "#2563eb",
-            },
+            colors: { from: "#3b82f6", to: "#2563eb", bg: "#dbeafe", text: "#2563eb" },
         },
         {
             value: "cyan",
             label: "Cyan",
-            colors: {
-                from: "#06b6d4",
-                to: "#0891b2",
-                bg: "#cffafe",
-                text: "#0891b2",
-            },
+            colors: { from: "#06b6d4", to: "#0891b2", bg: "#cffafe", text: "#0891b2" },
         },
         {
             value: "teal",
             label: "Teal",
-            colors: {
-                from: "#14b8a6",
-                to: "#0d9488",
-                bg: "#ccfbf1",
-                text: "#0d9488",
-            },
+            colors: { from: "#14b8a6", to: "#0d9488", bg: "#ccfbf1", text: "#0d9488" },
         },
         {
             value: "green",
             label: "Green",
-            colors: {
-                from: "#22c55e",
-                to: "#16a34a",
-                bg: "#dcfce7",
-                text: "#16a34a",
-            },
+            colors: { from: "#22c55e", to: "#16a34a", bg: "#dcfce7", text: "#16a34a" },
         },
         {
             value: "lime",
             label: "Lime",
-            colors: {
-                from: "#84cc16",
-                to: "#65a30d",
-                bg: "#ecfccb",
-                text: "#65a30d",
-            },
+            colors: { from: "#84cc16", to: "#65a30d", bg: "#ecfccb", text: "#65a30d" },
         },
         {
             value: "yellow",
             label: "Yellow",
-            colors: {
-                from: "#eab308",
-                to: "#ca8a04",
-                bg: "#fef9c3",
-                text: "#ca8a04",
-            },
+            colors: { from: "#eab308", to: "#ca8a04", bg: "#fef9c3", text: "#ca8a04" },
         },
         {
             value: "orange",
             label: "Orange",
-            colors: {
-                from: "#f97316",
-                to: "#ea580c",
-                bg: "#ffedd5",
-                text: "#ea580c",
-            },
+            colors: { from: "#f97316", to: "#ea580c", bg: "#ffedd5", text: "#ea580c" },
         },
         {
             value: "red",
             label: "Red",
-            colors: {
-                from: "#ef4444",
-                to: "#dc2626",
-                bg: "#fee2e2",
-                text: "#dc2626",
-            },
+            colors: { from: "#ef4444", to: "#dc2626", bg: "#fee2e2", text: "#dc2626" },
         },
         {
             value: "pink",
             label: "Pink",
-            colors: {
-                from: "#ec4899",
-                to: "#db2777",
-                bg: "#fce7f3",
-                text: "#db2777",
-            },
+            colors: { from: "#ec4899", to: "#db2777", bg: "#fce7f3", text: "#db2777" },
         },
         {
             value: "rose",
             label: "Rose",
-            colors: {
-                from: "#f43f5e",
-                to: "#e11d48",
-                bg: "#ffe4e6",
-                text: "#e11d48",
-            },
+            colors: { from: "#f43f5e", to: "#e11d48", bg: "#ffe4e6", text: "#e11d48" },
         },
     ];
 
 // Lucide icon names as string types
 export type HabitIconName =
-    | "Dumbbell"
-    | "Heart"
-    | "Brain"
-    | "Book"
-    | "Droplets"
-    | "Moon"
-    | "Sun"
-    | "Apple"
-    | "Pill"
-    | "Activity"
-    | "Bike"
-    | "Walk"
-    | "Flame"
-    | "Target"
-    | "Trophy"
-    | "Star"
-    | "Zap"
-    | "Coffee"
-    | "Cigarette"
-    | "Wine"
-    | "Music"
-    | "Palette"
-    | "Camera"
-    | "Pen"
-    | "Code"
-    | "Briefcase"
-    | "DollarSign"
-    | "PiggyBank"
-    | "TrendingUp"
-    | "Users"
-    | "MessageCircle"
-    | "Phone"
-    | "Home"
-    | "Sparkles"
-    | "Leaf"
-    | "Smile"
-    | "Clock"
-    | "Calendar"
-    | "CheckCircle"
-    | "ListTodo";
+    | "Dumbbell" | "Heart" | "Brain" | "Book" | "Droplets" | "Moon" | "Sun" | "Apple"
+    | "Pill" | "Activity" | "Bike" | "Walk" | "Flame" | "Target" | "Trophy" | "Star"
+    | "Zap" | "Coffee" | "Cigarette" | "Wine" | "Music" | "Palette" | "Camera" | "Pen"
+    | "Code" | "Briefcase" | "DollarSign" | "PiggyBank" | "TrendingUp" | "Users"
+    | "MessageCircle" | "Phone" | "Home" | "Sparkles" | "Leaf" | "Smile" | "Clock"
+    | "Calendar" | "CheckCircle" | "ListTodo";
 
 export interface HabitIconOption {
     name: HabitIconName;
@@ -356,14 +269,11 @@ export interface HabitIconOption {
 
 // Icon options organized by category
 export const habitIconOptions: HabitIconOption[] = [
-    // Fitness
     { name: "Dumbbell", label: "Workout", category: "fitness" },
     { name: "Activity", label: "Exercise", category: "fitness" },
     { name: "Bike", label: "Cycling", category: "fitness" },
     { name: "Walk", label: "Walking", category: "fitness" },
     { name: "Flame", label: "Cardio", category: "fitness" },
-
-    // Health
     { name: "Heart", label: "Health", category: "health" },
     { name: "Apple", label: "Nutrition", category: "health" },
     { name: "Droplets", label: "Hydration", category: "health" },
@@ -371,20 +281,14 @@ export const habitIconOptions: HabitIconOption[] = [
     { name: "Moon", label: "Sleep", category: "health" },
     { name: "Cigarette", label: "Quit Smoking", category: "health" },
     { name: "Wine", label: "No Alcohol", category: "health" },
-
-    // Mindfulness
     { name: "Brain", label: "Meditation", category: "mindfulness" },
     { name: "Sun", label: "Morning Routine", category: "mindfulness" },
     { name: "Smile", label: "Gratitude", category: "mindfulness" },
     { name: "Leaf", label: "Nature", category: "mindfulness" },
     { name: "Sparkles", label: "Self-care", category: "mindfulness" },
-
-    // Learning
     { name: "Book", label: "Reading", category: "learning" },
     { name: "Pen", label: "Writing", category: "learning" },
     { name: "Code", label: "Coding", category: "learning" },
-
-    // Productivity
     { name: "Target", label: "Goals", category: "productivity" },
     { name: "CheckCircle", label: "Tasks", category: "productivity" },
     { name: "ListTodo", label: "To-do", category: "productivity" },
@@ -392,24 +296,16 @@ export const habitIconOptions: HabitIconOption[] = [
     { name: "Calendar", label: "Planning", category: "productivity" },
     { name: "Briefcase", label: "Work", category: "productivity" },
     { name: "Zap", label: "Energy", category: "productivity" },
-
-    // Creativity
     { name: "Music", label: "Music", category: "creativity" },
     { name: "Palette", label: "Art", category: "creativity" },
     { name: "Camera", label: "Photography", category: "creativity" },
-
-    // Finance
     { name: "DollarSign", label: "Money", category: "finance" },
     { name: "PiggyBank", label: "Savings", category: "finance" },
     { name: "TrendingUp", label: "Investing", category: "finance" },
-
-    // Social
     { name: "Users", label: "Social", category: "social" },
     { name: "MessageCircle", label: "Communication", category: "social" },
     { name: "Phone", label: "Calls", category: "social" },
     { name: "Home", label: "Family", category: "social" },
-
-    // General
     { name: "Star", label: "Favorite", category: "other" },
     { name: "Trophy", label: "Achievement", category: "other" },
     { name: "Coffee", label: "Coffee", category: "other" },
@@ -477,7 +373,7 @@ export const habitIconsByCategory: Record<string, { name: HabitIconName; label: 
     ],
 };
 
-// Keep old emojis for backward compatibility (existing habits in database)
+// Legacy emoji icons for backward compatibility
 export const habitIcons = [
     "💪", "🏃", "📚", "💧", "🧘", "😴", "🥗", "💊",
     "✍️", "🎨", "🎵", "🌱", "🧠", "💰", "📱", "🚭",
@@ -485,7 +381,7 @@ export const habitIcons = [
     "❤️", "🙏", "😊", "🔥", "⭐", "🌈", "🎉", "✨"
 ];
 
-// Updated categories with Lucide icon names (string)
+// Categories with Lucide icon names
 export const habitCategories: { value: HabitCategory; label: string; icon: string }[] = [
     { value: "health", label: "Health", icon: "Heart" },
     { value: "fitness", label: "Fitness", icon: "Dumbbell" },
@@ -498,9 +394,34 @@ export const habitCategories: { value: HabitCategory; label: string; icon: strin
     { value: "other", label: "Other", icon: "Star" },
 ];
 
+// NEW: Habit type options for the form
+export const habitTypeOptions: { value: HabitType; label: string; description: string; icon: string; periodDays: number }[] = [
+    {
+        value: "weekly",
+        label: "Weekly",
+        description: "Track this habit on a 7-day cycle",
+        icon: "CalendarDays",
+        periodDays: 7,
+    },
+    {
+        value: "monthly",
+        label: "Monthly",
+        description: "Track this habit on a 30-day cycle",
+        icon: "Calendar",
+        periodDays: 30,
+    },
+    {
+        value: "custom",
+        label: "Custom",
+        description: "Set your own tracking period",
+        icon: "Settings",
+        periodDays: 0,
+    },
+];
+
 // Helper function to get color config by value
 export function getHabitColorConfig(color: HabitColor) {
-    return habitColorOptions.find((c) => c.value === color) || habitColorOptions[1]; // Default to purple
+    return habitColorOptions.find((c) => c.value === color) || habitColorOptions[1];
 }
 
 // Helper function to check if icon is a Lucide icon name or emoji
@@ -519,4 +440,18 @@ export function isLucideIcon(icon: string): icon is HabitIconName {
 // Helper function to get icons for a specific category
 export function getIconsForCategory(category: HabitCategory): { name: HabitIconName; label: string }[] {
     return habitIconsByCategory[category] || habitIconsByCategory.other;
+}
+
+// NEW: Helper to get period label
+export function getHabitTypePeriodLabel(habitType: HabitType, customPeriodDays?: number): string {
+    switch (habitType) {
+        case "weekly":
+            return "7 days";
+        case "monthly":
+            return "30 days";
+        case "custom":
+            return customPeriodDays ? `${customPeriodDays} days` : "Custom";
+        default:
+            return "7 days";
+    }
 }

@@ -2,162 +2,143 @@ import os
 from pathlib import Path
 
 # Configuration
-PROJECT_ROOT = r"D:\Nexus Nao\PROJECTS\DAY WIN"
-OUTPUT_FILE = r"D:\Nexus Nao\PROJECTS\DAY WIN\PROJECT_DOCUMENTATION.md"
-
-# File extensions to include
-INCLUDE_EXTENSIONS = {
-    '.tsx', '.ts', '.js', '.css', '.json'
-}
-
-# Specific files to include from root
-ROOT_FILES_INCLUDE = {
-    'next.config.js',
-    'package.json',
-    'tailwind.config.ts',
-    'tsconfig.json',
-    'postcss.config.js',
-}
-
-# Folders to include
-INCLUDE_FOLDERS = {
-    'app',
-    'components',
-    'hooks',
-    'lib',
-    'models',
-    'providers',
-    'types',
-}
+PROJECT_ROOT = r"D:\Nexus Nao\PROJECTS\DayWin"
+OUTPUT_FILE = r"D:\Nexus Nao\PROJECTS\DayWin\PROJECT_DOCUMENTATION.md"
 
 # Files and folders to skip
-SKIP_FILES = {
-    'package-lock.json',
-    '.gitignore',
-    'next-env.d.ts',
-    '.env.local',  # Skip for security
-}
-
 SKIP_FOLDERS = {
     'node_modules',
     '.next',
     '.git',
-    'public',  # Skip static assets
-    'assets',  # Skip image assets
+    'public',  # Contains only images/icons
+    'assets',  # Contains only images
+}
+
+SKIP_FILES = {
+    'package-lock.json',
+    'next-env.d.ts',
+    '.gitignore',
+    '.env.local',  # Skip for security
 }
 
 SKIP_EXTENSIONS = {
-    '.png', '.jpg', '.jpeg', '.svg', '.ico', '.gif', '.webp'
+    '.jpg', '.jpeg', '.png', '.svg', '.ico', '.gif', '.webp',
+    '.woff', '.woff2', '.ttf', '.eot',
+    '.lock',
 }
 
-def get_language(file_path: str) -> str:
-    """Return the language identifier for markdown code blocks."""
-    ext = Path(file_path).suffix.lower()
-    language_map = {
-        '.tsx': 'tsx',
-        '.ts': 'typescript',
-        '.js': 'javascript',
-        '.jsx': 'jsx',
-        '.css': 'css',
-        '.json': 'json',
-        '.md': 'markdown',
-    }
-    return language_map.get(ext, '')
+# File extensions to include with their markdown language identifiers
+EXTENSION_MAP = {
+    '.ts': 'typescript',
+    '.tsx': 'tsx',
+    '.js': 'javascript',
+    '.jsx': 'jsx',
+    '.css': 'css',
+    '.json': 'json',
+    '.md': 'markdown',
+}
 
-def should_include_file(file_path: Path, relative_path: str) -> bool:
-    """Determine if a file should be included in documentation."""
-    file_name = file_path.name
-    extension = file_path.suffix.lower()
-    
-    # Skip by filename
-    if file_name in SKIP_FILES:
-        return False
-    
-    # Skip by extension
-    if extension in SKIP_EXTENSIONS:
-        return False
-    
-    # Check if it's a root file we want to include
-    if file_path.parent == Path(PROJECT_ROOT):
-        return file_name in ROOT_FILES_INCLUDE
-    
-    # Check if in an included folder
-    parts = Path(relative_path).parts
-    if parts and parts[0] in INCLUDE_FOLDERS:
-        return extension in INCLUDE_EXTENSIONS
-    
+
+def should_skip_file(file_path: Path) -> bool:
+    """Check if a file should be skipped."""
+    if file_path.name in SKIP_FILES:
+        return True
+    if file_path.suffix.lower() in SKIP_EXTENSIONS:
+        return True
+    if file_path.suffix.lower() not in EXTENSION_MAP:
+        return True
     return False
 
+
 def should_skip_folder(folder_name: str) -> bool:
-    """Determine if a folder should be skipped entirely."""
+    """Check if a folder should be skipped."""
     return folder_name in SKIP_FOLDERS
 
-def compile_documentation():
-    """Main function to compile all code into markdown."""
-    project_path = Path(PROJECT_ROOT)
+
+def get_language(file_path: Path) -> str:
+    """Get the markdown language identifier for syntax highlighting."""
+    return EXTENSION_MAP.get(file_path.suffix.lower(), '')
+
+
+def get_relative_path(file_path: Path, root: Path) -> str:
+    """Get the relative path from the project root."""
+    return str(file_path.relative_to(root))
+
+
+def compile_documentation(project_root: str, output_file: str):
+    """Compile all code files into a single markdown document."""
+    root_path = Path(project_root)
     
-    # Collect all files
-    files_content = []
+    # Collect all files organized by directory
+    files_by_dir = {}
     
-    for root, dirs, files in os.walk(project_path):
-        # Remove folders we want to skip
-        dirs[:] = [d for d in dirs if not should_skip_folder(d)]
+    for dirpath, dirnames, filenames in os.walk(root_path):
+        # Filter out folders to skip
+        dirnames[:] = [d for d in dirnames if not should_skip_folder(d)]
         
-        for file in sorted(files):
-            file_path = Path(root) / file
-            relative_path = file_path.relative_to(project_path)
+        current_path = Path(dirpath)
+        
+        for filename in sorted(filenames):
+            file_path = current_path / filename
             
-            if should_include_file(file_path, str(relative_path)):
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    files_content.append({
-                        'path': str(relative_path).replace('\\', '/'),
-                        'content': content,
-                        'language': get_language(str(file_path))
-                    })
-                except Exception as e:
-                    print(f"Error reading {file_path}: {e}")
+            if should_skip_file(file_path):
+                continue
+            
+            relative_dir = get_relative_path(current_path, root_path)
+            if relative_dir == '.':
+                relative_dir = 'Root'
+            
+            if relative_dir not in files_by_dir:
+                files_by_dir[relative_dir] = []
+            
+            files_by_dir[relative_dir].append(file_path)
     
-    # Generate markdown
-    markdown_lines = [
-        "# DAY WIN - Project Documentation",
-        "",
-        "## Table of Contents",
-        "",
-    ]
+    # Generate markdown content
+    md_content = []
+    md_content.append("# DayWin Project Documentation\n")
+    md_content.append("**Auto-generated project documentation**\n")
+    md_content.append("---\n")
     
-    # Generate TOC
-    for i, file_info in enumerate(files_content, 1):
-        anchor = file_info['path'].replace('/', '-').replace('.', '-').lower()
-        markdown_lines.append(f"{i}. [{file_info['path']}](#{anchor})")
+    # Table of Contents
+    md_content.append("## Table of Contents\n")
+    for idx, dir_name in enumerate(sorted(files_by_dir.keys()), 1):
+        anchor = dir_name.lower().replace('\\', '-').replace('/', '-').replace('.', '')
+        md_content.append(f"{idx}. [{dir_name}](#{anchor})\n")
+    md_content.append("\n---\n")
     
-    markdown_lines.extend(["", "---", ""])
+    # File contents
+    for dir_name in sorted(files_by_dir.keys()):
+        anchor = dir_name.lower().replace('\\', '-').replace('/', '-').replace('.', '')
+        md_content.append(f"## {dir_name}\n")
+        
+        for file_path in sorted(files_by_dir[dir_name]):
+            relative_file = get_relative_path(file_path, root_path)
+            language = get_language(file_path)
+            
+            md_content.append(f"### `{relative_file}`\n")
+            
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                md_content.append(f"```{language}\n{content}\n```\n")
+            except Exception as e:
+                md_content.append(f"*Error reading file: {e}*\n")
+            
+            md_content.append("\n")
+        
+        md_content.append("---\n")
     
-    # Add file contents
-    for file_info in files_content:
-        anchor = file_info['path'].replace('/', '-').replace('.', '-').lower()
-        markdown_lines.extend([
-            f"## {file_info['path']}",
-            "",
-            f"```{file_info['language']}",
-            file_info['content'],
-            "```",
-            "",
-            "---",
-            "",
-        ])
+    # Write to output file
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(md_content))
     
-    # Write output file
-    output_content = '\n'.join(markdown_lines)
-    
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        f.write(output_content)
-    
-    print(f"✅ Documentation compiled successfully!")
-    print(f"📄 Output: {OUTPUT_FILE}")
-    print(f"📁 Total files documented: {len(files_content)}")
+    print(f"✅ Documentation generated successfully!")
+    print(f"📄 Output: {output_file}")
+    print(f"📁 Total directories processed: {len(files_by_dir)}")
+    total_files = sum(len(files) for files in files_by_dir.values())
+    print(f"📝 Total files documented: {total_files}")
+
 
 if __name__ == "__main__":
-    compile_documentation()
+    compile_documentation(PROJECT_ROOT, OUTPUT_FILE)
