@@ -38,30 +38,30 @@ export function HabitList() {
     const completedHabits = habits.filter((h) => h.todayLog?.completed);
 
     return (
-        <div className="space-y-8">
-            {/* Add Habit Button */}
+        <div className="space-y-6 sm:space-y-8">
+            {/* Add Habit Button - Mobile Optimized */}
             <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowForm(true)}
-                className="w-full p-4 rounded-2xl border-2 border-dashed border-surface-300 dark:border-surface-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors group"
+                className="w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-dashed border-surface-300 dark:border-surface-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors group"
             >
-                <div className="flex items-center justify-center gap-3 text-surface-200/50 group-hover:text-primary-500 transition-colors">
-                    <Plus className="w-5 h-5" />
-                    <span className="font-medium">Add new habit</span>
+                <div className="flex items-center justify-center gap-2 sm:gap-3 text-surface-200/50 group-hover:text-primary-500 transition-colors">
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-sm sm:text-base font-medium">Add new habit</span>
                 </div>
             </motion.button>
 
             {/* Pending Habits */}
             {pendingHabits.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                <div className="space-y-3 sm:space-y-4">
+                    <h2 className="text-base sm:text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
                         <span>To Do</span>
-                        <span className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-sm">
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs sm:text-sm">
                             {pendingHabits.length}
                         </span>
                     </h2>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                         <AnimatePresence mode="popLayout">
                             {pendingHabits.map((habit, index) => (
                                 <HabitCard
@@ -83,15 +83,15 @@ export function HabitList() {
 
             {/* Completed Habits */}
             {completedHabits.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-success-500" />
+                <div className="space-y-3 sm:space-y-4">
+                    <h2 className="text-base sm:text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-success-500" />
                         <span>Completed</span>
-                        <span className="px-2 py-0.5 rounded-full bg-success-100 dark:bg-success-900/30 text-success-600 dark:text-success-400 text-sm">
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-success-100 dark:bg-success-900/30 text-success-600 dark:text-success-400 text-xs sm:text-sm">
                             {completedHabits.length}
                         </span>
                     </h2>
-                    <div className="space-y-3 opacity-75">
+                    <div className="space-y-2 sm:space-y-3 opacity-75">
                         <AnimatePresence mode="popLayout">
                             {completedHabits.map((habit, index) => (
                                 <HabitCard
@@ -111,24 +111,24 @@ export function HabitList() {
                 </div>
             )}
 
-            {/* Empty State */}
+            {/* Empty State - Mobile Optimized */}
             {habits.length === 0 && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-16"
+                    className="text-center py-12 sm:py-16"
                 >
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center">
-                        <span className="text-5xl">🌱</span>
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center">
+                        <span className="text-4xl sm:text-5xl">🌱</span>
                     </div>
-                    <h3 className="text-xl font-semibold text-surface-900 dark:text-white mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-surface-900 dark:text-white mb-2">
                         Start your journey
                     </h3>
-                    <p className="text-surface-200/50 mb-6 max-w-sm mx-auto">
+                    <p className="text-surface-200/50 mb-4 sm:mb-6 max-w-sm mx-auto text-sm sm:text-base px-4">
                         Create your first habit and begin building a better version of yourself.
                     </p>
-                    <Button onClick={() => setShowForm(true)}>
-                        <Plus className="w-5 h-5" />
+                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto mx-4 sm:mx-0">
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                         Create your first habit
                     </Button>
                 </motion.div>
@@ -162,13 +162,13 @@ export function HabitList() {
                 size="sm"
             >
                 <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                        <span className="text-3xl">{deletingHabit?.icon}</span>
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <span className="text-2xl sm:text-3xl">{deletingHabit?.icon}</span>
                     </div>
-                    <p className="text-surface-600 dark:text-surface-200/50 mb-6">
+                    <p className="text-surface-600 dark:text-surface-200/50 mb-4 sm:mb-6 text-sm sm:text-base">
                         Are you sure you want to delete <strong>"{deletingHabit?.title}"</strong>? This action cannot be undone.
                     </p>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3">
                         <Button
                             variant="secondary"
                             onClick={() => setDeletingHabit(null)}

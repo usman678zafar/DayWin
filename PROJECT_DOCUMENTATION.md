@@ -2467,26 +2467,18 @@ import {
     Trash2,
     Loader2,
     CalendarDays,
-    LayoutGrid,
-    CalendarRange,
+    Calendar,
+    Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
-import { HabitWithLog, Habit, habitColors } from "@/types";
+import { HabitWithLog, Habit, habitColors, HabitType } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
 import toast from "react-hot-toast";
 
 // Types
-type ViewMode = "weekly" | "monthly" | "custom";
-
-interface DateRange {
-    startDate: Date;
-    endDate: Date;
-    label: string;
-}
-
 interface DayLog {
     date: Date;
     completed: boolean;
@@ -2498,63 +2490,21 @@ interface HabitData {
     completionRate: number;
 }
 
-// Preset ranges for custom view
-const presetRanges: { label: string; getRange: () => DateRange }[] = [
-    {
-        label: "Last 7 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 6),
-            endDate: new Date(),
-            label: "Last 7 Days",
-        }),
-    },
-    {
-        label: "Last 14 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 13),
-            endDate: new Date(),
-            label: "Last 14 Days",
-        }),
-    },
-    {
-        label: "Last 30 Days",
-        getRange: () => ({
-            startDate: subDays(new Date(), 29),
-            endDate: new Date(),
-            label: "Last 30 Days",
-        }),
-    },
-    {
-        label: "This Week",
-        getRange: () => ({
-            startDate: startOfWeek(new Date(), { weekStartsOn: 0 }),
-            endDate: endOfWeek(new Date(), { weekStartsOn: 0 }),
-            label: "This Week",
-        }),
-    },
-    {
-        label: "This Month",
-        getRange: () => ({
-            startDate: startOfMonth(new Date()),
-            endDate: endOfMonth(new Date()),
-            label: "This Month",
-        }),
-    },
+// Habit type tabs configuration
+const habitTypeTabs: { value: HabitType; label: string; icon: React.ElementType; periodDays: number }[] = [
+    { value: "weekly", label: "Weekly", icon: CalendarDays, periodDays: 7 },
+    { value: "monthly", label: "Monthly", icon: Calendar, periodDays: 30 },
+    { value: "custom", label: "Custom", icon: Settings, periodDays: 0 },
 ];
 
 export default function HabitsPage() {
     const { habits, fetchHabits, addHabit, updateHabit, deleteHabit } = useHabits();
 
-    // View mode state
-    const [viewMode, setViewMode] = useState<ViewMode>("weekly");
+    // Active habit type tab
+    const [activeType, setActiveType] = useState<HabitType>("weekly");
 
     // Date navigation state
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [customRange, setCustomRange] = useState<DateRange>({
-        startDate: subDays(new Date(), 6),
-        endDate: new Date(),
-        label: "Last 7 Days",
-    });
 
     // Data state
     const [habitsData, setHabitsData] = useState<HabitData[]>([]);
@@ -2566,11 +2516,24 @@ export default function HabitsPage() {
     const [editingHabit, setEditingHabit] = useState<HabitWithLog | null>(null);
     const [deletingHabit, setDeletingHabit] = useState<HabitWithLog | null>(null);
     const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
-    const [showRangePicker, setShowRangePicker] = useState(false);
 
-    // Calculate date range based on view mode
+    // Filter habits by active type
+    const filteredHabits = useMemo(() => {
+        return habits.filter((h) => (h.habitType || "weekly") === activeType);
+    }, [habits, activeType]);
+
+    // Count habits by type
+    const habitCounts = useMemo(() => {
+        return {
+            weekly: habits.filter((h) => (h.habitType || "weekly") === "weekly").length,
+            monthly: habits.filter((h) => h.habitType === "monthly").length,
+            custom: habits.filter((h) => h.habitType === "custom").length,
+        };
+    }, [habits]);
+
+    // Calculate date range based on active type
     const dateRange = useMemo(() => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 return {
                     start: startOfWeek(currentDate, { weekStartsOn: 0 }),
@@ -2582,11 +2545,18 @@ export default function HabitsPage() {
                     end: endOfMonth(currentDate),
                 };
             case "custom":
-                return { start: customRange.startDate, end: customRange.endDate };
+                // For custom, show last 14 days by default (can be adjusted per habit)
+                return {
+                    start: subDays(currentDate, 13),
+                    end: currentDate,
+                };
             default:
-                return { start: currentDate, end: currentDate };
+                return {
+                    start: startOfWeek(currentDate, { weekStartsOn: 0 }),
+                    end: endOfWeek(currentDate, { weekStartsOn: 0 }),
+                };
         }
-    }, [viewMode, currentDate, customRange]);
+    }, [activeType, currentDate]);
 
     // Generate array of dates
     const days = useMemo(() => {
@@ -2603,14 +2573,14 @@ export default function HabitsPage() {
         fetchHabits().finally(() => setIsLoading(false));
     }, [fetchHabits]);
 
-    // Fetch logs when date range or habits change
+    // Fetch logs when date range or filtered habits change
     useEffect(() => {
-        if (habits.length > 0) {
+        if (filteredHabits.length > 0) {
             fetchLogs();
         } else {
             setHabitsData([]);
         }
-    }, [dateRange, habits]);
+    }, [dateRange, filteredHabits]);
 
     const fetchLogs = async () => {
         setIsLoadingLogs(true);
@@ -2621,7 +2591,7 @@ export default function HabitsPage() {
             const data = await response.json();
             const logs = data.logs || [];
 
-            const habitsWithData: HabitData[] = habits.map((habit) => {
+            const habitsWithData: HabitData[] = filteredHabits.map((habit) => {
                 const habitLogs: DayLog[] = days.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
@@ -2654,27 +2624,33 @@ export default function HabitsPage() {
 
     // Navigation handlers
     const goToPrevious = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 setCurrentDate(subWeeks(currentDate, 1));
                 break;
             case "monthly":
                 setCurrentDate(subMonths(currentDate, 1));
                 break;
-            default:
+            case "custom":
+                setCurrentDate(subDays(currentDate, 14));
                 break;
         }
     };
 
     const goToNext = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 setCurrentDate(addWeeks(currentDate, 1));
                 break;
             case "monthly":
                 setCurrentDate(addMonths(currentDate, 1));
                 break;
-            default:
+            case "custom":
+                const nextDate = new Date(currentDate);
+                nextDate.setDate(nextDate.getDate() + 14);
+                if (nextDate <= new Date()) {
+                    setCurrentDate(nextDate);
+                }
                 break;
         }
     };
@@ -2763,15 +2739,15 @@ export default function HabitsPage() {
         }
     };
 
-    // Get title based on view mode
+    // Get title based on active type
     const getTitle = () => {
-        switch (viewMode) {
+        switch (activeType) {
             case "weekly":
                 return `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d, yyyy")}`;
             case "monthly":
                 return format(currentDate, "MMMM yyyy");
             case "custom":
-                return customRange.label;
+                return `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d, yyyy")}`;
             default:
                 return format(currentDate, "MMMM d, yyyy");
         }
@@ -2783,12 +2759,6 @@ export default function HabitsPage() {
         if (days.length <= 14) return "w-10";
         return "w-8";
     };
-
-    const viewModes = [
-        { value: "weekly" as ViewMode, label: "Weekly", icon: CalendarDays },
-        { value: "monthly" as ViewMode, label: "Monthly", icon: LayoutGrid },
-        { value: "custom" as ViewMode, label: "Custom", icon: CalendarRange },
-    ];
 
     if (isLoading) {
         return (
@@ -2806,7 +2776,7 @@ export default function HabitsPage() {
                     <div>
                         <h1 className="page-title">Habit Tracker</h1>
                         <p className="page-subtitle">
-                            Track your habits across days, weeks, or custom date ranges.
+                            Organize habits by weekly, monthly, or custom periods.
                         </p>
                     </div>
                     <Button onClick={() => setShowForm(true)}>
@@ -2816,117 +2786,81 @@ export default function HabitsPage() {
                 </div>
             </div>
 
-            {/* View Mode Selector */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Habit Type Tabs */}
+            <div className="mb-6">
                 <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-white p-1 dark:border-white/10 dark:bg-white/5">
-                    {viewModes.map((mode) => (
+                    {habitTypeTabs.map((tab) => (
                         <button
-                            key={mode.value}
-                            onClick={() => setViewMode(mode.value)}
+                            key={tab.value}
+                            onClick={() => {
+                                setActiveType(tab.value);
+                                setCurrentDate(new Date());
+                            }}
                             className={cn(
-                                "flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition",
-                                viewMode === mode.value
+                                "relative flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition",
+                                activeType === tab.value
                                     ? "bg-black text-white dark:bg-white dark:text-black"
                                     : "text-black/60 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
                             )}
                         >
-                            <mode.icon className="h-4 w-4" />
-                            <span className="hidden sm:inline">{mode.label}</span>
+                            <tab.icon className="h-4 w-4" />
+                            <span>{tab.label}</span>
+                            {habitCounts[tab.value] > 0 && (
+                                <span
+                                    className={cn(
+                                        "ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold",
+                                        activeType === tab.value
+                                            ? "bg-white/20 dark:bg-black/20"
+                                            : "bg-black/10 dark:bg-white/10"
+                                    )}
+                                >
+                                    {habitCounts[tab.value]}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </div>
+            </div>
 
-                {/* Date Navigation */}
-                {viewMode !== "custom" ? (
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={goToPrevious}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </button>
+            {/* Date Navigation */}
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={goToPrevious}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </button>
 
-                        <div className="min-w-[200px] text-center">
-                            <span className="text-lg font-bold text-black dark:text-white">
-                                {getTitle()}
-                            </span>
-                        </div>
-
-                        <button
-                            onClick={goToNext}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
-                        >
-                            <ChevronRight className="h-5 w-5" />
-                        </button>
-
-                        <button
-                            onClick={goToToday}
-                            className="rounded-xl bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
-                        >
-                            Today
-                        </button>
+                    <div className="min-w-[200px] text-center">
+                        <span className="text-lg font-bold text-black dark:text-white">
+                            {getTitle()}
+                        </span>
                     </div>
-                ) : (
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowRangePicker(!showRangePicker)}
-                            className="flex items-center gap-2 rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
-                        >
-                            <CalendarRange className="h-4 w-4" />
-                            <span>{customRange.label}</span>
-                            <ChevronRight
-                                className={cn(
-                                    "h-4 w-4 transition",
-                                    showRangePicker && "rotate-90"
-                                )}
-                            />
-                        </button>
 
-                        <AnimatePresence>
-                            {showRangePicker && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-40"
-                                        onClick={() => setShowRangePicker(false)}
-                                    />
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-surface-900"
-                                    >
-                                        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                            Quick Select
-                                        </p>
-                                        <div className="space-y-2">
-                                            {presetRanges.map((preset) => (
-                                                <button
-                                                    key={preset.label}
-                                                    onClick={() => {
-                                                        setCustomRange(preset.getRange());
-                                                        setShowRangePicker(false);
-                                                    }}
-                                                    className={cn(
-                                                        "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition",
-                                                        customRange.label === preset.label
-                                                            ? "bg-black text-white dark:bg-white dark:text-black"
-                                                            : "bg-black/5 text-black/70 hover:bg-black/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10"
-                                                    )}
-                                                >
-                                                    {preset.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
+                    <button
+                        onClick={goToNext}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-black/15 text-black transition hover:bg-black hover:text-white dark:border-white/15 dark:text-white dark:hover:bg-white dark:hover:text-black"
+                    >
+                        <ChevronRight className="h-5 w-5" />
+                    </button>
+
+                    <button
+                        onClick={goToToday}
+                        className="rounded-xl bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/80"
+                    >
+                        Today
+                    </button>
+                </div>
+
+                {/* Period info */}
+                <div className="text-sm text-black/60 dark:text-white/60">
+                    Tracking {days.length} days
+                </div>
             </div>
 
             {/* Habit Matrix View */}
-            {habits.length > 0 ? (
+            {filteredHabits.length > 0 ? (
                 <>
                     <div className="card overflow-hidden">
                         {isLoadingLogs ? (
@@ -3044,14 +2978,21 @@ export default function HabitsPage() {
                                                                     <p className="truncate font-semibold text-black dark:text-white">
                                                                         {habit.title}
                                                                     </p>
-                                                                    {habit.streak.current > 0 && (
-                                                                        <div className="flex items-center gap-1 text-orange-500">
-                                                                            <Flame className="h-3 w-3" />
-                                                                            <span className="text-xs font-semibold">
-                                                                                {habit.streak.current}d streak
+                                                                    <div className="flex items-center gap-2">
+                                                                        {habit.streak.current > 0 && (
+                                                                            <div className="flex items-center gap-1 text-orange-500">
+                                                                                <Flame className="h-3 w-3" />
+                                                                                <span className="text-xs font-semibold">
+                                                                                    {habit.streak.current}d
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                        {habit.customPeriodDays && (
+                                                                            <span className="text-[10px] text-black/40 dark:text-white/40">
+                                                                                {habit.customPeriodDays}d period
                                                                             </span>
-                                                                        </div>
-                                                                    )}
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -3242,7 +3183,7 @@ export default function HabitsPage() {
                                 {habitsData.length}
                             </p>
                             <p className="text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                Total Habits
+                                {activeType} Habits
                             </p>
                         </div>
                         <div className="card p-4 text-center">
@@ -3290,17 +3231,20 @@ export default function HabitsPage() {
                     className="card py-16 text-center"
                 >
                     <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
-                        <span className="text-4xl">🌱</span>
+                        {activeType === "weekly" && <CalendarDays className="h-10 w-10 text-black/30 dark:text-white/30" />}
+                        {activeType === "monthly" && <Calendar className="h-10 w-10 text-black/30 dark:text-white/30" />}
+                        {activeType === "custom" && <Settings className="h-10 w-10 text-black/30 dark:text-white/30" />}
                     </div>
                     <h3 className="mb-2 text-xl font-bold text-black dark:text-white">
-                        No habits yet
+                        No {activeType} habits yet
                     </h3>
                     <p className="mx-auto mb-6 max-w-sm text-black/60 dark:text-white/60">
-                        Create your first habit and start building daily consistency.
+                        Create a {activeType} habit to track your progress over{" "}
+                        {activeType === "weekly" ? "7" : activeType === "monthly" ? "30" : "custom"} days.
                     </p>
                     <Button onClick={() => setShowForm(true)}>
                         <Plus className="h-5 w-5" />
-                        Create First Habit
+                        Create {activeType.charAt(0).toUpperCase() + activeType.slice(1)} Habit
                     </Button>
                 </motion.div>
             )}
@@ -5303,52 +5247,13 @@ export function HabitCard({
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Dumbbell,
-    Heart,
-    Brain,
-    Book,
-    Droplets,
-    Moon,
-    Sun,
-    Apple,
-    Pill,
-    Activity,
-    Bike,
-    Footprints,
-    Flame,
-    Target,
-    Trophy,
-    Star,
-    Zap,
-    Coffee,
-    Cigarette,
-    Wine,
-    Music,
-    Palette,
-    Camera,
-    Pen,
-    Code,
-    Briefcase,
-    DollarSign,
-    PiggyBank,
-    TrendingUp,
-    Users,
-    MessageCircle,
-    Phone,
-    Home,
-    Sparkles,
-    Leaf,
-    Smile,
-    Clock,
-    Calendar,
-    CheckCircle,
-    ListTodo,
-    ChevronRight,
-    ChevronLeft,
-    Search,
-    X,
-    Check,
-    LucideIcon,
+    Dumbbell, Heart, Brain, Book, Droplets, Moon, Sun, Apple,
+    Pill, Activity, Bike, Footprints, Flame, Target, Trophy, Star,
+    Zap, Coffee, Cigarette, Wine, Music, Palette, Camera, Pen,
+    Code, Briefcase, DollarSign, PiggyBank, TrendingUp, Users,
+    MessageCircle, Phone, Home, Sparkles, Leaf, Smile, Clock,
+    Calendar, CheckCircle, ListTodo, ChevronRight, ChevronLeft,
+    Search, X, Check, CalendarDays, Settings, LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -5357,7 +5262,9 @@ import {
     Habit,
     HabitColor,
     HabitCategory,
+    HabitType,
     habitCategories,
+    habitTypeOptions,
 } from "@/types";
 
 interface HabitFormProps {
@@ -5368,46 +5275,12 @@ interface HabitFormProps {
 
 // Icon map for rendering
 const iconComponents: Record<string, LucideIcon> = {
-    Dumbbell,
-    Heart,
-    Brain,
-    Book,
-    Droplets,
-    Moon,
-    Sun,
-    Apple,
-    Pill,
-    Activity,
-    Bike,
-    Walk: Footprints,
-    Flame,
-    Target,
-    Trophy,
-    Star,
-    Zap,
-    Coffee,
-    Cigarette,
-    Wine,
-    Music,
-    Palette,
-    Camera,
-    Pen,
-    Code,
-    Briefcase,
-    DollarSign,
-    PiggyBank,
-    TrendingUp,
-    Users,
-    MessageCircle,
-    Phone,
-    Home,
-    Sparkles,
-    Leaf,
-    Smile,
-    Clock,
-    Calendar,
-    CheckCircle,
-    ListTodo,
+    Dumbbell, Heart, Brain, Book, Droplets, Moon, Sun, Apple,
+    Pill, Activity, Bike, Walk: Footprints, Flame, Target, Trophy, Star,
+    Zap, Coffee, Cigarette, Wine, Music, Palette, Camera, Pen,
+    Code, Briefcase, DollarSign, PiggyBank, TrendingUp, Users,
+    MessageCircle, Phone, Home, Sparkles, Leaf, Smile, Clock,
+    Calendar, CheckCircle, ListTodo, CalendarDays, Settings,
 };
 
 // Organized icons by category
@@ -5472,137 +5345,24 @@ const iconsByCategory: Record<string, { name: string; label: string }[]> = {
     ],
 };
 
-// FIXED: Color options with actual CSS color values
+// Color options with actual CSS color values
 const colorOptions: {
     value: HabitColor;
     label: string;
-    colors: {
-        from: string;
-        to: string;
-        bg: string;
-        text: string;
-    };
+    colors: { from: string; to: string; bg: string; text: string };
 }[] = [
-        {
-            value: "violet",
-            label: "Violet",
-            colors: {
-                from: "#8b5cf6",
-                to: "#7c3aed",
-                bg: "#ede9fe",
-                text: "#7c3aed",
-            },
-        },
-        {
-            value: "purple",
-            label: "Purple",
-            colors: {
-                from: "#a855f7",
-                to: "#9333ea",
-                bg: "#f3e8ff",
-                text: "#9333ea",
-            },
-        },
-        {
-            value: "blue",
-            label: "Blue",
-            colors: {
-                from: "#3b82f6",
-                to: "#2563eb",
-                bg: "#dbeafe",
-                text: "#2563eb",
-            },
-        },
-        {
-            value: "cyan",
-            label: "Cyan",
-            colors: {
-                from: "#06b6d4",
-                to: "#0891b2",
-                bg: "#cffafe",
-                text: "#0891b2",
-            },
-        },
-        {
-            value: "teal",
-            label: "Teal",
-            colors: {
-                from: "#14b8a6",
-                to: "#0d9488",
-                bg: "#ccfbf1",
-                text: "#0d9488",
-            },
-        },
-        {
-            value: "green",
-            label: "Green",
-            colors: {
-                from: "#22c55e",
-                to: "#16a34a",
-                bg: "#dcfce7",
-                text: "#16a34a",
-            },
-        },
-        {
-            value: "lime",
-            label: "Lime",
-            colors: {
-                from: "#84cc16",
-                to: "#65a30d",
-                bg: "#ecfccb",
-                text: "#65a30d",
-            },
-        },
-        {
-            value: "yellow",
-            label: "Yellow",
-            colors: {
-                from: "#eab308",
-                to: "#ca8a04",
-                bg: "#fef9c3",
-                text: "#ca8a04",
-            },
-        },
-        {
-            value: "orange",
-            label: "Orange",
-            colors: {
-                from: "#f97316",
-                to: "#ea580c",
-                bg: "#ffedd5",
-                text: "#ea580c",
-            },
-        },
-        {
-            value: "red",
-            label: "Red",
-            colors: {
-                from: "#ef4444",
-                to: "#dc2626",
-                bg: "#fee2e2",
-                text: "#dc2626",
-            },
-        },
-        {
-            value: "pink",
-            label: "Pink",
-            colors: {
-                from: "#ec4899",
-                to: "#db2777",
-                bg: "#fce7f3",
-                text: "#db2777",
-            },
-        },
-        {
-            value: "rose",
-            label: "Rose",
-            colors: {
-                from: "#f43f5e",
-                to: "#e11d48",
-                bg: "#ffe4e6",
-                text: "#e11d48",
-            },
-        },
+        { value: "violet", label: "Violet", colors: { from: "#8b5cf6", to: "#7c3aed", bg: "#ede9fe", text: "#7c3aed" } },
+        { value: "purple", label: "Purple", colors: { from: "#a855f7", to: "#9333ea", bg: "#f3e8ff", text: "#9333ea" } },
+        { value: "blue", label: "Blue", colors: { from: "#3b82f6", to: "#2563eb", bg: "#dbeafe", text: "#2563eb" } },
+        { value: "cyan", label: "Cyan", colors: { from: "#06b6d4", to: "#0891b2", bg: "#cffafe", text: "#0891b2" } },
+        { value: "teal", label: "Teal", colors: { from: "#14b8a6", to: "#0d9488", bg: "#ccfbf1", text: "#0d9488" } },
+        { value: "green", label: "Green", colors: { from: "#22c55e", to: "#16a34a", bg: "#dcfce7", text: "#16a34a" } },
+        { value: "lime", label: "Lime", colors: { from: "#84cc16", to: "#65a30d", bg: "#ecfccb", text: "#65a30d" } },
+        { value: "yellow", label: "Yellow", colors: { from: "#eab308", to: "#ca8a04", bg: "#fef9c3", text: "#ca8a04" } },
+        { value: "orange", label: "Orange", colors: { from: "#f97316", to: "#ea580c", bg: "#ffedd5", text: "#ea580c" } },
+        { value: "red", label: "Red", colors: { from: "#ef4444", to: "#dc2626", bg: "#fee2e2", text: "#dc2626" } },
+        { value: "pink", label: "Pink", colors: { from: "#ec4899", to: "#db2777", bg: "#fce7f3", text: "#db2777" } },
+        { value: "rose", label: "Rose", colors: { from: "#f43f5e", to: "#e11d48", bg: "#ffe4e6", text: "#e11d48" } },
     ];
 
 const frequencyOptions = [
@@ -5621,11 +5381,11 @@ const daysOfWeek = [
     { value: 6, label: "Sat", fullLabel: "Saturday" },
 ];
 
-type FormStep = "basics" | "schedule" | "review";
+type FormStep = "type" | "basics" | "schedule" | "review";
 
 export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [currentStep, setCurrentStep] = useState<FormStep>("basics");
+    const [currentStep, setCurrentStep] = useState<FormStep>("type");
     const [iconSearch, setIconSearch] = useState("");
     const [showAllIcons, setShowAllIcons] = useState(false);
 
@@ -5635,6 +5395,8 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
         icon: habit?.icon || "Star",
         color: (habit?.color as HabitColor) || "purple",
         category: (habit?.category as HabitCategory) || "other",
+        habitType: (habit?.habitType as HabitType) || "weekly",
+        customPeriodDays: habit?.customPeriodDays || 14,
         frequency: {
             type: habit?.frequency?.type || "daily",
             daysOfWeek: habit?.frequency?.daysOfWeek || [0, 1, 2, 3, 4, 5, 6],
@@ -5650,10 +5412,8 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
     // Filter icons based on search
     const filteredIcons = useMemo(() => {
         if (!iconSearch) return iconsByCategory;
-
         const searchLower = iconSearch.toLowerCase();
         const filtered: typeof iconsByCategory = {};
-
         Object.entries(iconsByCategory).forEach(([category, icons]) => {
             const matchingIcons = icons.filter(
                 (icon) =>
@@ -5665,7 +5425,6 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                 filtered[category] = matchingIcons;
             }
         });
-
         return filtered;
     }, [iconSearch]);
 
@@ -5676,10 +5435,12 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
 
     const handleSubmit = async () => {
         if (!formData.title.trim()) return;
-
         setIsLoading(true);
         try {
-            await onSubmit(formData);
+            await onSubmit({
+                ...formData,
+                customPeriodDays: formData.habitType === "custom" ? formData.customPeriodDays : undefined,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -5690,40 +5451,56 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
         if (days.includes(day)) {
             setFormData({
                 ...formData,
-                frequency: {
-                    ...formData.frequency,
-                    daysOfWeek: days.filter((d) => d !== day),
-                },
+                frequency: { ...formData.frequency, daysOfWeek: days.filter((d) => d !== day) },
             });
         } else {
             setFormData({
                 ...formData,
-                frequency: {
-                    ...formData.frequency,
-                    daysOfWeek: [...days, day].sort(),
-                },
+                frequency: { ...formData.frequency, daysOfWeek: [...days, day].sort() },
             });
         }
     };
 
     const goToStep = (step: FormStep) => {
+        if (step === "basics" && currentStep === "type") {
+            setCurrentStep(step);
+            return;
+        }
         if (step === "schedule" && !formData.title.trim()) return;
         setCurrentStep(step);
     };
 
     const SelectedIcon = iconComponents[formData.icon] || Star;
 
+    // Get period days based on habit type
+    const getPeriodDays = () => {
+        switch (formData.habitType) {
+            case "weekly": return 7;
+            case "monthly": return 30;
+            case "custom": return formData.customPeriodDays;
+            default: return 7;
+        }
+    };
+
+    const steps: FormStep[] = ["type", "basics", "schedule", "review"];
+
     return (
         <div className="space-y-6">
             {/* Progress Steps */}
             <div className="flex items-center justify-center gap-2 pb-2">
-                {(["basics", "schedule", "review"] as FormStep[]).map((step, index) => (
+                {steps.map((step, index) => (
                     <button
                         key={step}
-                        onClick={() => goToStep(step)}
-                        disabled={step !== "basics" && !formData.title.trim()}
+                        onClick={() => {
+                            if (step === "type" || (step === "basics") ||
+                                (step === "schedule" && formData.title.trim()) ||
+                                (step === "review" && formData.title.trim())) {
+                                goToStep(step);
+                            }
+                        }}
+                        disabled={step !== "type" && step !== "basics" && !formData.title.trim()}
                         className={cn(
-                            "flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition",
+                            "flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-wider transition",
                             currentStep === step
                                 ? "bg-black text-white dark:bg-white dark:text-black"
                                 : "text-black/40 hover:text-black/70 dark:text-white/40 dark:hover:text-white/70"
@@ -5739,15 +5516,165 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                         >
                             {index + 1}
                         </span>
-                        {step === "basics" && "Basics"}
-                        {step === "schedule" && "Schedule"}
-                        {step === "review" && "Review"}
+                        <span className="hidden sm:inline">
+                            {step === "type" && "Type"}
+                            {step === "basics" && "Basics"}
+                            {step === "schedule" && "Schedule"}
+                            {step === "review" && "Review"}
+                        </span>
                     </button>
                 ))}
             </div>
 
             <AnimatePresence mode="wait">
-                {/* Step 1: Basics */}
+                {/* Step 1: Habit Type Selection */}
+                {currentStep === "type" && (
+                    <motion.div
+                        key="type"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="space-y-6"
+                    >
+                        <div className="text-center">
+                            <h3 className="text-xl font-bold text-black dark:text-white">
+                                Choose Habit Type
+                            </h3>
+                            <p className="mt-2 text-sm text-black/60 dark:text-white/60">
+                                Select the tracking period for your habit
+                            </p>
+                        </div>
+
+                        <div className="grid gap-4">
+                            {habitTypeOptions.map((option) => {
+                                const TypeIcon = iconComponents[option.icon] || Calendar;
+                                const isSelected = formData.habitType === option.value;
+
+                                return (
+                                    <button
+                                        key={option.value}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, habitType: option.value })}
+                                        className={cn(
+                                            "relative flex items-start gap-4 rounded-2xl border-2 p-5 text-left transition-all",
+                                            isSelected
+                                                ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                                : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                                        )}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl",
+                                                isSelected
+                                                    ? "bg-white/20 dark:bg-black/20"
+                                                    : "bg-black/5 dark:bg-white/5"
+                                            )}
+                                        >
+                                            <TypeIcon className="h-6 w-6" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-lg font-bold">{option.label}</p>
+                                                {option.value !== "custom" && (
+                                                    <span
+                                                        className={cn(
+                                                            "rounded-full px-2 py-0.5 text-xs font-semibold",
+                                                            isSelected
+                                                                ? "bg-white/20 dark:bg-black/20"
+                                                                : "bg-black/10 dark:bg-white/10"
+                                                        )}
+                                                    >
+                                                        {option.periodDays} days
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p
+                                                className={cn(
+                                                    "mt-1 text-sm",
+                                                    isSelected
+                                                        ? "text-white/70 dark:text-black/70"
+                                                        : "text-black/60 dark:text-white/60"
+                                                )}
+                                            >
+                                                {option.description}
+                                            </p>
+                                        </div>
+                                        {isSelected && (
+                                            <div className="absolute right-4 top-4">
+                                                <Check className="h-5 w-5" strokeWidth={3} />
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Custom Period Input */}
+                        {formData.habitType === "custom" && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="rounded-xl border border-black/10 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5"
+                            >
+                                <label className="mb-3 block text-sm font-semibold text-black dark:text-white">
+                                    Custom Period (days)
+                                </label>
+                                <div className="flex items-center gap-4">
+                                    <input
+                                        type="range"
+                                        min={1}
+                                        max={90}
+                                        value={formData.customPeriodDays}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                customPeriodDays: parseInt(e.target.value),
+                                            })
+                                        }
+                                        className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-black/10 dark:bg-white/10"
+                                    />
+                                    <div className="flex items-center gap-2 rounded-lg border border-black/15 px-3 py-2 dark:border-white/15">
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={365}
+                                            value={formData.customPeriodDays}
+                                            onChange={(e) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    customPeriodDays: Math.min(365, Math.max(1, parseInt(e.target.value) || 1)),
+                                                })
+                                            }
+                                            className="w-16 bg-transparent text-center font-bold text-black outline-none dark:text-white"
+                                        />
+                                        <span className="text-sm text-black/60 dark:text-white/60">days</span>
+                                    </div>
+                                </div>
+                                <p className="mt-2 text-xs text-black/50 dark:text-white/50">
+                                    Your habit will be tracked over a {formData.customPeriodDays}-day period
+                                </p>
+                            </motion.div>
+                        )}
+
+                        {/* Next Button */}
+                        <div className="flex gap-3 pt-4">
+                            <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() => goToStep("basics")}
+                                className="flex-1"
+                                rightIcon={<ChevronRight className="h-4 w-4" />}
+                            >
+                                Continue
+                            </Button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 2: Basics */}
                 {currentStep === "basics" && (
                     <motion.div
                         key="basics"
@@ -5756,6 +5683,16 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                         exit={{ opacity: 0, x: 20 }}
                         className="space-y-6"
                     >
+                        {/* Habit Type Badge */}
+                        <div className="flex items-center justify-center">
+                            <span className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-black/70 dark:bg-white/5 dark:text-white/70">
+                                {formData.habitType === "weekly" && <CalendarDays className="h-3.5 w-3.5" />}
+                                {formData.habitType === "monthly" && <Calendar className="h-3.5 w-3.5" />}
+                                {formData.habitType === "custom" && <Settings className="h-3.5 w-3.5" />}
+                                {formData.habitType} habit ({getPeriodDays()} days)
+                            </span>
+                        </div>
+
                         {/* Habit Name */}
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-black dark:text-white">
@@ -5803,9 +5740,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                         {/* Icon Selection */}
                         <div>
                             <div className="mb-3 flex items-center justify-between">
-                                <label className="text-sm font-semibold text-black dark:text-white">
-                                    Icon
-                                </label>
+                                <label className="text-sm font-semibold text-black dark:text-white">Icon</label>
                                 <button
                                     type="button"
                                     onClick={() => setShowAllIcons(!showAllIcons)}
@@ -5821,10 +5756,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                     className="flex h-16 w-16 items-center justify-center rounded-2xl"
                                     style={{ backgroundColor: selectedColorConfig.colors.bg }}
                                 >
-                                    <SelectedIcon
-                                        className="h-8 w-8"
-                                        style={{ color: selectedColorConfig.colors.text }}
-                                    />
+                                    <SelectedIcon className="h-8 w-8" style={{ color: selectedColorConfig.colors.text }} />
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-black dark:text-white">
@@ -5836,7 +5768,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                 </div>
                             </div>
 
-                            {/* Quick Suggestions based on category */}
+                            {/* Quick Suggestions */}
                             {!showAllIcons && (
                                 <div className="rounded-xl border border-black/10 bg-white/50 p-4 dark:border-white/10 dark:bg-white/5">
                                     <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
@@ -5884,7 +5816,6 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                             }
                                         />
                                     </div>
-
                                     <div className="max-h-64 space-y-4 overflow-y-auto">
                                         {Object.entries(filteredIcons).map(([category, icons]) => (
                                             <div key={category}>
@@ -5922,7 +5853,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                             )}
                         </div>
 
-                        {/* FIXED: Color Selection with Inline Styles */}
+                        {/* Color Selection */}
                         <div>
                             <label className="mb-3 block text-sm font-semibold text-black dark:text-white">
                                 Color Theme
@@ -5952,15 +5883,17 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                     </button>
                                 ))}
                             </div>
-                            <p className="mt-2 text-xs text-black/50 dark:text-white/50">
-                                Selected: {selectedColorConfig.label}
-                            </p>
                         </div>
 
-                        {/* Next Button */}
+                        {/* Navigation */}
                         <div className="flex gap-3 pt-4">
-                            <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
-                                Cancel
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => goToStep("type")}
+                                leftIcon={<ChevronLeft className="h-4 w-4" />}
+                            >
+                                Back
                             </Button>
                             <Button
                                 type="button"
@@ -5975,7 +5908,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                     </motion.div>
                 )}
 
-                {/* Step 2: Schedule */}
+                {/* Step 3: Schedule */}
                 {currentStep === "schedule" && (
                     <motion.div
                         key="schedule"
@@ -5987,7 +5920,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                         {/* Frequency Type */}
                         <div>
                             <label className="mb-3 block text-sm font-semibold text-black dark:text-white">
-                                How often?
+                                How often within the {getPeriodDays()}-day period?
                             </label>
                             <div className="grid gap-3 sm:grid-cols-3">
                                 {frequencyOptions.map((option) => (
@@ -6023,7 +5956,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                             </div>
                         </div>
 
-                        {/* Days of Week for Weekly */}
+                        {/* Days of Week for Weekly Frequency */}
                         {formData.frequency.type === "weekly" && (
                             <div>
                                 <label className="mb-3 block text-sm font-semibold text-black dark:text-white">
@@ -6070,24 +6003,9 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                         }
                                         className="w-16 rounded-lg border border-black/20 bg-white px-3 py-2 text-center font-semibold dark:border-white/20 dark:bg-surface-900"
                                     />
-                                    <span className="text-sm text-black/70 dark:text-white/70">time(s) every</span>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        max={30}
-                                        value={formData.frequency.periodDays}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                frequency: {
-                                                    ...formData.frequency,
-                                                    periodDays: parseInt(e.target.value) || 7,
-                                                },
-                                            })
-                                        }
-                                        className="w-16 rounded-lg border border-black/20 bg-white px-3 py-2 text-center font-semibold dark:border-white/20 dark:bg-surface-900"
-                                    />
-                                    <span className="text-sm text-black/70 dark:text-white/70">days</span>
+                                    <span className="text-sm text-black/70 dark:text-white/70">
+                                        time(s) within the {getPeriodDays()}-day period
+                                    </span>
                                 </div>
                             </div>
                         )}
@@ -6131,9 +6049,6 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                     {formData.targetCount === 1 ? "time per day" : "times per day"}
                                 </span>
                             </div>
-                            <p className="mt-2 text-xs text-black/40 dark:text-white/40">
-                                Set to more than 1 if you want to track multiple completions (e.g., 8 glasses of water)
-                            </p>
                         </div>
 
                         {/* Description */}
@@ -6171,7 +6086,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                     </motion.div>
                 )}
 
-                {/* Step 3: Review */}
+                {/* Step 4: Review */}
                 {currentStep === "review" && (
                     <motion.div
                         key="review"
@@ -6193,10 +6108,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                     className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl"
                                     style={{ backgroundColor: selectedColorConfig.colors.bg }}
                                 >
-                                    <SelectedIcon
-                                        className="h-8 w-8"
-                                        style={{ color: selectedColorConfig.colors.text }}
-                                    />
+                                    <SelectedIcon className="h-8 w-8" style={{ color: selectedColorConfig.colors.text }} />
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="text-xl font-bold text-black dark:text-white">
@@ -6211,6 +6123,17 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                             </div>
 
                             <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                                {/* Habit Type */}
+                                <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5">
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                                        Habit Type
+                                    </p>
+                                    <p className="mt-1 font-semibold capitalize text-black dark:text-white">
+                                        {formData.habitType} ({getPeriodDays()} days)
+                                    </p>
+                                </div>
+
+                                {/* Category */}
                                 <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5">
                                     <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
                                         Category
@@ -6219,6 +6142,8 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                         {habitCategories.find((c) => c.value === formData.category)?.label}
                                     </p>
                                 </div>
+
+                                {/* Frequency */}
                                 <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5">
                                     <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
                                         Frequency
@@ -6228,9 +6153,11 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                         {formData.frequency.type === "weekly" &&
                                             `${formData.frequency.daysOfWeek?.length} days/week`}
                                         {formData.frequency.type === "custom" &&
-                                            `${formData.frequency.timesPerPeriod}x per ${formData.frequency.periodDays} days`}
+                                            `${formData.frequency.timesPerPeriod}x per period`}
                                     </p>
                                 </div>
+
+                                {/* Color */}
                                 <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5">
                                     <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
                                         Color
@@ -6247,8 +6174,9 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                         </span>
                                     </div>
                                 </div>
+
                                 {formData.targetCount > 1 && (
-                                    <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5">
+                                    <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5 sm:col-span-2">
                                         <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
                                             Daily Target
                                         </p>
@@ -6257,6 +6185,7 @@ export function HabitForm({ habit, onSubmit, onCancel }: HabitFormProps) {
                                         </p>
                                     </div>
                                 )}
+
                                 {formData.frequency.type === "weekly" && (
                                     <div className="rounded-xl bg-black/5 p-4 dark:bg-white/5 sm:col-span-2">
                                         <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
@@ -9585,6 +9514,10 @@ export interface IHabit extends Document {
     icon: string;
     color: string;
     category: string;
+    // NEW: Habit type for grouping
+    habitType: "weekly" | "monthly" | "custom";
+    // NEW: Custom period in days
+    customPeriodDays?: number;
     frequency: {
         type: "daily" | "weekly" | "custom";
         daysOfWeek?: number[];
@@ -9633,7 +9566,7 @@ const HabitSchema = new Schema<IHabit>(
         },
         icon: {
             type: String,
-            default: "⭐",
+            default: "Star",
         },
         color: {
             type: String,
@@ -9642,6 +9575,18 @@ const HabitSchema = new Schema<IHabit>(
         category: {
             type: String,
             default: "other",
+        },
+        // NEW: Habit type field
+        habitType: {
+            type: String,
+            enum: ["weekly", "monthly", "custom"],
+            default: "weekly",
+        },
+        // NEW: Custom period days
+        customPeriodDays: {
+            type: Number,
+            min: 1,
+            max: 365,
         },
         frequency: {
             type: {
@@ -9696,6 +9641,7 @@ const HabitSchema = new Schema<IHabit>(
 
 // Indexes for better query performance
 HabitSchema.index({ userId: 1, isArchived: 1 });
+HabitSchema.index({ userId: 1, habitType: 1 });
 HabitSchema.index({ userId: 1, createdAt: -1 });
 
 export default mongoose.models.Habit || mongoose.model<IHabit>("Habit", HabitSchema);
@@ -9973,6 +9919,9 @@ export interface UserStats {
 
 export type HabitFrequency = "daily" | "weekly" | "custom";
 
+// NEW: Habit tracking type
+export type HabitType = "weekly" | "monthly" | "custom";
+
 export type HabitCategory =
     | "health"
     | "fitness"
@@ -9992,6 +9941,10 @@ export interface Habit {
     icon: string;
     color: HabitColor;
     category: HabitCategory;
+    // NEW: Habit type for grouping
+    habitType: HabitType;
+    // NEW: Custom period in days (for custom type)
+    customPeriodDays?: number;
     frequency: {
         type: HabitFrequency;
         daysOfWeek?: number[];
@@ -10115,7 +10068,7 @@ export const habitColors: Record<HabitColor, { bg: string; text: string; gradien
     },
 };
 
-// Color options with actual hex values for inline styles (fixes dynamic Tailwind issue)
+// Color options with actual hex values for inline styles
 export const habitColorOptions: {
     value: HabitColor;
     label: string;
@@ -10129,167 +10082,73 @@ export const habitColorOptions: {
         {
             value: "violet",
             label: "Violet",
-            colors: {
-                from: "#8b5cf6",
-                to: "#7c3aed",
-                bg: "#ede9fe",
-                text: "#7c3aed",
-            },
+            colors: { from: "#8b5cf6", to: "#7c3aed", bg: "#ede9fe", text: "#7c3aed" },
         },
         {
             value: "purple",
             label: "Purple",
-            colors: {
-                from: "#a855f7",
-                to: "#9333ea",
-                bg: "#f3e8ff",
-                text: "#9333ea",
-            },
+            colors: { from: "#a855f7", to: "#9333ea", bg: "#f3e8ff", text: "#9333ea" },
         },
         {
             value: "blue",
             label: "Blue",
-            colors: {
-                from: "#3b82f6",
-                to: "#2563eb",
-                bg: "#dbeafe",
-                text: "#2563eb",
-            },
+            colors: { from: "#3b82f6", to: "#2563eb", bg: "#dbeafe", text: "#2563eb" },
         },
         {
             value: "cyan",
             label: "Cyan",
-            colors: {
-                from: "#06b6d4",
-                to: "#0891b2",
-                bg: "#cffafe",
-                text: "#0891b2",
-            },
+            colors: { from: "#06b6d4", to: "#0891b2", bg: "#cffafe", text: "#0891b2" },
         },
         {
             value: "teal",
             label: "Teal",
-            colors: {
-                from: "#14b8a6",
-                to: "#0d9488",
-                bg: "#ccfbf1",
-                text: "#0d9488",
-            },
+            colors: { from: "#14b8a6", to: "#0d9488", bg: "#ccfbf1", text: "#0d9488" },
         },
         {
             value: "green",
             label: "Green",
-            colors: {
-                from: "#22c55e",
-                to: "#16a34a",
-                bg: "#dcfce7",
-                text: "#16a34a",
-            },
+            colors: { from: "#22c55e", to: "#16a34a", bg: "#dcfce7", text: "#16a34a" },
         },
         {
             value: "lime",
             label: "Lime",
-            colors: {
-                from: "#84cc16",
-                to: "#65a30d",
-                bg: "#ecfccb",
-                text: "#65a30d",
-            },
+            colors: { from: "#84cc16", to: "#65a30d", bg: "#ecfccb", text: "#65a30d" },
         },
         {
             value: "yellow",
             label: "Yellow",
-            colors: {
-                from: "#eab308",
-                to: "#ca8a04",
-                bg: "#fef9c3",
-                text: "#ca8a04",
-            },
+            colors: { from: "#eab308", to: "#ca8a04", bg: "#fef9c3", text: "#ca8a04" },
         },
         {
             value: "orange",
             label: "Orange",
-            colors: {
-                from: "#f97316",
-                to: "#ea580c",
-                bg: "#ffedd5",
-                text: "#ea580c",
-            },
+            colors: { from: "#f97316", to: "#ea580c", bg: "#ffedd5", text: "#ea580c" },
         },
         {
             value: "red",
             label: "Red",
-            colors: {
-                from: "#ef4444",
-                to: "#dc2626",
-                bg: "#fee2e2",
-                text: "#dc2626",
-            },
+            colors: { from: "#ef4444", to: "#dc2626", bg: "#fee2e2", text: "#dc2626" },
         },
         {
             value: "pink",
             label: "Pink",
-            colors: {
-                from: "#ec4899",
-                to: "#db2777",
-                bg: "#fce7f3",
-                text: "#db2777",
-            },
+            colors: { from: "#ec4899", to: "#db2777", bg: "#fce7f3", text: "#db2777" },
         },
         {
             value: "rose",
             label: "Rose",
-            colors: {
-                from: "#f43f5e",
-                to: "#e11d48",
-                bg: "#ffe4e6",
-                text: "#e11d48",
-            },
+            colors: { from: "#f43f5e", to: "#e11d48", bg: "#ffe4e6", text: "#e11d48" },
         },
     ];
 
 // Lucide icon names as string types
 export type HabitIconName =
-    | "Dumbbell"
-    | "Heart"
-    | "Brain"
-    | "Book"
-    | "Droplets"
-    | "Moon"
-    | "Sun"
-    | "Apple"
-    | "Pill"
-    | "Activity"
-    | "Bike"
-    | "Walk"
-    | "Flame"
-    | "Target"
-    | "Trophy"
-    | "Star"
-    | "Zap"
-    | "Coffee"
-    | "Cigarette"
-    | "Wine"
-    | "Music"
-    | "Palette"
-    | "Camera"
-    | "Pen"
-    | "Code"
-    | "Briefcase"
-    | "DollarSign"
-    | "PiggyBank"
-    | "TrendingUp"
-    | "Users"
-    | "MessageCircle"
-    | "Phone"
-    | "Home"
-    | "Sparkles"
-    | "Leaf"
-    | "Smile"
-    | "Clock"
-    | "Calendar"
-    | "CheckCircle"
-    | "ListTodo";
+    | "Dumbbell" | "Heart" | "Brain" | "Book" | "Droplets" | "Moon" | "Sun" | "Apple"
+    | "Pill" | "Activity" | "Bike" | "Walk" | "Flame" | "Target" | "Trophy" | "Star"
+    | "Zap" | "Coffee" | "Cigarette" | "Wine" | "Music" | "Palette" | "Camera" | "Pen"
+    | "Code" | "Briefcase" | "DollarSign" | "PiggyBank" | "TrendingUp" | "Users"
+    | "MessageCircle" | "Phone" | "Home" | "Sparkles" | "Leaf" | "Smile" | "Clock"
+    | "Calendar" | "CheckCircle" | "ListTodo";
 
 export interface HabitIconOption {
     name: HabitIconName;
@@ -10299,14 +10158,11 @@ export interface HabitIconOption {
 
 // Icon options organized by category
 export const habitIconOptions: HabitIconOption[] = [
-    // Fitness
     { name: "Dumbbell", label: "Workout", category: "fitness" },
     { name: "Activity", label: "Exercise", category: "fitness" },
     { name: "Bike", label: "Cycling", category: "fitness" },
     { name: "Walk", label: "Walking", category: "fitness" },
     { name: "Flame", label: "Cardio", category: "fitness" },
-
-    // Health
     { name: "Heart", label: "Health", category: "health" },
     { name: "Apple", label: "Nutrition", category: "health" },
     { name: "Droplets", label: "Hydration", category: "health" },
@@ -10314,20 +10170,14 @@ export const habitIconOptions: HabitIconOption[] = [
     { name: "Moon", label: "Sleep", category: "health" },
     { name: "Cigarette", label: "Quit Smoking", category: "health" },
     { name: "Wine", label: "No Alcohol", category: "health" },
-
-    // Mindfulness
     { name: "Brain", label: "Meditation", category: "mindfulness" },
     { name: "Sun", label: "Morning Routine", category: "mindfulness" },
     { name: "Smile", label: "Gratitude", category: "mindfulness" },
     { name: "Leaf", label: "Nature", category: "mindfulness" },
     { name: "Sparkles", label: "Self-care", category: "mindfulness" },
-
-    // Learning
     { name: "Book", label: "Reading", category: "learning" },
     { name: "Pen", label: "Writing", category: "learning" },
     { name: "Code", label: "Coding", category: "learning" },
-
-    // Productivity
     { name: "Target", label: "Goals", category: "productivity" },
     { name: "CheckCircle", label: "Tasks", category: "productivity" },
     { name: "ListTodo", label: "To-do", category: "productivity" },
@@ -10335,24 +10185,16 @@ export const habitIconOptions: HabitIconOption[] = [
     { name: "Calendar", label: "Planning", category: "productivity" },
     { name: "Briefcase", label: "Work", category: "productivity" },
     { name: "Zap", label: "Energy", category: "productivity" },
-
-    // Creativity
     { name: "Music", label: "Music", category: "creativity" },
     { name: "Palette", label: "Art", category: "creativity" },
     { name: "Camera", label: "Photography", category: "creativity" },
-
-    // Finance
     { name: "DollarSign", label: "Money", category: "finance" },
     { name: "PiggyBank", label: "Savings", category: "finance" },
     { name: "TrendingUp", label: "Investing", category: "finance" },
-
-    // Social
     { name: "Users", label: "Social", category: "social" },
     { name: "MessageCircle", label: "Communication", category: "social" },
     { name: "Phone", label: "Calls", category: "social" },
     { name: "Home", label: "Family", category: "social" },
-
-    // General
     { name: "Star", label: "Favorite", category: "other" },
     { name: "Trophy", label: "Achievement", category: "other" },
     { name: "Coffee", label: "Coffee", category: "other" },
@@ -10420,7 +10262,7 @@ export const habitIconsByCategory: Record<string, { name: HabitIconName; label: 
     ],
 };
 
-// Keep old emojis for backward compatibility (existing habits in database)
+// Legacy emoji icons for backward compatibility
 export const habitIcons = [
     "💪", "🏃", "📚", "💧", "🧘", "😴", "🥗", "💊",
     "✍️", "🎨", "🎵", "🌱", "🧠", "💰", "📱", "🚭",
@@ -10428,7 +10270,7 @@ export const habitIcons = [
     "❤️", "🙏", "😊", "🔥", "⭐", "🌈", "🎉", "✨"
 ];
 
-// Updated categories with Lucide icon names (string)
+// Categories with Lucide icon names
 export const habitCategories: { value: HabitCategory; label: string; icon: string }[] = [
     { value: "health", label: "Health", icon: "Heart" },
     { value: "fitness", label: "Fitness", icon: "Dumbbell" },
@@ -10441,9 +10283,34 @@ export const habitCategories: { value: HabitCategory; label: string; icon: strin
     { value: "other", label: "Other", icon: "Star" },
 ];
 
+// NEW: Habit type options for the form
+export const habitTypeOptions: { value: HabitType; label: string; description: string; icon: string; periodDays: number }[] = [
+    {
+        value: "weekly",
+        label: "Weekly",
+        description: "Track this habit on a 7-day cycle",
+        icon: "CalendarDays",
+        periodDays: 7,
+    },
+    {
+        value: "monthly",
+        label: "Monthly",
+        description: "Track this habit on a 30-day cycle",
+        icon: "Calendar",
+        periodDays: 30,
+    },
+    {
+        value: "custom",
+        label: "Custom",
+        description: "Set your own tracking period",
+        icon: "Settings",
+        periodDays: 0,
+    },
+];
+
 // Helper function to get color config by value
 export function getHabitColorConfig(color: HabitColor) {
-    return habitColorOptions.find((c) => c.value === color) || habitColorOptions[1]; // Default to purple
+    return habitColorOptions.find((c) => c.value === color) || habitColorOptions[1];
 }
 
 // Helper function to check if icon is a Lucide icon name or emoji
@@ -10462,6 +10329,20 @@ export function isLucideIcon(icon: string): icon is HabitIconName {
 // Helper function to get icons for a specific category
 export function getIconsForCategory(category: HabitCategory): { name: HabitIconName; label: string }[] {
     return habitIconsByCategory[category] || habitIconsByCategory.other;
+}
+
+// NEW: Helper to get period label
+export function getHabitTypePeriodLabel(habitType: HabitType, customPeriodDays?: number): string {
+    switch (habitType) {
+        case "weekly":
+            return "7 days";
+        case "monthly":
+            return "30 days";
+        case "custom":
+            return customPeriodDays ? `${customPeriodDays} days` : "Custom";
+        default:
+            return "7 days";
+    }
 }
 
 ```

@@ -35,18 +35,18 @@ export function MotivationalQuote() {
             animate={{ opacity: 1, y: 0 }}
             className="card relative overflow-hidden"
         >
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-black/65 dark:text-white/65">
-                    <Sparkles className="h-4.5 w-4.5" />
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em]">Daily Motivation</span>
+            <div className="mb-3 sm:mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-black/65 dark:text-white/65">
+                    <Sparkles className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.12em]">Daily Motivation</span>
                 </div>
                 <button
                     onClick={changeQuote}
                     disabled={isChanging}
-                    className="rounded-lg border border-black/15 p-2 text-black/70 transition hover:border-black hover:text-black dark:border-white/15 dark:text-white/70 dark:hover:border-white dark:hover:text-white"
+                    className="rounded-lg border border-black/15 p-1.5 sm:p-2 text-black/70 transition hover:border-black hover:text-black dark:border-white/15 dark:text-white/70 dark:hover:border-white dark:hover:text-white"
                     aria-label="Refresh quote"
                 >
-                    <RefreshCw className={`h-4 w-4 ${isChanging ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isChanging ? "animate-spin" : ""}`} />
                 </button>
             </div>
 
@@ -57,13 +57,12 @@ export function MotivationalQuote() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                 >
-                    <p className="text-lg font-semibold leading-relaxed text-black dark:text-white">
+                    <p className="text-base sm:text-lg font-semibold leading-relaxed text-black dark:text-white">
                         "{quote.text}"
                     </p>
-                    <p className="mt-3 text-sm text-black/55 dark:text-white/55">- {quote.author}</p>
+                    <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-black/55 dark:text-white/55">- {quote.author}</p>
                 </motion.div>
             </AnimatePresence>
         </motion.div>
     );
 }
-

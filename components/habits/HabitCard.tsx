@@ -65,7 +65,10 @@ export function HabitCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={cn("habit-card group", disabled && "opacity-60")}
+            className={cn(
+                "habit-card group p-3 sm:p-5",
+                disabled && "opacity-60"
+            )}
         >
             {/* Streak celebration overlay */}
             <AnimatePresence>
@@ -81,15 +84,15 @@ export function HabitCard({
                                 animate={{ scale: [1, 1.2, 1] }}
                                 transition={{ repeat: Infinity, duration: 0.5 }}
                             >
-                                <Flame className="mx-auto h-12 w-12" />
+                                <Flame className="mx-auto h-10 w-10 sm:h-12 sm:w-12" />
                             </motion.div>
-                            <p className="mt-2 text-xl font-bold">{habit.streak.current} Day Streak!</p>
+                            <p className="mt-2 text-lg sm:text-xl font-bold">{habit.streak.current} Day Streak!</p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
                 {/* Checkbox */}
                 <motion.button
                     whileHover={!disabled ? { scale: 1.1 } : undefined}
@@ -97,7 +100,7 @@ export function HabitCard({
                     onClick={handleComplete}
                     disabled={isLoading || disabled}
                     className={cn(
-                        "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl",
+                        "flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-xl",
                         "border-2 transition-all duration-300",
                         isCompleted
                             ? `bg-gradient-to-br ${colors.gradient} border-transparent shadow-lg`
@@ -113,7 +116,7 @@ export function HabitCard({
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
                             >
-                                <Check className="h-6 w-6 text-white" strokeWidth={3} />
+                                <Check className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={3} />
                             </motion.div>
                         ) : (
                             <motion.div
@@ -121,7 +124,7 @@ export function HabitCard({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
-                                className="h-6 w-6"
+                                className="h-5 w-5 sm:h-6 sm:w-6"
                             />
                         )}
                     </AnimatePresence>
@@ -130,7 +133,7 @@ export function HabitCard({
                 {/* Icon */}
                 <div
                     className={cn(
-                        "flex h-12 w-12 items-center justify-center rounded-xl",
+                        "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl",
                         colors.bg
                     )}
                 >
@@ -141,21 +144,21 @@ export function HabitCard({
                 <div className="min-w-0 flex-1">
                     <h3
                         className={cn(
-                            "font-semibold text-surface-900 transition-all duration-300 dark:text-white",
+                            "font-semibold text-sm sm:text-base text-surface-900 transition-all duration-300 dark:text-white truncate",
                             isCompleted && "line-through opacity-60"
                         )}
                     >
                         {habit.title}
                     </h3>
-                    <div className="mt-1 flex items-center gap-3">
-                        <span className={cn("text-xs font-medium", colors.text)}>
+                    <div className="mt-0.5 sm:mt-1 flex items-center gap-2 sm:gap-3 flex-wrap">
+                        <span className={cn("text-[10px] sm:text-xs font-medium", colors.text)}>
                             {habit.category}
                         </span>
 
                         {habit.streak.current > 0 && (
                             <div className="flex items-center gap-1 text-orange-500">
-                                <Flame className="h-3.5 w-3.5" />
-                                <span className="text-xs font-semibold">{habit.streak.current}</span>
+                                <Flame className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                <span className="text-[10px] sm:text-xs font-semibold">{habit.streak.current}</span>
                             </div>
                         )}
                     </div>
@@ -165,9 +168,9 @@ export function HabitCard({
                 <div className="relative">
                     <button
                         onClick={() => setShowMenu(!showMenu)}
-                        className="rounded-lg p-2 opacity-0 transition-all hover:bg-surface-100 group-hover:opacity-100 dark:hover:bg-surface-800"
+                        className="rounded-lg p-1.5 sm:p-2 opacity-100 sm:opacity-0 transition-all hover:bg-surface-100 group-hover:opacity-100 dark:hover:bg-surface-800"
                     >
-                        <MoreVertical className="h-5 w-5 text-surface-400" />
+                        <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5 text-surface-400" />
                     </button>
 
                     <AnimatePresence>
@@ -181,27 +184,27 @@ export function HabitCard({
                                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                    className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900"
+                                    className="absolute right-0 top-full z-20 mt-2 w-40 sm:w-48 overflow-hidden rounded-xl border border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900"
                                 >
                                     <button
                                         onClick={() => {
                                             setShowMenu(false);
                                             onEdit();
                                         }}
-                                        className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-100 dark:hover:bg-surface-800"
+                                        className="flex w-full items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 transition-colors hover:bg-surface-100 dark:hover:bg-surface-800"
                                     >
                                         <Edit className="h-4 w-4 text-surface-400" />
-                                        <span className="text-surface-900 dark:text-white">Edit</span>
+                                        <span className="text-sm text-surface-900 dark:text-white">Edit</span>
                                     </button>
                                     <button
                                         onClick={() => {
                                             setShowMenu(false);
                                             onDelete();
                                         }}
-                                        className="flex w-full items-center gap-3 px-4 py-3 text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                                        className="flex w-full items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                                     >
                                         <Trash2 className="h-4 w-4" />
-                                        <span>Delete</span>
+                                        <span className="text-sm">Delete</span>
                                     </button>
                                 </motion.div>
                             </>
@@ -212,14 +215,14 @@ export function HabitCard({
 
             {/* Progress bar for target count > 1 */}
             {habit.targetCount > 1 && (
-                <div className="mt-4">
-                    <div className="mb-2 flex items-center justify-between text-sm">
+                <div className="mt-3 sm:mt-4">
+                    <div className="mb-1.5 sm:mb-2 flex items-center justify-between text-xs sm:text-sm">
                         <span className="text-surface-400">Progress</span>
                         <span className={colors.text}>
                             {habit.todayLog?.count ?? 0} / {habit.targetCount}
                         </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
+                    <div className="h-1.5 sm:h-2 overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{

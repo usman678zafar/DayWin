@@ -46,34 +46,37 @@ export default function DashboardPage() {
         <div className="page-container">
             <Header />
 
-            <div className="mb-6 grid gap-3 sm:grid-cols-3">
-                <div className="card p-4">
-                    <p className="text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Active Habits</p>
-                    <p className="mt-2 text-3xl font-black text-black dark:text-white">{totalCount}</p>
+            {/* Stats Cards - Mobile Optimized */}
+            <div className="mb-4 sm:mb-6 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="card p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Active</p>
+                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount}</p>
                 </div>
-                <div className="card p-4">
-                    <p className="text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Completed Today</p>
-                    <p className="mt-2 text-3xl font-black text-black dark:text-white">{completedCount}</p>
+                <div className="card p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Done</p>
+                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{completedCount}</p>
                 </div>
-                <div className="card p-4">
-                    <p className="text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Completion Rate</p>
-                    <p className="mt-2 text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
+                <div className="card p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Rate</p>
+                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
                 </div>
             </div>
 
-            <div className="mb-6 flex flex-wrap gap-3">
-                <Link href="/dashboard/habits" className="inline-flex items-center gap-2 rounded-xl border border-black bg-black px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white">
+            {/* Action Buttons - Mobile Optimized */}
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <Link href="/dashboard/habits" className="inline-flex items-center justify-center gap-2 rounded-xl border border-black bg-black px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white">
                     <Plus className="h-4 w-4" />
                     New Habit
                 </Link>
-                <Link href="/dashboard/stats" className="inline-flex items-center gap-2 rounded-xl border border-black/25 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-black transition hover:border-black dark:border-white/25 dark:text-white dark:hover:border-white">
+                <Link href="/dashboard/stats" className="inline-flex items-center justify-center gap-2 rounded-xl border border-black/25 px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-[0.12em] text-black transition hover:border-black dark:border-white/25 dark:text-white dark:hover:border-white">
                     <BarChart3 className="h-4 w-4" />
                     View Analytics
                 </Link>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
+            {/* Main Content Grid - Mobile Stack */}
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                     <DailyProgress
                         completed={completedCount}
                         total={totalCount}
@@ -91,7 +94,7 @@ export default function DashboardPage() {
                     </motion.div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                     <MotivationalQuote />
                     <WeeklyChart data={weeklyData} />
                 </div>
@@ -99,4 +102,3 @@ export default function DashboardPage() {
         </div>
     );
 }
-
