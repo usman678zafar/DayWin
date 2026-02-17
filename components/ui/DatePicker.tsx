@@ -18,14 +18,15 @@ import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
-    selected: Date;
+    value: Date;
     onChange: (date: Date) => void;
+    label?: string;
     className?: string;
 }
 
-export function DatePicker({ selected, onChange, className }: DatePickerProps) {
+export function DatePicker({ value, onChange, label, className }: DatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState(selected);
+    const [currentMonth, setCurrentMonth] = useState(value);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -64,7 +65,7 @@ export function DatePicker({ selected, onChange, className }: DatePickerProps) {
         while (day <= endDate) {
             for (let i = 0; i < 7; i++) {
                 const cloneDay = day;
-                const isSelected = isSameDay(day, selected);
+                const isSelected = isSameDay(day, value);
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const isToday = isSameDay(day, new Date());
 
@@ -101,14 +102,19 @@ export function DatePicker({ selected, onChange, className }: DatePickerProps) {
     };
 
     return (
-        <div ref={containerRef} className={cn("relative", className)}>
+        <div ref={containerRef} className={cn("w-full", className)}>
+            {label && (
+                <label className="block text-sm font-bold text-black dark:text-white mb-2 uppercase tracking-wide text-[10px]">
+                    {label}
+                </label>
+            )}
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
+                className="flex w-full items-center gap-2 rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
             >
                 <Calendar className="h-4 w-4" />
-                {format(selected, "MMM d, yyyy")}
+                {format(value, "MMM d, yyyy")}
             </button>
 
             <AnimatePresence>

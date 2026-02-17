@@ -80,7 +80,7 @@ export function DateNavigator({ selectedDate, onDateChange, className }: DateNav
             <div className="flex items-center gap-3">
                 {/* Date Picker */}
                 <DatePicker
-                    selected={selectedDate}
+                    value={selectedDate}
                     onChange={(date) => {
                         if (!isFuture(date) || isToday(date)) {
                             onDateChange(date);
