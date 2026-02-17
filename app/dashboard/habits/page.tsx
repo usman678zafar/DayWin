@@ -888,7 +888,7 @@ export default function HabitsPage() {
                 onClick={() => setShowForm(true)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30 transition-shadow hover:shadow-xl hover:shadow-[#4D7CFE]/40"
+                className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30 transition-shadow hover:shadow-xl hover:shadow-[#4D7CFE]/40"
             >
                 <Plus className="h-6 w-6" strokeWidth={2.5} />
             </motion.button>
