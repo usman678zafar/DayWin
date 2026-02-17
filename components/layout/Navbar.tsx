@@ -43,11 +43,7 @@ export function Navbar() {
                     />
                 </Link>
 
-                <div className="mb-6 rounded-2xl border border-black/10 bg-black px-4 py-4 text-white dark:border-white/10">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">Daily System</p>
-                    <p className="mt-2 text-xl font-bold leading-tight">Consistency Wins</p>
-                    <p className="mt-2 text-sm text-white/70">Track habits, build streaks, and review trends faster.</p>
-                </div>
+
 
                 <nav className="flex-1 space-y-2">
                     {navItems.map((item) => {

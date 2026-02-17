@@ -532,7 +532,7 @@ export default function HabitsPage() {
 
                                                 return (
                                                     <div key={index} className="flex flex-col items-center">
-                                                        <span className="text-[9px] font-semibold text-black/40 dark:text-white/40 mb-1">
+                                                        <span className="text-[9px] font-bold text-black/60 dark:text-white/60 mb-1">
                                                             {format(log.date, "EEE")}
                                                         </span>
                                                         <motion.button
@@ -551,7 +551,7 @@ export default function HabitsPage() {
                                                             {log.completed ? (
                                                                 <Check className="h-4 w-4" strokeWidth={3} />
                                                             ) : (
-                                                                <span className="text-xs font-medium text-black/40 dark:text-white/40">
+                                                                <span className="text-xs font-bold text-black/70 dark:text-white/70">
                                                                     {format(log.date, "d")}
                                                                 </span>
                                                             )}
@@ -881,7 +881,7 @@ export default function HabitsPage() {
                 onClick={() => setShowForm(true)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30 transition-shadow hover:shadow-xl hover:shadow-[#4D7CFE]/40"
+                className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30 transition-shadow hover:shadow-xl hover:shadow-[#4D7CFE]/40"
             >
                 <Plus className="h-6 w-6" strokeWidth={2.5} />
             </motion.button>
