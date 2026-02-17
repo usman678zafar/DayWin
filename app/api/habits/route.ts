@@ -6,6 +6,7 @@ import HabitLog from "@/models/HabitLog";
 import { startOfDay, endOfDay } from "date-fns";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // GET all habits for user
 export async function GET(req: NextRequest) {

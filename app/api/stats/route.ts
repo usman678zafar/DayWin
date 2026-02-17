@@ -5,6 +5,7 @@ import Habit from "@/models/Habit";
 import HabitLog from "@/models/HabitLog";
 import { startOfDay, endOfDay, subDays, format, differenceInDays } from "date-fns";
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
     try {
