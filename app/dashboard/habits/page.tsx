@@ -25,7 +25,6 @@ import {
     Plus,
     Check,
     X,
-    Flame,
     MoreVertical,
     Edit2,
     Trash2,
@@ -485,12 +484,6 @@ export default function HabitsPage() {
                                                     {habit.title}
                                                 </p>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    {habit.streak.current > 0 && (
-                                                        <div className="flex items-center gap-1 text-orange-500">
-                                                            <Flame className="h-3 w-3" />
-                                                            <span className="text-xs font-semibold">{habit.streak.current}d</span>
-                                                        </div>
-                                                    )}
                                                     <span className={cn(
                                                         "text-xs font-bold px-2 py-0.5 rounded-full",
                                                         completionRate >= 80
@@ -657,25 +650,19 @@ export default function HabitsPage() {
                                                                     <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-black/10 dark:text-white/10" />
                                                                     <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
                                                                 </svg>
-                                                                <div className={cn("absolute inset-1 flex items-center justify-center rounded-full text-sm", colors.bg)}>
-                                                                    {habit.icon}
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <span className={cn("text-[10px] font-bold", colors.text)}>
+                                                                        {completionRate}%
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                             <div className="min-w-0 flex-1">
                                                                 <p className="truncate font-semibold text-black dark:text-white">{habit.title}</p>
-                                                                <div className="flex items-center gap-2">
-                                                                    {habit.streak.current > 0 && (
-                                                                        <div className="flex items-center gap-1 text-orange-500">
-                                                                            <Flame className="h-3 w-3" />
-                                                                            <span className="text-xs font-semibold">{habit.streak.current}d</span>
-                                                                        </div>
-                                                                    )}
-                                                                    {habit.customPeriodDays && (
-                                                                        <span className="text-[10px] text-black/40 dark:text-white/40">
-                                                                            {habit.customPeriodDays}d period
-                                                                        </span>
-                                                                    )}
-                                                                </div>
+                                                                {habit.customPeriodDays && (
+                                                                    <span className="text-[10px] text-black/40 dark:text-white/40">
+                                                                        {habit.customPeriodDays}d period
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </td>
