@@ -44,6 +44,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
 import { HabitIcon } from "@/components/habits/HabitIcon";
+import { PageLoader } from "@/components/ui/PageLoader";
 import toast from "react-hot-toast";
 
 // Types
@@ -354,11 +355,7 @@ export default function HabitsPage() {
     };
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin text-[#4D7CFE]" />
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (
@@ -443,9 +440,7 @@ export default function HabitsPage() {
                     {/* Mobile Card View */}
                     <div className="block md:hidden space-y-3">
                         {isLoadingLogs ? (
-                            <div className="flex items-center justify-center py-16">
-                                <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
-                            </div>
+                            <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
                         ) : (
                             habitsData.map(({ habit, logs, completionRate }) => {
                                 const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;

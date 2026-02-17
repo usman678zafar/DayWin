@@ -19,6 +19,7 @@ import { QuickStats } from "@/components/dashboard/QuickStats";
 import { DateRangePicker, DateRange } from "@/components/habits/DateRangePicker";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import { cn } from "@/lib/utils";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 const defaultRange: DateRange = {
     startDate: subDays(new Date(), 29),
@@ -53,11 +54,7 @@ export default function StatsPage() {
     };
 
     if (isLoading) {
-        return (
-            <div className="page-container flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
+        return <PageLoader />;
     }
 
     const CustomTooltip = ({ active, payload, label }: any) => {

@@ -22,6 +22,7 @@ import { useHabits } from "@/hooks/useHabits";
 import { Button } from "@/components/ui/Button";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import { habitColors } from "@/types";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 import toast from "react-hot-toast";
 
@@ -235,9 +236,7 @@ export default function CalendarPage() {
                         {renderHeader()}
                         {renderDays()}
                         {isLoading ? (
-                            <div className="flex items-center justify-center py-20">
-                                <div className="h-8 w-8 animate-spin rounded-full border-4 border-black/20 border-t-black dark:border-white/20 dark:border-t-white" />
-                            </div>
+                            <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
                         ) : (
                             renderCells()
                         )}
