@@ -20,12 +20,17 @@ import {
     Loader2,
     BellRing,
     BellOff,
+    Check,
+    CalendarDays,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useNotifications } from "@/hooks/usePWA";
+import { Modal } from "@/components/ui/Modal";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 
 export default function SettingsPage() {
     const { data: session } = useSession();
@@ -34,6 +39,15 @@ export default function SettingsPage() {
     const [isExporting, setIsExporting] = useState(false);
     const [name, setName] = useState(session?.user?.name || "");
     const { requestPermission, isSupported, permission, sendDailyReminder } = useNotifications();
+
+    // Export state
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [exportFormat, setExportFormat] = useState<"csv" | "json">("csv");
+    const [exportRange, setExportRange] = useState<"all" | "weekly" | "monthly" | "custom">("all");
+    const [exportDates, setExportDates] = useState<{ start: Date; end: Date }>({
+        start: subDays(new Date(), 30),
+        end: new Date()
+    });
 
     const [notifSettings, setNotifSettings] = useState({
         dailyReminders: true,
@@ -83,24 +97,30 @@ export default function SettingsPage() {
         }
     };
 
-    const handleExportData = async (format: "csv" | "json") => {
+    const handleExportData = async () => {
         setIsExporting(true);
         try {
-            const response = await fetch(`/api/export?format=${format}`);
+            let url = `/api/export?format=${exportFormat}&range=${exportRange}`;
+            if (exportRange === "custom") {
+                url += `&startDate=${exportDates.start.toISOString()}&endDate=${exportDates.end.toISOString()}`;
+            }
+
+            const response = await fetch(url);
 
             if (!response.ok) throw new Error("Export failed");
 
             const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
+            const urlBlob = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url;
-            a.download = `daywin-export-${new Date().toISOString().split("T")[0]}.${format}`;
+            a.href = urlBlob;
+            a.download = `daywin-export-${new Date().toISOString().split("T")[0]}.${exportFormat}`;
             document.body.appendChild(a);
             a.click();
-            window.URL.revokeObjectURL(url);
+            window.URL.revokeObjectURL(urlBlob);
             document.body.removeChild(a);
 
-            toast.success(`Data exported as ${format.toUpperCase()}!`);
+            toast.success(`Data exported as ${exportFormat.toUpperCase()}!`);
+            setShowExportModal(false);
         } catch (error) {
             toast.error("Failed to export data. Please try again.");
         } finally {
@@ -196,7 +216,7 @@ export default function SettingsPage() {
                             <p className="font-semibold text-surface-900 dark:text-white">
                                 {session?.user?.name}
                             </p>
-                            <p className="text-sm text-surface-200/50">
+                            <p className="text-sm text-black/50 dark:text-white/40">
                                 {session?.user?.email}
                             </p>
                         </div>
@@ -249,7 +269,7 @@ export default function SettingsPage() {
                                         "w-6 h-6",
                                         theme === t.value
                                             ? "text-primary-500"
-                                            : "text-surface-200/50"
+                                            : "text-black/30 dark:text-white/20"
                                     )}
                                 />
                                 <span
@@ -257,7 +277,7 @@ export default function SettingsPage() {
                                         "text-sm font-medium",
                                         theme === t.value
                                             ? "text-primary-600 dark:text-primary-400"
-                                            : "text-surface-600 dark:text-surface-200/50"
+                                            : "text-black/60 dark:text-white/40"
                                     )}
                                 >
                                     {t.label}
@@ -302,10 +322,10 @@ export default function SettingsPage() {
                                 <div className="flex items-center gap-3">
                                     <item.icon className="w-4 h-4 text-black/40 dark:text-white/40" />
                                     <div>
-                                        <p className="font-medium text-surface-900 dark:text-white">
+                                        <p className="font-medium text-black dark:text-white">
                                             {item.label}
                                         </p>
-                                        <p className="text-sm text-surface-200/50">
+                                        <p className="text-sm text-black/50 dark:text-white/40">
                                             {item.description}
                                         </p>
                                     </div>
@@ -340,50 +360,49 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="space-y-3">
-                        <button
-                            onClick={() => handleExportData("csv")}
-                            disabled={isExporting}
-                            className="w-full flex items-center justify-between p-4 rounded-xl bg-surface-50 dark:bg-surface-800/50 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors disabled:opacity-50"
+                        <Button
+                            onClick={() => {
+                                setExportFormat("csv");
+                                setShowExportModal(true);
+                            }}
+                            variant="secondary"
+                            className="w-full justify-between py-6 h-auto"
                         >
                             <div className="flex items-center gap-3 text-left">
                                 <FileSpreadsheet className="w-5 h-5 text-green-500" />
                                 <div>
-                                    <p className="font-medium text-surface-900 dark:text-white">
+                                    <p className="font-medium text-black dark:text-white">
                                         Export as CSV
                                     </p>
-                                    <p className="text-sm text-surface-200/50">
-                                        Download spreadsheet-compatible file
+                                    <p className="text-sm text-black/50 dark:text-white/40">
+                                        Spreadsheet compatible with analysis
                                     </p>
                                 </div>
                             </div>
-                            {isExporting ? (
-                                <Loader2 className="w-5 h-5 animate-spin text-surface-200/50" />
-                            ) : (
-                                <ChevronRight className="w-5 h-5 text-surface-200/50" />
-                            )}
-                        </button>
-                        <button
-                            onClick={() => handleExportData("json")}
-                            disabled={isExporting}
-                            className="w-full flex items-center justify-between p-4 rounded-xl bg-surface-50 dark:bg-surface-800/50 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors disabled:opacity-50"
+                            <ChevronRight className="w-5 h-5 text-black/20 dark:text-white/20" />
+                        </Button>
+
+                        <Button
+                            onClick={() => {
+                                setExportFormat("json");
+                                setShowExportModal(true);
+                            }}
+                            variant="secondary"
+                            className="w-full justify-between py-6 h-auto"
                         >
                             <div className="flex items-center gap-3 text-left">
                                 <FileJson className="w-5 h-5 text-blue-500" />
                                 <div>
-                                    <p className="font-medium text-surface-900 dark:text-white">
+                                    <p className="font-medium text-black dark:text-white">
                                         Export as JSON
                                     </p>
-                                    <p className="text-sm text-surface-200/50">
-                                        Download raw data backup
+                                    <p className="text-sm text-black/50 dark:text-white/40">
+                                        Raw data and stats for developers
                                     </p>
                                 </div>
                             </div>
-                            {isExporting ? (
-                                <Loader2 className="w-5 h-5 animate-spin text-surface-200/50" />
-                            ) : (
-                                <ChevronRight className="w-5 h-5 text-surface-200/50" />
-                            )}
-                        </button>
+                            <ChevronRight className="w-5 h-5 text-black/20 dark:text-white/20" />
+                        </Button>
                     </div>
                 </motion.div>
 
@@ -396,7 +415,7 @@ export default function SettingsPage() {
                 >
                     <div className="flex items-center gap-3 mb-6">
                         <Shield className="w-5 h-5 text-red-500" />
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-white">
+                        <h2 className="text-lg font-semibold text-black dark:text-white">
                             Account
                         </h2>
                     </div>
@@ -410,6 +429,80 @@ export default function SettingsPage() {
                     </Button>
                 </motion.div>
             </div>
+
+            {/* Export Options Modal */}
+            <Modal
+                isOpen={showExportModal}
+                onClose={() => setShowExportModal(false)}
+                title="Export Data"
+                size="md"
+            >
+                <div className="space-y-6">
+                    <p className="text-sm text-black/60 dark:text-white/40">
+                        Choose the data range and format for your export. The exported file will include a detailed analysis summary.
+                    </p>
+
+                    <div className="space-y-4">
+                        <label className="text-sm font-black uppercase tracking-wider text-black/40 dark:text-white/30">
+                            Select Range
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {[
+                                { value: "weekly", label: "This Week", icon: CalendarDays },
+                                { value: "monthly", label: "This Month", icon: Palette },
+                                { value: "custom", label: "Custom Range", icon: Bell },
+                                { value: "all", label: "All Time", icon: Monitor },
+                            ].map((opt) => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => setExportRange(opt.value as any)}
+                                    className={cn(
+                                        "flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-bold",
+                                        exportRange === opt.value
+                                            ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
+                                            : "border-black/5 dark:border-white/5 text-black/60 dark:text-white/40 hover:border-black/10 dark:hover:border-white/10"
+                                    )}
+                                >
+                                    {exportRange === opt.value && <Check className="w-4 h-4" />}
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {exportRange === "custom" && (
+                            <div className="grid grid-cols-2 gap-4 mt-4 animate-in fade-in slide-in-from-top-2">
+                                <DatePicker
+                                    label="Start Date"
+                                    value={exportDates.start}
+                                    onChange={(date) => setExportDates(prev => ({ ...prev, start: date || new Date() }))}
+                                />
+                                <DatePicker
+                                    label="End Date"
+                                    value={exportDates.end}
+                                    onChange={(date) => setExportDates(prev => ({ ...prev, end: date || new Date() }))}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="pt-4 flex gap-3">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowExportModal(false)}
+                            className="flex-1"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleExportData}
+                            isLoading={isExporting}
+                            className="flex-1"
+                        >
+                            Download {exportFormat.toUpperCase()}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }
