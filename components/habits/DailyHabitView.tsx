@@ -65,10 +65,9 @@ export function DailyHabitView({
             const data = await response.json();
             const logs = data.logs || [];
 
-            const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
             const habitsWithStatus: DayHabit[] = habits.map((habit) => {
                 const dayLog = logs.find(
-                    (log: any) => log.habitId === habit._id && log.date.split("T")[0] === selectedDateStr
+                    (log: any) => log.habitId === habit._id && isSameDay(new Date(log.date), selectedDate)
                 );
                 return {
                     ...habit,

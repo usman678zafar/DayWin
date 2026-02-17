@@ -68,9 +68,8 @@ export default function CalendarPage() {
         // Optimistic update
         const newCompleted = !currentCompleted;
         setLogs((prevLogs) => {
-            const dateStr = format(date, "yyyy-MM-dd");
             const existingLogIndex = prevLogs.findIndex(
-                (log) => log.habitId === habitId && log.date.split("T")[0] === dateStr
+                (log) => log.habitId === habitId && isSameDay(new Date(log.date), date)
             );
 
             if (existingLogIndex >= 0) {
@@ -154,9 +153,8 @@ export default function CalendarPage() {
 
         while (day <= endDate) {
             for (let i = 0; i < 7; i++) {
-                const dayStr = format(day, "yyyy-MM-dd");
                 const dayLogs = logs.filter((log) =>
-                    log.date.split("T")[0] === dayStr
+                    isSameDay(new Date(log.date), day)
                 );
                 const completedCount = dayLogs.filter((log) => log.completed).length;
                 const totalHabits = habits.length;
@@ -224,9 +222,8 @@ export default function CalendarPage() {
         return <div className="space-y-1">{rows}</div>;
     };
 
-    const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
     const selectedDateLogs = logs.filter((log) =>
-        log.date.split("T")[0] === selectedDateStr
+        isSameDay(new Date(log.date), selectedDate)
     );
     const isSelectedFuture = isFuture(selectedDate) && !isToday(selectedDate);
 

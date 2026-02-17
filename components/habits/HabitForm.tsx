@@ -3,8 +3,10 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    ChevronRight, ChevronLeft, Search, X, Check, CalendarDays, Settings, Calendar, Plus
+    ChevronRight, ChevronLeft, Search, X, Check, CalendarDays, Settings, Calendar, Plus, CalendarRange
 } from "lucide-react";
+import { format, differenceInDays, addDays } from "date-fns";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -146,6 +148,8 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
             periodDays: habit?.frequency?.periodDays || 7,
         },
         targetCount: habit?.targetCount || 1,
+        startDate: habit?.startDate ? new Date(habit.startDate) : new Date(),
+        endDate: habit?.endDate ? new Date(habit.endDate) : addDays(new Date(), 13),
     });
 
     // Get selected color configuration
@@ -181,7 +185,9 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
         try {
             await onSubmit({
                 ...formData,
-                customPeriodDays: formData.habitType === "custom" ? formData.customPeriodDays : undefined,
+                customPeriodDays: formData.habitType === "custom"
+                    ? differenceInDays(formData.endDate, formData.startDate) + 1
+                    : undefined,
             });
         } finally {
             setIsLoading(false);
@@ -217,7 +223,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
         switch (formData.habitType) {
             case "weekly": return 7;
             case "monthly": return 30;
-            case "custom": return formData.customPeriodDays;
+            case "custom": return differenceInDays(formData.endDate, formData.startDate) + 1;
             default: return 7;
         }
     };
@@ -348,46 +354,55 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             })}
                         </div>
 
-                        {/* Custom Period Input */}
+                        {/* Custom Period Date Range Picker */}
                         {formData.habitType === "custom" && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="rounded-xl border border-black/10 bg-white/50 p-3 sm:p-4 dark:border-white/10 dark:bg-white/5"
+                                className="rounded-xl border border-black/10 bg-white/50 p-3 sm:p-5 dark:border-white/10 dark:bg-white/5"
                             >
-                                <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                    Custom Period (days)
-                                </label>
-                                <div className="flex items-center gap-3 sm:gap-4">
-                                    <input
-                                        type="range"
-                                        min={1}
-                                        max={90}
-                                        value={formData.customPeriodDays}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                customPeriodDays: parseInt(e.target.value),
-                                            })
-                                        }
-                                        className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-black/10 dark:bg-white/10"
-                                    />
-                                    <div className="flex items-center gap-2 rounded-lg border border-black/15 px-2 sm:px-3 py-1.5 sm:py-2 dark:border-white/15">
-                                        <input
-                                            type="number"
-                                            min={1}
-                                            max={365}
-                                            value={formData.customPeriodDays}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    customPeriodDays: Math.min(365, Math.max(1, parseInt(e.target.value) || 1)),
-                                                })
-                                            }
-                                            className="w-12 sm:w-16 bg-transparent text-center font-bold text-black outline-none dark:text-white"
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <CalendarRange className="h-4 w-4 text-[#4D7CFE]" />
+                                        <h4 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
+                                            Tracking Period
+                                        </h4>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <DatePicker
+                                            label="Start Date"
+                                            value={formData.startDate}
+                                            onChange={(date) => {
+                                                setFormData({ ...formData, startDate: date });
+                                                if (date > formData.endDate) {
+                                                    setFormData({ ...formData, startDate: date, endDate: addDays(date, 1) });
+                                                }
+                                            }}
+                                            className="relative"
+                                            align="left"
                                         />
-                                        <span className="text-xs sm:text-sm text-black/60 dark:text-white/60">days</span>
+                                        <DatePicker
+                                            label="End Date"
+                                            value={formData.endDate}
+                                            onChange={(date) => {
+                                                if (date >= formData.startDate) {
+                                                    setFormData({ ...formData, endDate: date });
+                                                }
+                                            }}
+                                            className="relative"
+                                            align="right"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between px-1 pt-2">
+                                        <span className="text-xs font-semibold text-black/50 dark:text-white/40">
+                                            Total duration:
+                                        </span>
+                                        <span className="text-xs font-black text-[#4D7CFE]">
+                                            {differenceInDays(formData.endDate, formData.startDate) + 1} Days
+                                        </span>
                                     </div>
                                 </div>
                             </motion.div>

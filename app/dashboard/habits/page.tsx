@@ -155,8 +155,6 @@ export default function HabitsPage() {
     // Fetch logs when date range or filtered habits change
     const fetchLogs = useCallback(async (
         habitsToFetch: HabitWithLog[],
-        daysToFetch: Date[],
-        range: { start: Date; end: Date },
         type: HabitType
     ) => {
         const currentFetchId = ++fetchIdRef.current;
@@ -168,8 +166,21 @@ export default function HabitsPage() {
 
         setIsLoadingLogs(true);
         try {
+            // Determine the range to fetch from API
+            let fetchStart = dateRange.start;
+            let fetchEnd = dateRange.end;
+
+            if (type === "custom") {
+                const starts = habitsToFetch.map((h) => new Date(h.startDate).getTime());
+                const ends = habitsToFetch.map((h) => h.endDate ? new Date(h.endDate).getTime() : new Date(h.startDate).getTime());
+                if (starts.length > 0) {
+                    fetchStart = new Date(Math.min(...starts));
+                    fetchEnd = new Date(Math.max(...ends));
+                }
+            }
+
             const response = await fetch(
-                `/api/logs?startDate=${range.start.toISOString()}&endDate=${range.end.toISOString()}`
+                `/api/logs?startDate=${fetchStart.toISOString()}&endDate=${fetchEnd.toISOString()}`
             );
             const data = await response.json();
             const logs = data.logs || [];
@@ -180,11 +191,17 @@ export default function HabitsPage() {
             }
 
             const habitsWithData: HabitData[] = habitsToFetch.map((habit) => {
-                const habitLogs: DayLog[] = daysToFetch.map((day) => {
-                    const dayStr = format(day, "yyyy-MM-dd");
+                const habitDays = type === "custom"
+                    ? eachDayOfInterval({
+                        start: new Date(habit.startDate),
+                        end: new Date(habit.endDate || habit.startDate)
+                    })
+                    : days;
+
+                const habitLogs: DayLog[] = habitDays.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
-                            log.habitId === habit._id && log.date.split("T")[0] === dayStr
+                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
                     );
                     return {
                         date: day,
@@ -219,9 +236,31 @@ export default function HabitsPage() {
 
     // Effect to trigger log fetching
     useEffect(() => {
-        fetchLogs(filteredHabits, days, dateRange, activeType);
-    }, [filteredHabits, days, dateRange, activeType, fetchLogs]);
+        fetchLogs(filteredHabits, activeType);
+    }, [filteredHabits, activeType, fetchLogs]);
 
+    // Memoized custom groups for special layout
+    const customHabitGroups = useMemo(() => {
+        if (activeType !== "custom") return [];
+
+        const groups: Record<string, HabitData[]> = {};
+        habitsData.forEach((hd) => {
+            const key = `${format(new Date(hd.habit.startDate), "yyyy-MM-dd")}_${hd.habit.endDate ? format(new Date(hd.habit.endDate), "yyyy-MM-dd") : "none"}`;
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(hd);
+        });
+
+        return Object.entries(groups).map(([key, habits]) => ({
+            key,
+            startDate: new Date(habits[0].habit.startDate),
+            endDate: habits[0].habit.endDate ? new Date(habits[0].habit.endDate) : new Date(habits[0].habit.startDate),
+            habits,
+            days: eachDayOfInterval({
+                start: new Date(habits[0].habit.startDate),
+                end: habits[0].habit.endDate ? new Date(habits[0].habit.endDate) : new Date(habits[0].habit.startDate)
+            })
+        })).sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+    }, [habitsData, activeType]);
     // Navigation handlers
     const goToPrevious = () => {
         switch (activeType) {
@@ -311,7 +350,7 @@ export default function HabitsPage() {
 
             fetchHabits();
         } catch (error) {
-            fetchLogs(filteredHabits, days, dateRange, activeType);
+            fetchLogs(filteredHabits, activeType);
             toast.error("Failed to update habit");
         }
     };
@@ -438,310 +477,575 @@ export default function HabitsPage() {
             {/* Habit Display */}
             {filteredHabits.length > 0 ? (
                 <>
-                    {/* Mobile Matrix View - Consolidated Chronological Table */}
-                    <div className="block md:hidden card overflow-hidden">
-                        {isLoadingLogs ? (
-                            <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
-                        ) : (
-                            <div className="overflow-x-auto scrollbar-hide">
-                                <div className="min-w-max">
-                                    {/* Date Header Row */}
-                                    <div className="flex border-b border-black/5 bg-black/[0.02] dark:border-white/5 dark:bg-white/[0.02] py-4">
-                                        <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end pb-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Habits</span>
+                    {activeType === "custom" ? (
+                        <div className="space-y-12">
+                            {customHabitGroups.map((group) => (
+                                <div key={group.key} className="space-y-4">
+                                    <div className="flex items-center justify-between px-1">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-2 w-2 rounded-full bg-[#4D7CFE]" />
+                                            <h3 className="font-black uppercase tracking-widest text-[11px] text-black/50 dark:text-white/40">
+                                                {format(group.startDate, "MMM d")} - {format(group.endDate, "MMM d, yyyy")}
+                                            </h3>
                                         </div>
-                                        <div className="flex">
-                                            {days.map((day) => (
-                                                <div key={day.toISOString()} className="w-12 flex flex-col items-center flex-shrink-0">
-                                                    <span className="text-[9px] font-black text-black/30 dark:text-white/30 uppercase tracking-tighter">
-                                                        {format(day, "EEE")}
-                                                    </span>
-                                                    <span className={cn(
-                                                        "text-[13px] font-black mt-1 flex items-center justify-center w-7 h-7 rounded-full transition-colors",
-                                                        isToday(day)
-                                                            ? "bg-black text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black"
-                                                            : "text-black/40 dark:text-white/40"
-                                                    )}>
-                                                        {format(day, "d")}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <span className="text-[10px] font-bold text-[#4D7CFE] bg-[#4D7CFE]/10 px-2 py-0.5 rounded-full">
+                                            {group.days.length} Days
+                                        </span>
                                     </div>
 
-                                    {/* Habit Rows */}
-                                    <div className="divide-y divide-black/5 dark:divide-white/5 pb-2">
-                                        {habitsData.map(({ habit, logs, completionRate }) => {
-                                            const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
-
-                                            return (
-                                                <div key={habit._id} className="flex items-center group">
-                                                    {/* Sticky Habit Label */}
-                                                    <div
-                                                        onClick={() => {
-                                                            setEditingHabit(habit);
-                                                            setShowForm(true);
-                                                        }}
-                                                        className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
-                                                    >
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="text-[11px] font-black text-black dark:text-white truncate leading-tight uppercase tracking-tight">
-                                                                {habit.title}
-                                                            </p>
-                                                            <p className={cn("text-[9px] font-bold mt-0.5",
-                                                                completionRate >= 80 ? "text-green-500" :
-                                                                    completionRate >= 50 ? "text-yellow-500" : "text-red-500"
-                                                            )}>
-                                                                {completionRate}%
-                                                            </p>
+                                    {/* Mobile View for this group */}
+                                    <div className="block md:hidden card overflow-hidden">
+                                        {isLoadingLogs ? (
+                                            <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
+                                        ) : (
+                                            <div className="overflow-x-auto scrollbar-hide">
+                                                <div className="min-w-max">
+                                                    <div className="flex border-b border-black/5 bg-black/[0.02] dark:border-white/5 dark:bg-white/[0.02] py-4">
+                                                        <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end pb-1">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Habits</span>
+                                                        </div>
+                                                        <div className="flex">
+                                                            {group.days.map((day) => (
+                                                                <div key={day.toISOString()} className="w-12 flex flex-col items-center flex-shrink-0">
+                                                                    <span className="text-[9px] font-black text-black/30 dark:text-white/30 uppercase tracking-tighter">
+                                                                        {format(day, "EEE")}
+                                                                    </span>
+                                                                    <span className={cn(
+                                                                        "text-[13px] font-black mt-1 flex items-center justify-center w-7 h-7 rounded-full transition-colors",
+                                                                        isToday(day)
+                                                                            ? "bg-black text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black"
+                                                                            : "text-black/40 dark:text-white/40"
+                                                                    )}>
+                                                                        {format(day, "d")}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
-
-                                                    {/* Toggle Buttons Grid */}
-                                                    <div className="flex">
-                                                        {logs.map((log, logIdx) => {
-                                                            const isFutureDay = isFuture(log.date) && !isToday(log.date);
-                                                            const isTodayDate = isToday(log.date);
-
+                                                    <div className="divide-y divide-black/5 dark:divide-white/5 pb-2">
+                                                        {group.habits.map(({ habit, logs, completionRate }) => {
+                                                            const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
                                                             return (
-                                                                <div key={logIdx} className="w-12 flex justify-center p-2">
-                                                                    <motion.button
-                                                                        whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
-                                                                        onClick={() => handleToggle(habit._id, log.date, log.completed)}
-                                                                        disabled={isFutureDay}
-                                                                        className={cn(
-                                                                            "flex h-8 w-8 items-center justify-center rounded-lg transition-all shadow-sm",
-                                                                            log.completed
-                                                                                ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
-                                                                                : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
-                                                                            isFutureDay && "opacity-20 cursor-not-allowed",
-                                                                            isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/20"
-                                                                        )}
+                                                                <div key={habit._id} className="flex items-center group">
+                                                                    <div
+                                                                        onClick={() => {
+                                                                            setEditingHabit(habit);
+                                                                            setShowForm(true);
+                                                                        }}
+                                                                        className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
                                                                     >
-                                                                        {log.completed ? (
-                                                                            <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
-                                                                        ) : (
-                                                                            <span className="text-[9px] font-black text-black/40 dark:text-white/20">
-                                                                                {format(log.date, "d")}
-                                                                            </span>
-                                                                        )}
-                                                                    </motion.button>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <p className="text-[11px] font-black text-black dark:text-white truncate leading-tight uppercase tracking-tight">
+                                                                                {habit.title}
+                                                                            </p>
+                                                                            <p className={cn("text-[9px] font-bold mt-0.5",
+                                                                                completionRate >= 80 ? "text-green-500" :
+                                                                                    completionRate >= 50 ? "text-yellow-500" : "text-red-500"
+                                                                            )}>
+                                                                                {completionRate}%
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex">
+                                                                        {logs.map((log, logIdx) => {
+                                                                            const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                                            const isTodayDate = isToday(log.date);
+                                                                            return (
+                                                                                <div key={logIdx} className="w-12 flex justify-center p-2">
+                                                                                    <motion.button
+                                                                                        whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                                        onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                                        disabled={isFutureDay}
+                                                                                        className={cn(
+                                                                                            "flex h-8 w-8 items-center justify-center rounded-lg transition-all shadow-sm",
+                                                                                            log.completed
+                                                                                                ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
+                                                                                                : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                                            isFutureDay && "opacity-20 cursor-not-allowed",
+                                                                                            isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/20"
+                                                                                        )}
+                                                                                    >
+                                                                                        {log.completed ? (
+                                                                                            <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
+                                                                                        ) : (
+                                                                                            <span className="text-[9px] font-black text-black/40 dark:text-white/20">
+                                                                                                {format(log.date, "d")}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </motion.button>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
                                                             );
                                                         })}
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Desktop View for this group */}
+                                    <div className="hidden md:block card overflow-visible">
+                                        {isLoadingLogs ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
+                                            </div>
+                                        ) : (
+                                            <div className="overflow-x-auto habit-matrix-scroll">
+                                                <table className="w-full min-w-[600px]">
+                                                    <thead>
+                                                        <tr className="border-b border-black/10 dark:border-white/10">
+                                                            <th className="sticky left-0 z-10 bg-white px-4 py-4 text-left dark:bg-surface-900">
+                                                                <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">Habit</span>
+                                                            </th>
+                                                            {group.days.map((day) => (
+                                                                <th key={day.toISOString()} className="px-1 py-3 text-center min-w-[40px]">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">{format(day, "EEE")}</span>
+                                                                        <span className={cn(
+                                                                            "mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold",
+                                                                            isToday(day) ? "bg-black text-white dark:bg-white dark:text-black" : "text-black/40 dark:text-white/40"
+                                                                        )}>{format(day, "d")}</span>
+                                                                    </div>
+                                                                </th>
+                                                            ))}
+                                                            <th className="px-4 py-4 text-center">
+                                                                <div className="flex items-center justify-center gap-1.5">
+                                                                    <TrendingUp className="h-3 w-3 text-purple-500" />
+                                                                    <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">Rate</span>
+                                                                </div>
+                                                            </th>
+                                                            <th className="w-12 px-2 py-4" />
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {group.habits.map(({ habit, logs, completionRate }, rowIndex) => {
+                                                            const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
+                                                            return (
+                                                                <motion.tr
+                                                                    key={habit._id}
+                                                                    initial={{ opacity: 0, y: 10 }}
+                                                                    animate={{ opacity: 1, y: 0 }}
+                                                                    transition={{ delay: rowIndex * 0.03 }}
+                                                                    className="group border-b border-black/5 last:border-0 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                                                                >
+                                                                    <td className="sticky left-0 z-10 bg-white px-4 py-3 dark:bg-surface-900 group-hover:bg-gray-50 dark:group-hover:bg-surface-800/50">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="relative h-10 w-10 flex-shrink-0">
+                                                                                <svg className="h-10 w-10 -rotate-90 transform" viewBox="0 0 36 36">
+                                                                                    <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-black/10 dark:text-white/10" />
+                                                                                    <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
+                                                                                </svg>
+                                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                                    <span className={cn("text-[10px] font-bold", colors.text)}>{completionRate}%</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="min-w-0 flex-1">
+                                                                                <p className="truncate font-semibold text-black dark:text-white">{habit.title}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    {logs.map((log, index) => {
+                                                                        const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                                        const isTodayDate = isToday(log.date);
+                                                                        return (
+                                                                            <td key={index} className="px-1 py-3 text-center">
+                                                                                <motion.button
+                                                                                    whileHover={!isFutureDay ? { scale: 1.15 } : undefined}
+                                                                                    whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                                    onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                                    disabled={isFutureDay}
+                                                                                    className={cn(
+                                                                                        "mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
+                                                                                        log.completed
+                                                                                            ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-md`
+                                                                                            : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                                        isFutureDay && "cursor-not-allowed opacity-10",
+                                                                                        isTodayDate && !log.completed && "ring-2 ring-black/10 dark:ring-white/10"
+                                                                                    )}
+                                                                                >
+                                                                                    <div className="relative">
+                                                                                        <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/40 dark:text-white/20")}>
+                                                                                            {format(log.date, "d")}
+                                                                                        </span>
+                                                                                        {log.completed && <Check className={cn("absolute -top-1.5 -right-1.5 h-3 w-3", colors.checkedText)} strokeWidth={4} />}
+                                                                                    </div>
+                                                                                </motion.button>
+                                                                            </td>
+                                                                        );
+                                                                    })}
+                                                                    <td className="px-4 py-3 text-center">
+                                                                        <span className={cn(
+                                                                            "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold",
+                                                                            completionRate >= 80 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+                                                                                completionRate >= 50 ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                                                                                    "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                                                        )}>{completionRate}%</span>
+                                                                    </td>
+                                                                    <td className="px-2 py-3">
+                                                                        <div className="relative">
+                                                                            <button
+                                                                                onClick={() => setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id)}
+                                                                                className="flex h-8 w-8 items-center justify-center rounded-lg text-black/30 opacity-0 transition-all hover:bg-black/5 hover:text-black/60 group-hover:opacity-100 dark:text-white/30 dark:hover:bg-white/5 dark:hover:text-white/60"
+                                                                            >
+                                                                                <MoreVertical className="h-4 w-4" />
+                                                                            </button>
+                                                                            <AnimatePresence>
+                                                                                {menuOpenFor === habit._id && (
+                                                                                    <>
+                                                                                        <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
+                                                                                        <motion.div
+                                                                                            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                                                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                                                            className="absolute right-0 bottom-full z-20 mb-1 w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
+                                                                                        >
+                                                                                            <button
+                                                                                                onClick={() => {
+                                                                                                    setMenuOpenFor(null);
+                                                                                                    setEditingHabit(habit);
+                                                                                                    setShowForm(true);
+                                                                                                }}
+                                                                                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm hover:bg-black/5 dark:hover:bg-white/5"
+                                                                                            >
+                                                                                                <Edit2 className="h-4 w-4" /> Edit
+                                                                                            </button>
+                                                                                            <button
+                                                                                                onClick={() => {
+                                                                                                    setMenuOpenFor(null);
+                                                                                                    setDeletingHabit(habit);
+                                                                                                }}
+                                                                                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                                                            >
+                                                                                                <Trash2 className="h-4 w-4" /> Delete
+                                                                                            </button>
+                                                                                        </motion.div>
+                                                                                    </>
+                                                                                )}
+                                                                            </AnimatePresence>
+                                                                        </div>
+                                                                    </td>
+                                                                </motion.tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Desktop Table View */}
-                    <div className="hidden md:block card overflow-visible">
-                        {isLoadingLogs ? (
-                            <div className="flex items-center justify-center py-16">
-                                <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto habit-matrix-scroll">
-                                <table className="w-full min-w-[600px]">
-                                    <thead>
-                                        <tr className="border-b border-black/10 dark:border-white/10">
-                                            <th className="sticky left-0 z-10 bg-white px-4 py-4 text-left dark:bg-surface-900">
-                                                <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
-                                                    Habit
-                                                </span>
-                                            </th>
-                                            {displayDays.map((day) => (
-                                                <th key={day.toISOString()} className={cn("px-1 py-3 text-center", getColumnWidth())}>
-                                                    <div className="flex flex-col items-center">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
-                                                            {format(day, "EEE")}
-                                                        </span>
-                                                        <span
-                                                            className={cn(
-                                                                "mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold",
-                                                                isToday(day)
-                                                                    ? "bg-black text-white dark:bg-white dark:text-black"
-                                                                    : "text-black/40 dark:text-white/40"
-                                                            )}
-                                                        >
-                                                            {format(day, "d")}
-                                                        </span>
-                                                    </div>
-                                                </th>
-                                            ))}
-                                            <th className="px-4 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-1.5">
-                                                    <TrendingUp className="h-3 w-3 text-purple-500" />
-                                                    <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
-                                                        Rate
-                                                    </span>
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+                            {/* Mobile Matrix View - Consolidated Chronological Table */}
+                            <div className="block md:hidden card overflow-hidden">
+                                {isLoadingLogs ? (
+                                    <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
+                                ) : (
+                                    <div className="overflow-x-auto scrollbar-hide">
+                                        <div className="min-w-max">
+                                            {/* Date Header Row */}
+                                            <div className="flex border-b border-black/5 bg-black/[0.02] dark:border-white/5 dark:bg-white/[0.02] py-4">
+                                                <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end pb-1">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Habits</span>
                                                 </div>
-                                            </th>
-                                            <th className="w-12 px-2 py-4" />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {habitsData.map(({ habit, logs, completionRate }, rowIndex) => {
-                                            const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
+                                                <div className="flex">
+                                                    {days.map((day) => (
+                                                        <div key={day.toISOString()} className="w-12 flex flex-col items-center flex-shrink-0">
+                                                            <span className="text-[9px] font-black text-black/30 dark:text-white/30 uppercase tracking-tighter">
+                                                                {format(day, "EEE")}
+                                                            </span>
+                                                            <span className={cn(
+                                                                "text-[13px] font-black mt-1 flex items-center justify-center w-7 h-7 rounded-full transition-colors",
+                                                                isToday(day)
+                                                                    ? "bg-black text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black"
+                                                                    : "text-black/40 dark:text-white/40"
+                                                            )}>
+                                                                {format(day, "d")}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
 
-                                            // Display logs in same order as displayDays
-                                            const displayLogs = activeType === "custom"
-                                                ? [...logs].reverse()  // Custom: reverse to match displayDays
-                                                : logs;  // Weekly/Monthly: keep chronological
+                                            {/* Habit Rows */}
+                                            <div className="divide-y divide-black/5 dark:divide-white/5 pb-2">
+                                                {habitsData.map(({ habit, logs, completionRate }) => {
+                                                    const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
-                                            return (
-                                                <motion.tr
-                                                    key={habit._id}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: rowIndex * 0.03 }}
-                                                    className="group border-b border-black/5 last:border-0 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
-                                                >
-                                                    <td className="sticky left-0 z-10 bg-white px-4 py-3 dark:bg-surface-900 group-hover:bg-gray-50 dark:group-hover:bg-surface-800/50">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="relative h-10 w-10 flex-shrink-0">
-                                                                <svg className="h-10 w-10 -rotate-90 transform" viewBox="0 0 36 36">
-                                                                    <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-black/10 dark:text-white/10" />
-                                                                    <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
-                                                                </svg>
-                                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                                    <span className={cn("text-[10px] font-bold", colors.text)}>
+                                                    return (
+                                                        <div key={habit._id} className="flex items-center group">
+                                                            {/* Sticky Habit Label */}
+                                                            <div
+                                                                onClick={() => {
+                                                                    setEditingHabit(habit);
+                                                                    setShowForm(true);
+                                                                }}
+                                                                className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
+                                                            >
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="text-[11px] font-black text-black dark:text-white truncate leading-tight uppercase tracking-tight">
+                                                                        {habit.title}
+                                                                    </p>
+                                                                    <p className={cn("text-[9px] font-bold mt-0.5",
+                                                                        completionRate >= 80 ? "text-green-500" :
+                                                                            completionRate >= 50 ? "text-yellow-500" : "text-red-500"
+                                                                    )}>
                                                                         {completionRate}%
-                                                                    </span>
+                                                                    </p>
                                                                 </div>
                                                             </div>
-                                                            <div className="min-w-0 flex-1">
-                                                                <p className="truncate font-semibold text-black dark:text-white">{habit.title}</p>
-                                                                {habit.customPeriodDays && (
-                                                                    <span className="text-[10px] text-black/40 dark:text-white/40">
-                                                                        {habit.customPeriodDays}d period
-                                                                    </span>
-                                                                )}
+
+                                                            {/* Toggle Buttons Grid */}
+                                                            <div className="flex">
+                                                                {logs.map((log, logIdx) => {
+                                                                    const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                                    const isTodayDate = isToday(log.date);
+
+                                                                    return (
+                                                                        <div key={logIdx} className="w-12 flex justify-center p-2">
+                                                                            <motion.button
+                                                                                whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                                onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                                disabled={isFutureDay}
+                                                                                className={cn(
+                                                                                    "flex h-8 w-8 items-center justify-center rounded-lg transition-all shadow-sm",
+                                                                                    log.completed
+                                                                                        ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
+                                                                                        : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                                    isFutureDay && "opacity-20 cursor-not-allowed",
+                                                                                    isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/20"
+                                                                                )}
+                                                                            >
+                                                                                {log.completed ? (
+                                                                                    <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
+                                                                                ) : (
+                                                                                    <span className="text-[9px] font-black text-black/40 dark:text-white/20">
+                                                                                        {format(log.date, "d")}
+                                                                                    </span>
+                                                                                )}
+                                                                            </motion.button>
+                                                                        </div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    {displayLogs.map((log, index) => {
-                                                        const isFutureDay = isFuture(log.date) && !isToday(log.date);
-                                                        const isTodayDate = isToday(log.date);
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                                                        return (
-                                                            <td key={index} className={cn("px-1 py-3 text-center", getColumnWidth())}>
-                                                                <motion.button
-                                                                    whileHover={!isFutureDay ? { scale: 1.15 } : undefined}
-                                                                    whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
-                                                                    onClick={() => handleToggle(habit._id, log.date, log.completed)}
-                                                                    disabled={isFutureDay}
+                            {/* Desktop Table View */}
+                            <div className="hidden md:block card overflow-visible">
+                                {isLoadingLogs ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
+                                    </div>
+                                ) : (
+                                    <div className="overflow-x-auto habit-matrix-scroll">
+                                        <table className="w-full min-w-[600px]">
+                                            <thead>
+                                                <tr className="border-b border-black/10 dark:border-white/10">
+                                                    <th className="sticky left-0 z-10 bg-white px-4 py-4 text-left dark:bg-surface-900">
+                                                        <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
+                                                            Habit
+                                                        </span>
+                                                    </th>
+                                                    {displayDays.map((day) => (
+                                                        <th key={day.toISOString()} className={cn("px-1 py-3 text-center", getColumnWidth())}>
+                                                            <div className="flex flex-col items-center">
+                                                                <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
+                                                                    {format(day, "EEE")}
+                                                                </span>
+                                                                <span
                                                                     className={cn(
-                                                                        "mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
-                                                                        log.completed
-                                                                            ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-md`
-                                                                            : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
-                                                                        isFutureDay && "cursor-not-allowed opacity-10",
-                                                                        isTodayDate && !log.completed && "ring-2 ring-black/10 dark:ring-white/10"
+                                                                        "mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold",
+                                                                        isToday(day)
+                                                                            ? "bg-black text-white dark:bg-white dark:text-black"
+                                                                            : "text-black/40 dark:text-white/40"
                                                                     )}
                                                                 >
-                                                                    <div className="relative">
-                                                                        <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/40 dark:text-white/20")}>
-                                                                            {format(log.date, "d")}
-                                                                        </span>
-                                                                        {log.completed && (
-                                                                            <Check className={cn("absolute -top-1.5 -right-1.5 h-3 w-3", colors.checkedText)} strokeWidth={4} />
+                                                                    {format(day, "d")}
+                                                                </span>
+                                                            </div>
+                                                        </th>
+                                                    ))}
+                                                    <th className="px-4 py-4 text-center">
+                                                        <div className="flex items-center justify-center gap-1.5">
+                                                            <TrendingUp className="h-3 w-3 text-purple-500" />
+                                                            <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
+                                                                Rate
+                                                            </span>
+                                                        </div>
+                                                    </th>
+                                                    <th className="w-12 px-2 py-4" />
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {habitsData.map(({ habit, logs, completionRate }, rowIndex) => {
+                                                    const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
+
+                                                    // Display logs in same order as displayDays
+                                                    const displayLogs = activeType === "custom"
+                                                        ? [...logs].reverse()  // Custom: reverse to match displayDays
+                                                        : logs;  // Weekly/Monthly: keep chronological
+
+                                                    return (
+                                                        <motion.tr
+                                                            key={habit._id}
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: rowIndex * 0.03 }}
+                                                            className="group border-b border-black/5 last:border-0 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                                                        >
+                                                            <td className="sticky left-0 z-10 bg-white px-4 py-3 dark:bg-surface-900 group-hover:bg-gray-50 dark:group-hover:bg-surface-800/50">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="relative h-10 w-10 flex-shrink-0">
+                                                                        <svg className="h-10 w-10 -rotate-90 transform" viewBox="0 0 36 36">
+                                                                            <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-black/10 dark:text-white/10" />
+                                                                            <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
+                                                                        </svg>
+                                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                                            <span className={cn("text-[10px] font-bold", colors.text)}>
+                                                                                {completionRate}%
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="min-w-0 flex-1">
+                                                                        <p className="truncate font-semibold text-black dark:text-white">{habit.title}</p>
+                                                                        {habit.customPeriodDays && (
+                                                                            <span className="text-[10px] text-black/40 dark:text-white/40">
+                                                                                {habit.customPeriodDays}d period
+                                                                            </span>
                                                                         )}
                                                                     </div>
-                                                                </motion.button>
+                                                                </div>
                                                             </td>
-                                                        );
-                                                    })}
-                                                    <td className="px-4 py-3 text-center">
-                                                        <span
-                                                            className={cn(
-                                                                "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold",
-                                                                completionRate >= 80
-                                                                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                                                    : completionRate >= 50
-                                                                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                                                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                                            )}
-                                                        >
-                                                            {completionRate}%
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-2 py-3">
-                                                        <div className="relative">
-                                                            <button
-                                                                onClick={() => setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id)}
-                                                                className="flex h-8 w-8 items-center justify-center rounded-lg text-black/30 opacity-0 transition-all hover:bg-black/5 hover:text-black/60 group-hover:opacity-100 dark:text-white/30 dark:hover:bg-white/5 dark:hover:text-white/60"
-                                                            >
-                                                                <MoreVertical className="h-4 w-4" />
-                                                            </button>
-                                                            <AnimatePresence>
-                                                                {menuOpenFor === habit._id && (
-                                                                    <>
-                                                                        <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
-                                                                        <motion.div
-                                                                            initial={{ opacity: 0, scale: 0.95, y: 8 }}
-                                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                                            exit={{ opacity: 0, scale: 0.95 }}
-                                                                            className="absolute right-0 bottom-full z-20 mb-1 w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
-                                                                        >
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    setMenuOpenFor(null);
-                                                                                    setEditingHabit(habit);
-                                                                                    setShowForm(true);
-                                                                                }}
-                                                                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm hover:bg-black/5 dark:hover:bg-white/5"
-                                                                            >
-                                                                                <Edit2 className="h-4 w-4" />
-                                                                                Edit
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    setMenuOpenFor(null);
-                                                                                    setDeletingHabit(habit);
-                                                                                }}
-                                                                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                                            >
-                                                                                <Trash2 className="h-4 w-4" />
-                                                                                Delete
-                                                                            </button>
-                                                                        </motion.div>
-                                                                    </>
-                                                                )}
-                                                            </AnimatePresence>
-                                                        </div>
-                                                    </td>
-                                                </motion.tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                                            {logs.map((log, index) => {
+                                                                const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                                const isTodayDate = isToday(log.date);
 
-                        {/* Legend */}
-                        <div className="flex items-center justify-center gap-6 border-t border-black/10 px-4 py-4 dark:border-white/10">
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-green-600 text-white shadow-sm">
-                                    <Check className="h-3 w-3" strokeWidth={4} />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Completed</span>
+                                                                return (
+                                                                    <td key={index} className={cn("px-1 py-3 text-center", getColumnWidth())}>
+                                                                        <motion.button
+                                                                            whileHover={!isFutureDay ? { scale: 1.15 } : undefined}
+                                                                            whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                            onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                            disabled={isFutureDay}
+                                                                            className={cn(
+                                                                                "mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
+                                                                                log.completed
+                                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-md`
+                                                                                    : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                                isFutureDay && "cursor-not-allowed opacity-10",
+                                                                                isTodayDate && !log.completed && "ring-2 ring-black/10 dark:ring-white/10"
+                                                                            )}
+                                                                        >
+                                                                            <div className="relative">
+                                                                                <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/40 dark:text-white/20")}>
+                                                                                    {format(log.date, "d")}
+                                                                                </span>
+                                                                                {log.completed && (
+                                                                                    <Check className={cn("absolute -top-1.5 -right-1.5 h-3 w-3", colors.checkedText)} strokeWidth={4} />
+                                                                                )}
+                                                                            </div>
+                                                                        </motion.button>
+                                                                    </td>
+                                                                );
+                                                            })}
+                                                            <td className="px-4 py-3 text-center">
+                                                                <span
+                                                                    className={cn(
+                                                                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold",
+                                                                        completionRate >= 80
+                                                                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                                                            : completionRate >= 50
+                                                                                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                                                                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                                                    )}
+                                                                >
+                                                                    {completionRate}%
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-2 py-3">
+                                                                <div className="relative">
+                                                                    <button
+                                                                        onClick={() => setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id)}
+                                                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-black/30 opacity-0 transition-all hover:bg-black/5 hover:text-black/60 group-hover:opacity-100 dark:text-white/30 dark:hover:bg-white/5 dark:hover:text-white/60"
+                                                                    >
+                                                                        <MoreVertical className="h-4 w-4" />
+                                                                    </button>
+                                                                    <AnimatePresence>
+                                                                        {menuOpenFor === habit._id && (
+                                                                            <>
+                                                                                <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
+                                                                                <motion.div
+                                                                                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                                                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                                                    className="absolute right-0 bottom-full z-20 mb-1 w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
+                                                                                >
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            setMenuOpenFor(null);
+                                                                                            setEditingHabit(habit);
+                                                                                            setShowForm(true);
+                                                                                        }}
+                                                                                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm hover:bg-black/5 dark:hover:bg-white/5"
+                                                                                    >
+                                                                                        <Edit2 className="h-4 w-4" />
+                                                                                        Edit
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            setMenuOpenFor(null);
+                                                                                            setDeletingHabit(habit);
+                                                                                        }}
+                                                                                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                                                    >
+                                                                                        <Trash2 className="h-4 w-4" />
+                                                                                        Delete
+                                                                                    </button>
+                                                                                </motion.div>
+                                                                            </>
+                                                                        )}
+                                                                    </AnimatePresence>
+                                                                </div>
+                                                            </td>
+                                                        </motion.tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-dashed border-black/10 dark:border-white/10">
-                                    <X className="h-3 w-3 text-black/20 dark:text-white/20" />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Missed</span>
+                        </>
+                    )}
+
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-6 border-t border-black/10 px-4 py-4 mt-6 dark:border-white/10">
+                        <div className="flex items-center gap-2">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-green-600 text-white shadow-sm">
+                                <Check className="h-3 w-3" strokeWidth={4} />
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="h-6 w-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Future</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Completed</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-dashed border-black/10 dark:border-white/10">
+                                <X className="h-3 w-3 text-black/20 dark:text-white/20" />
                             </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Missed</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Future</span>
                         </div>
                     </div>
 
@@ -779,7 +1083,11 @@ export default function HabitsPage() {
                                 <CalendarDays className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4D7CFE]" />
                                 <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">Tracked</p>
                             </div>
-                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{days.length}</p>
+                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
+                                {activeType === "custom"
+                                    ? customHabitGroups.reduce((acc, g) => acc + g.days.length, 0)
+                                    : days.length}
+                            </p>
                         </div>
                     </div>
                 </>

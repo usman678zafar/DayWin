@@ -22,9 +22,10 @@ interface DatePickerProps {
     onChange: (date: Date) => void;
     label?: string;
     className?: string;
+    align?: "left" | "right" | "center";
 }
 
-export function DatePicker({ value, onChange, label, className }: DatePickerProps) {
+export function DatePicker({ value, onChange, label, className, align = "left" }: DatePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(value);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -44,7 +45,7 @@ export function DatePicker({ value, onChange, label, className }: DatePickerProp
         return (
             <div className="grid grid-cols-7 mb-1">
                 {days.map((day) => (
-                    <div key={day} className="py-2 text-center text-xs font-medium text-black/40 dark:text-white/40">
+                    <div key={day} className="py-2 text-center text-[10px] sm:text-xs font-medium text-black/40 dark:text-white/40">
                         {day}
                     </div>
                 ))}
@@ -79,10 +80,10 @@ export function DatePicker({ value, onChange, label, className }: DatePickerProp
                         }}
                         disabled={!isCurrentMonth}
                         className={cn(
-                            "w-8 h-8 rounded-lg text-sm font-medium transition-all",
-                            !isCurrentMonth && "opacity-30 cursor-not-allowed",
+                            "w-8 h-8 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all",
+                            !isCurrentMonth && "opacity-10 cursor-not-allowed",
                             isCurrentMonth && !isSelected && "hover:bg-black/5 dark:hover:bg-white/10",
-                            isSelected && "bg-black text-white dark:bg-white dark:text-black",
+                            isSelected && "bg-black text-white dark:bg-white dark:text-black shadow-lg",
                             isToday && !isSelected && "ring-1 ring-black/20 dark:ring-white/20"
                         )}
                     >
@@ -102,7 +103,7 @@ export function DatePicker({ value, onChange, label, className }: DatePickerProp
     };
 
     return (
-        <div ref={containerRef} className={cn("w-full", className)}>
+        <div ref={containerRef} className={cn("relative w-full", className)}>
             {label && (
                 <label className="block text-sm font-bold text-black dark:text-white mb-2 uppercase tracking-wide text-[10px]">
                     {label}
@@ -111,21 +112,33 @@ export function DatePicker({ value, onChange, label, className }: DatePickerProp
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex w-full items-center gap-2 rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
+                className="flex w-full items-center gap-2 rounded-xl border border-black/15 bg-white px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
             >
-                <Calendar className="h-4 w-4" />
-                {format(value, "MMM d, yyyy")}
+                <Calendar className="h-4 w-4 text-[#4D7CFE]" />
+                <span className="truncate">
+                    {format(value, "MMM d, yyyy")}
+                </span>
             </button>
 
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full z-50 mt-2 w-72 rounded-2xl border border-black/10 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-surface-900"
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className={cn(
+                            "fixed sm:absolute z-[100] mt-2 w-[calc(100vw-2.5rem)] sm:w-72 rounded-2xl border border-black/10 bg-white p-3 sm:p-4 shadow-2xl dark:border-white/10 dark:bg-[#1a1a1a]",
+                            // Mobile positioning (centered)
+                            "left-5 right-5 top-1/2 -translate-y-1/2 sm:top-full sm:translate-y-0",
+                            // Desktop positioning (based on align prop)
+                            align === "left" && "sm:left-0 sm:right-auto",
+                            align === "right" && "sm:left-auto sm:right-0",
+                            align === "center" && "sm:left-1/2 sm:-translate-x-1/2"
+                        )}
                     >
+                        {/* mobile backdrop for centered modal style */}
+                        <div className="sm:hidden fixed inset-0 -z-10 bg-black/20 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+
                         {/* Header */}
                         <div className="mb-4 flex items-center justify-between">
                             <button
@@ -135,7 +148,7 @@ export function DatePicker({ value, onChange, label, className }: DatePickerProp
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </button>
-                            <span className="text-sm font-semibold text-black dark:text-white">
+                            <span className="text-sm font-bold text-black dark:text-white">
                                 {format(currentMonth, "MMMM yyyy")}
                             </span>
                             <button

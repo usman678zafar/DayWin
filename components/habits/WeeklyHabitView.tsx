@@ -57,10 +57,9 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
 
             const habitsWithWeekData: HabitWeekData[] = habits.map((habit) => {
                 const weekLogs: WeekLog[] = weekDays.map((day) => {
-                    const dayStr = format(day, "yyyy-MM-dd");
                     const dayLog = logs.find(
                         (log: any) =>
-                            log.habitId === habit._id && log.date.split("T")[0] === dayStr
+                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
                     );
                     return {
                         date: day,
