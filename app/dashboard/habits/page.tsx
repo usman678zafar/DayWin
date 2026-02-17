@@ -404,7 +404,7 @@ export default function HabitsPage() {
 
             {/* Habit Type Tabs - Mobile Optimized */}
             <div className="mb-4 sm:mb-6">
-                <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-white p-1 dark:border-white/10 dark:bg-white/5 overflow-x-auto">
+                <div className="flex items-center justify-center gap-1 rounded-xl border border-black/10 bg-white p-1 dark:border-white/10 dark:bg-white/5 overflow-x-auto">
                     {habitTypeTabs.map((tab) => (
                         <button
                             key={tab.value}
