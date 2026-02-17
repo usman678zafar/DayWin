@@ -481,11 +481,8 @@ export default function HabitsPage() {
                                                             setEditingHabit(habit);
                                                             setShowForm(true);
                                                         }}
-                                                        className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center gap-2 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
+                                                        className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
                                                     >
-                                                        <div className={cn("flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg shadow-sm", colors.bg)}>
-                                                            <HabitIcon name={habit.icon} className={colors.text} size={16} />
-                                                        </div>
                                                         <div className="min-w-0 flex-1">
                                                             <p className="text-[11px] font-black text-black dark:text-white truncate leading-tight uppercase tracking-tight">
                                                                 {habit.title}
