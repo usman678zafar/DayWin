@@ -17,18 +17,22 @@ export async function POST(
         }
 
         const { completed, count, note, date } = await req.json();
+
+        // Normalize to UTC midnight to avoid timezone shifts
         const targetDate = date ? new Date(date) : new Date();
+        const utcDate = new Date(Date.UTC(
+            targetDate.getFullYear(),
+            targetDate.getMonth(),
+            targetDate.getDate()
+        ));
 
         await dbConnect();
 
-        // Find or create log for the day
+        // Find or create log for the day using exact UTC date match
         let log = await HabitLog.findOne({
             habitId: params.id,
             userId: session.user.id,
-            date: {
-                $gte: startOfDay(targetDate),
-                $lte: endOfDay(targetDate),
-            },
+            date: utcDate,
         });
 
         if (log) {
@@ -41,7 +45,7 @@ export async function POST(
             log = await HabitLog.create({
                 habitId: params.id,
                 userId: session.user.id,
-                date: startOfDay(targetDate),
+                date: utcDate,
                 completed,
                 count: count ?? 1,
                 note,
@@ -54,11 +58,12 @@ export async function POST(
 
         if (habit && completed) {
             const lastCompleted = habit.streak.lastCompletedDate;
-            const today = startOfDay(new Date());
-            const targetDay = startOfDay(targetDate);
+            const now = new Date();
+            const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+            const targetDay = utcDate;
 
             // Only update streak if completing for today or yesterday
-            if (targetDay.getTime() >= today.getTime() - 86400000) {
+            if (targetDay.getTime() >= today.getTime() - (24 * 60 * 60 * 1000)) {
                 if (!lastCompleted) {
                     habit.streak.current = 1;
                 } else {
@@ -85,7 +90,7 @@ export async function POST(
             }
         } else if (habit && !completed) {
             // Handle uncomplete
-            const targetDay = startOfDay(targetDate);
+            const targetDay = utcDate;
             const lastCompleted = habit.streak.lastCompletedDate;
 
             if (lastCompleted && startOfDay(new Date(lastCompleted)).getTime() === targetDay.getTime()) {

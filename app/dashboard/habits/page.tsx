@@ -201,7 +201,8 @@ export default function HabitsPage() {
                 const habitLogs: DayLog[] = habitDays.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
-                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
+                            log.habitId === habit._id &&
+                            format(new Date(log.date), "yyyy-MM-dd") === format(day, "yyyy-MM-dd")
                     );
                     return {
                         date: day,
@@ -232,7 +233,7 @@ export default function HabitsPage() {
                 setIsLoadingLogs(false);
             }
         }
-    }, [fetchHabits]);
+    }, [fetchHabits, dateRange, days]);
 
     // Effect to trigger log fetching
     useEffect(() => {
@@ -313,7 +314,7 @@ export default function HabitsPage() {
             prev.map((hd) => {
                 if (hd.habit._id === habitId) {
                     const newLogs = hd.logs.map((log) =>
-                        isSameDay(log.date, date)
+                        format(log.date, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
                             ? { ...log, completed: !currentCompleted }
                             : log
                     );
@@ -858,7 +859,11 @@ export default function HabitsPage() {
                                                         </span>
                                                     </th>
                                                     {displayDays.map((day) => (
-                                                        <th key={day.toISOString()} className={cn("px-1 py-3 text-center", getColumnWidth())}>
+                                                        <th key={day.toISOString()} className={cn(
+                                                            "px-1 py-3 text-center",
+                                                            getColumnWidth(),
+                                                            format(day, "i") === "6" && "border-r border-black/10 dark:border-white/10"
+                                                        )}>
                                                             <div className="flex flex-col items-center">
                                                                 <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
                                                                     {format(day, "EEE")}
@@ -927,7 +932,11 @@ export default function HabitsPage() {
                                                                 const isTodayDate = isToday(log.date);
 
                                                                 return (
-                                                                    <td key={index} className={cn("px-1 py-3 text-center", getColumnWidth())}>
+                                                                    <td key={index} className={cn(
+                                                                        "px-1 py-3 text-center",
+                                                                        getColumnWidth(),
+                                                                        format(logs[index].date, "i") === "6" && "border-r border-black/5 dark:border-white/5"
+                                                                    )}>
                                                                         <motion.button
                                                                             whileHover={!isFutureDay ? { scale: 1.15 } : undefined}
                                                                             whileTap={!isFutureDay ? { scale: 0.9 } : undefined}

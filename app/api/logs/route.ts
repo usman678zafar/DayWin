@@ -30,14 +30,18 @@ export async function GET(req: NextRequest) {
         }
 
         if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
             query.date = {
-                $gte: startOfDay(new Date(startDate)),
-                $lte: endOfDay(new Date(endDate)),
+                $gte: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)),
+                $lte: new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59, 999)),
             };
         } else if (days) {
+            const now = new Date();
+            const start = subDays(now, parseInt(days));
             query.date = {
-                $gte: startOfDay(subDays(new Date(), parseInt(days))),
-                $lte: endOfDay(new Date()),
+                $gte: new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)),
+                $lte: new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)),
             };
         }
 
