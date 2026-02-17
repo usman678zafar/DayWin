@@ -360,21 +360,6 @@ export default function HabitsPage() {
 
     return (
         <div className="page-container">
-            {/* Header */}
-            <div className="page-header">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h1 className="page-title">Habit Tracker</h1>
-                        <p className="page-subtitle">
-                            Organize habits by weekly, monthly, or custom periods.
-                        </p>
-                    </div>
-                    <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
-                        <Plus className="h-5 w-5" />
-                        Add Habit
-                    </Button>
-                </div>
-            </div>
 
             {/* Habit Type Tabs - Mobile Optimized */}
             <div className="mb-4 sm:mb-6">
@@ -584,7 +569,7 @@ export default function HabitsPage() {
                     </div>
 
                     {/* Desktop Table View */}
-                    <div className="hidden sm:block card overflow-hidden">
+                    <div className="hidden sm:block card overflow-visible">
                         {isLoadingLogs ? (
                             <div className="flex items-center justify-center py-16">
                                 <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
@@ -722,10 +707,10 @@ export default function HabitsPage() {
                                                                     <>
                                                                         <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
                                                                         <motion.div
-                                                                            initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                                                                            initial={{ opacity: 0, scale: 0.95, y: 8 }}
                                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                             exit={{ opacity: 0, scale: 0.95 }}
-                                                                            className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
+                                                                            className="absolute right-0 bottom-full z-20 mb-1 w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
                                                                         >
                                                                             <button
                                                                                 onClick={() => {
@@ -892,6 +877,16 @@ export default function HabitsPage() {
                     </div>
                 </div>
             </Modal>
+
+            {/* Floating Add Button */}
+            <motion.button
+                onClick={() => setShowForm(true)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30 transition-shadow hover:shadow-xl hover:shadow-[#4D7CFE]/40"
+            >
+                <Plus className="h-6 w-6" strokeWidth={2.5} />
+            </motion.button>
         </div>
     );
 }
