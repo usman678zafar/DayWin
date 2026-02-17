@@ -891,11 +891,6 @@ export default function HabitsPage() {
                                                 {habitsData.map(({ habit, logs, completionRate }, rowIndex) => {
                                                     const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
-                                                    // Display logs in same order as displayDays
-                                                    const displayLogs = activeType === "custom"
-                                                        ? [...logs].reverse()  // Custom: reverse to match displayDays
-                                                        : logs;  // Weekly/Monthly: keep chronological
-
                                                     return (
                                                         <motion.tr
                                                             key={habit._id}
