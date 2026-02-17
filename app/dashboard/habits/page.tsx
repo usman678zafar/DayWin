@@ -446,9 +446,7 @@ export default function HabitsPage() {
                                 const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
                                 // For mobile, show all logs in the period - order depends on view type
-                                const mobileDisplayLogs = activeType === "weekly"
-                                    ? logs // Chronological for weekly
-                                    : [...logs].reverse(); // Most recent first for monthly/custom on mobile
+                                const mobileDisplayLogs = logs; // Keep chronological for all views on mobile
 
                                 return (
                                     <motion.div

@@ -90,19 +90,21 @@ export default function CalendarPage() {
     };
 
     const renderHeader = () => (
-        <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-surface-900 dark:text-white">
                 {format(currentMonth, "MMMM yyyy")}
             </h2>
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
+                    size="sm"
                     onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                 >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
                 <Button
                     variant="secondary"
+                    size="sm"
                     onClick={() => {
                         setCurrentMonth(new Date());
                         setSelectedDate(new Date());
@@ -112,24 +114,27 @@ export default function CalendarPage() {
                 </Button>
                 <Button
                     variant="ghost"
+                    size="sm"
                     onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
                 >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
             </div>
         </div>
     );
 
     const renderDays = () => {
-        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const days = ["S", "M", "T", "W", "T", "F", "S"];
+        const fullDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         return (
             <div className="grid grid-cols-7 mb-2">
-                {days.map((day) => (
+                {fullDays.map((day, i) => (
                     <div
                         key={day}
-                        className="py-3 text-center text-sm font-semibold text-surface-200/50"
+                        className="py-2 sm:py-3 text-center text-[10px] sm:text-sm font-semibold text-surface-200/50"
                     >
-                        {day}
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{days[i]}</span>
                     </div>
                 ))}
             </div>
@@ -167,15 +172,15 @@ export default function CalendarPage() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedDate(cloneDay)}
                         className={cn(
-                            "relative aspect-square p-2 cursor-pointer rounded-xl transition-all duration-300",
+                            "relative aspect-square p-0.5 sm:p-1.5 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-300",
                             !isCurrentMonth && "opacity-30",
-                            isSelected && "ring-2 ring-primary-500",
+                            isSelected && "ring-1 sm:ring-2 ring-primary-500",
                             isTodayDate && "bg-primary-50 dark:bg-primary-900/20"
                         )}
                     >
                         <div
                             className={cn(
-                                "w-full h-full rounded-lg flex flex-col items-center justify-center",
+                                "w-full h-full rounded sm:rounded-lg flex flex-col items-center justify-center",
                                 completionRate === 100 && !isFutureDate && "bg-success-100 dark:bg-success-900/30",
                                 completionRate > 0 && completionRate < 100 && !isFutureDate && "bg-yellow-100 dark:bg-yellow-900/30",
                                 completionRate === 0 && totalHabits > 0 && dayLogs.length > 0 && !isFutureDate && "bg-red-100 dark:bg-red-900/30"
@@ -183,7 +188,7 @@ export default function CalendarPage() {
                         >
                             <span
                                 className={cn(
-                                    "text-sm font-semibold",
+                                    "text-xs sm:text-sm font-semibold",
                                     isTodayDate
                                         ? "text-primary-600 dark:text-primary-400"
                                         : "text-surface-900 dark:text-white"
@@ -229,10 +234,10 @@ export default function CalendarPage() {
                 <p className="page-subtitle">Track completion patterns across every day. Click any date to view and edit habits.</p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
                 {/* Calendar */}
                 <div className="lg:col-span-2">
-                    <div className="card p-6">
+                    <div className="card p-3 sm:p-6">
                         {renderHeader()}
                         {renderDays()}
                         {isLoading ? (
@@ -243,18 +248,18 @@ export default function CalendarPage() {
                     </div>
 
                     {/* Legend */}
-                    <div className="flex items-center justify-center gap-6 mt-6">
+                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 px-2">
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-success-100 dark:bg-success-900/30" />
-                            <span className="text-sm text-surface-200/50">All complete</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-success-100 dark:bg-success-900/30" />
+                            <span className="text-[10px] sm:text-xs text-surface-200/50">All complete</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-yellow-100 dark:bg-yellow-900/30" />
-                            <span className="text-sm text-surface-200/50">Partial</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-yellow-100 dark:bg-yellow-900/30" />
+                            <span className="text-[10px] sm:text-xs text-surface-200/50">Partial</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-red-100 dark:bg-red-900/30" />
-                            <span className="text-sm text-surface-200/50">None</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-red-100 dark:bg-red-900/30" />
+                            <span className="text-[10px] sm:text-xs text-surface-200/50">None</span>
                         </div>
                     </div>
                 </div>

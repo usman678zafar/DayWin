@@ -18,7 +18,7 @@ export function Header() {
         >
             <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40">{today}</p>
             <h1 className="mt-2 text-4xl sm:text-5xl font-black tracking-[-0.04em] text-black dark:text-white leading-tight">
-                {greeting}, <span className="bg-gradient-to-r from-[#4D7CFE] to-purple-500 bg-clip-text text-transparent">{session?.user?.name?.split(" ")[0] || "Champion"}</span>
+                {greeting}, <span className="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] bg-clip-text text-transparent">{session?.user?.name?.split(" ")[0] || "Champion"}</span>
             </h1>
             <p className="mt-3 text-xs sm:text-sm font-medium text-black/50 dark:text-white/40 max-w-lg">
                 Focus on momentum. Small actions today create the massive wins of tomorrow.
