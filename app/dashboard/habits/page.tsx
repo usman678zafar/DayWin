@@ -376,7 +376,7 @@ export default function HabitsPage() {
                                 "relative flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition whitespace-nowrap flex-1 sm:flex-none justify-center",
                                 activeType === tab.value
                                     ? "bg-black text-white dark:bg-white dark:text-black"
-                                    : "text-black/60 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+                                    : "text-black/70 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
                             )}
                         >
                             <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -521,7 +521,7 @@ export default function HabitsPage() {
                                                                         {log.completed ? (
                                                                             <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
                                                                         ) : (
-                                                                            <span className="text-[9px] font-black text-black/20 dark:text-white/20">
+                                                                            <span className="text-[9px] font-black text-black/40 dark:text-white/20">
                                                                                 {format(log.date, "d")}
                                                                             </span>
                                                                         )}
@@ -646,7 +646,7 @@ export default function HabitsPage() {
                                                                     )}
                                                                 >
                                                                     <div className="relative">
-                                                                        <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/20 dark:text-white/20")}>
+                                                                        <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/40 dark:text-white/20")}>
                                                                             {format(log.date, "d")}
                                                                         </span>
                                                                         {log.completed && (
@@ -750,14 +750,14 @@ export default function HabitsPage() {
                         <div className="card p-3 sm:p-4 group hover:border-blue-500/30 transition-colors">
                             <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                                 <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-500" />
-                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Habits</p>
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">Habits</p>
                             </div>
                             <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{habitsData.length}</p>
                         </div>
                         <div className="card p-3 sm:p-4 group hover:border-success-500/30 transition-colors">
                             <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                                 <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success-500" />
-                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Done</p>
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">Done</p>
                             </div>
                             <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
                                 {habitsData.reduce((acc, hd) => acc + hd.logs.filter((l) => l.completed).length, 0)}
@@ -766,7 +766,7 @@ export default function HabitsPage() {
                         <div className="card p-3 sm:p-4 group hover:border-purple-500/30 transition-colors">
                             <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                                 <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-500" />
-                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Avg Rate</p>
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">Avg Rate</p>
                             </div>
                             <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
                                 {habitsData.length > 0
@@ -777,7 +777,7 @@ export default function HabitsPage() {
                         <div className="card p-3 sm:p-4 group hover:border-[#4D7CFE]/30 transition-colors">
                             <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                                 <CalendarDays className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4D7CFE]" />
-                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Tracked</p>
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">Tracked</p>
                             </div>
                             <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{days.length}</p>
                         </div>
@@ -790,9 +790,9 @@ export default function HabitsPage() {
                     className="card py-12 sm:py-16 text-center"
                 >
                     <div className="mx-auto mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 shadow-inner">
-                        {activeType === "weekly" && <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
-                        {activeType === "monthly" && <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
-                        {activeType === "custom" && <Settings className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
+                        {activeType === "weekly" && <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-black/60 dark:text-white/40" />}
+                        {activeType === "monthly" && <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-black/60 dark:text-white/40" />}
+                        {activeType === "custom" && <Settings className="h-8 w-8 sm:h-10 sm:w-10 text-black/60 dark:text-white/40" />}
                     </div>
                     <h3 className="mb-2 text-lg sm:text-xl font-bold text-black dark:text-white">
                         No {activeType} habits yet

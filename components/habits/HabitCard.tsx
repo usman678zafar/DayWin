@@ -135,7 +135,7 @@ export function HabitCard({
                                 key="empty"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="text-xl font-black text-black/10 dark:text-white/10"
+                                className="text-xl font-black text-black/40 dark:text-white/10"
                             >
                                 {new Date().getDate()}
                             </motion.div>
@@ -164,7 +164,7 @@ export function HabitCard({
                     <h3
                         className={cn(
                             "font-black text-base sm:text-xl text-black transition-all duration-500 dark:text-white truncate tracking-tight",
-                            isCompleted && "opacity-40 line-through decoration-2"
+                            isCompleted && "opacity-60 line-through decoration-2"
                         )}
                     >
                         {habit.title}
@@ -188,7 +188,7 @@ export function HabitCard({
                             onClick={() => setShowMenu(!showMenu)}
                             className="rounded-xl p-2 transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-90"
                         >
-                            <MoreVertical className="h-5 w-5 text-black/40 dark:text-white/20" />
+                            <MoreVertical className="h-5 w-5 text-black/60 dark:text-white/20" />
                         </button>
 
                         <AnimatePresence>
@@ -236,9 +236,9 @@ export function HabitCard({
             {habit.targetCount > 1 && (
                 <div className="mt-5 sm:mt-6">
                     <div className="mb-2 flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/20">Momentum</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-black/70 dark:text-white/20">Momentum</span>
                         <span className={cn("text-xs font-black", colors.text)}>
-                            {habit.todayLog?.count ?? 0} <span className="opacity-40">/ {habit.targetCount}</span>
+                            {habit.todayLog?.count ?? 0} <span className="opacity-60">/ {habit.targetCount}</span>
                         </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-black/5 dark:bg-white/5 p-0.5 shadow-inner">

@@ -243,7 +243,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             "flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition whitespace-nowrap",
                             currentStep === step
                                 ? "bg-black text-white dark:bg-white dark:text-black"
-                                : "text-black/40 hover:text-black/70 dark:text-white/40 dark:hover:text-white/70"
+                                : "text-black/60 hover:text-black dark:text-white/40 dark:hover:text-white/70"
                         )}
                     >
                         <span
@@ -280,7 +280,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white">
                                 Choose Habit Type
                             </h3>
-                            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-black/60 dark:text-white/60">
+                            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-black/80 dark:text-white/60">
                                 Select the tracking period for your habit
                             </p>
                         </div>
@@ -332,7 +332,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                     "mt-0.5 sm:mt-1 text-xs sm:text-sm",
                                                     isSelected
                                                         ? "text-white/70 dark:text-black/70"
-                                                        : "text-black/60 dark:text-white/60"
+                                                        : "text-black/70 dark:text-white/60"
                                                 )}
                                             >
                                                 {option.description}
@@ -479,7 +479,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                 <button
                                     type="button"
                                     onClick={() => setShowAllIcons(!showAllIcons)}
-                                    className="text-[10px] sm:text-xs font-medium text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                                    className="text-[10px] sm:text-xs font-bold text-black/70 hover:text-black dark:text-white/60 dark:hover:text-white"
                                 >
                                     {showAllIcons ? "Show less" : "Browse all"}
                                 </button>
@@ -506,7 +506,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             {/* Quick Suggestions */}
                             {!showAllIcons && (
                                 <div className="rounded-lg sm:rounded-xl border border-black/10 bg-white/50 p-3 sm:p-4 dark:border-white/10 dark:bg-white/5">
-                                    <p className="mb-2 sm:mb-3 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                                    <p className="mb-2 sm:mb-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/60 dark:text-white/50">
                                         Suggested for {formData.category}
                                     </p>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -553,7 +553,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                     <div className="max-h-48 sm:max-h-64 space-y-3 sm:space-y-4 overflow-y-auto">
                                         {Object.entries(filteredIcons).map(([category, icons]) => (
                                             <div key={category}>
-                                                <p className="mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/40 dark:text-white/40">
+                                                <p className="mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">
                                                     {category}
                                                 </p>
                                                 <div className="flex flex-wrap gap-1">
@@ -679,7 +679,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                 "mt-0.5 text-[10px] sm:text-xs",
                                                 formData.frequency.type === option.value
                                                     ? "text-white/70 dark:text-black/70"
-                                                    : "text-black/50 dark:text-white/50"
+                                                    : "text-black/70 dark:text-white/50"
                                             )}
                                         >
                                             {option.description}
@@ -705,7 +705,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                 "flex h-10 w-10 sm:h-12 sm:w-12 flex-col items-center justify-center rounded-lg sm:rounded-xl border-2 text-[10px] sm:text-xs font-semibold transition",
                                                 formData.frequency.daysOfWeek?.includes(day.value)
                                                     ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                    : "border-black/15 text-black/60 hover:border-black/30 dark:border-white/15 dark:text-white/60 dark:hover:border-white/30"
+                                                    : "border-black/15 text-black/80 hover:border-black/30 dark:border-white/15 dark:text-white/60 dark:hover:border-white/30"
                                             )}
                                         >
                                             {day.label}
@@ -778,7 +778,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                         +
                                     </button>
                                 </div>
-                                <span className="text-xs sm:text-sm text-black/60 dark:text-white/60">
+                                <span className="text-xs sm:text-sm font-bold text-black/70 dark:text-white/60">
                                     {formData.targetCount === 1 ? "time per day" : "times per day"}
                                 </span>
                             </div>
@@ -829,7 +829,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         className="space-y-4 sm:space-y-6"
                     >
                         <div className="text-center">
-                            <p className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                            <p className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/50">
                                 Review your habit
                             </p>
                         </div>
@@ -848,7 +848,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                         {formData.title}
                                     </h3>
                                     {formData.description && (
-                                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-black/60 dark:text-white/60 line-clamp-2">
+                                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-black/80 dark:text-white/60 line-clamp-2">
                                             {formData.description}
                                         </p>
                                     )}
