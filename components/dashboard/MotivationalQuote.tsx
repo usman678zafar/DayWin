@@ -36,7 +36,7 @@ export function MotivationalQuote() {
             className="card relative overflow-hidden"
         >
             <div className="mb-3 sm:mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-1.5 sm:gap-2 text-black/65 dark:text-white/65">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-black/75 dark:text-white/65">
                     <Sparkles className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                     <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.12em]">Daily Motivation</span>
                 </div>
@@ -60,7 +60,7 @@ export function MotivationalQuote() {
                     <p className="text-base sm:text-lg font-semibold leading-relaxed text-black dark:text-white">
                         "{quote.text}"
                     </p>
-                    <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-black/55 dark:text-white/55">- {quote.author}</p>
+                    <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-black/65 dark:text-white/55">- {quote.author}</p>
                 </motion.div>
             </AnimatePresence>
         </motion.div>

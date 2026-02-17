@@ -23,7 +23,7 @@ export function DailyProgress({
         <div className="card">
             <div className="mb-4 sm:mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h3 className="text-base sm:text-lg font-semibold text-black dark:text-white">Daily Progress</h3>
-                <span className="rounded-full border border-black/15 px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.1em] text-black/60 dark:border-white/15 dark:text-white/60 self-start sm:self-auto">
+                <span className="rounded-full border border-black/15 px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.1em] text-black/75 dark:border-white/15 dark:text-white/60 self-start sm:self-auto">
                     {completed}/{total} completed
                 </span>
             </div>
@@ -73,7 +73,7 @@ export function DailyProgress({
                         whileHover={{ y: -2 }}
                         className="rounded-xl border border-black/10 bg-white p-3 sm:p-4 dark:border-white/10 dark:bg-white/5"
                     >
-                        <div className="mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 text-black/60 dark:text-white/60">
+                        <div className="mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 text-black/75 dark:text-white/60">
                             <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             <span className="text-[9px] sm:text-xs font-semibold uppercase tracking-[0.1em]">Current</span>
                         </div>
@@ -84,7 +84,7 @@ export function DailyProgress({
                         whileHover={{ y: -2 }}
                         className="rounded-xl border border-black/10 bg-white p-3 sm:p-4 dark:border-white/10 dark:bg-white/5"
                     >
-                        <div className="mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 text-black/60 dark:text-white/60">
+                        <div className="mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 text-black/75 dark:text-white/60">
                             <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             <span className="text-[9px] sm:text-xs font-semibold uppercase tracking-[0.1em]">Best</span>
                         </div>

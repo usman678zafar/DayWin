@@ -56,9 +56,9 @@ export function HabitList() {
             {pendingHabits.length > 0 && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-1">
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-black/50 dark:text-white/40 flex items-center gap-3">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/40 flex items-center gap-3">
                             To Do
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/5 text-[10px] text-black/60 dark:bg-white/5 dark:text-white/40">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/5 text-[10px] text-black/80 dark:bg-white/5 dark:text-white/40">
                                 {pendingHabits.length}
                             </span>
                         </h2>

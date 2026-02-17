@@ -26,7 +26,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
             return (
                 <div className="bg-white dark:bg-surface-900 px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-surface-200 dark:border-surface-800">
                     <p className="font-semibold text-sm text-surface-900 dark:text-white">{label}</p>
-                    <p className="text-xs text-surface-200/50">
+                    <p className="text-xs text-black/50 dark:text-white/30">
                         {payload[0].value} / {payload[0].payload.total} completed
                     </p>
                     <p className="text-xs font-medium text-primary-500">
@@ -82,15 +82,15 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
             <div className="flex items-center justify-center gap-4 sm:gap-6 mt-3 sm:mt-4 flex-wrap">
                 <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-success-500" />
-                    <span className="text-[10px] sm:text-xs text-surface-200/50">100%</span>
+                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">100%</span>
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary-500" />
-                    <span className="text-[10px] sm:text-xs text-surface-200/50">50%+</span>
+                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">50%+</span>
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-secondary-500" />
-                    <span className="text-[10px] sm:text-xs text-surface-200/50">&lt;50%</span>
+                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">&lt;50%</span>
                 </div>
             </div>
         </motion.div>

@@ -110,21 +110,21 @@ export default function DashboardPage() {
                 <div className="card p-3 sm:p-4 group hover:border-primary-500/30 transition-colors">
                     <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Active</p>
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Active</p>
                     </div>
                     <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount}</p>
                 </div>
                 <div className="card p-3 sm:p-4 group hover:border-success-500/30 transition-colors">
                     <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Done</p>
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Done</p>
                     </div>
                     <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{completedCount}</p>
                 </div>
                 <div className="card p-3 sm:p-4 group hover:border-purple-500/30 transition-colors">
                     <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
                         <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Rate</p>
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Rate</p>
                     </div>
                     <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
                 </div>
