@@ -437,131 +437,107 @@ export default function HabitsPage() {
             {/* Habit Display */}
             {filteredHabits.length > 0 ? (
                 <>
-                    {/* Mobile Card View */}
-                    <div className="block md:hidden space-y-3">
+                    {/* Mobile Matrix View - Consolidated Chronological Table */}
+                    <div className="block md:hidden card overflow-hidden">
                         {isLoadingLogs ? (
                             <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
                         ) : (
-                            habitsData.map(({ habit, logs, completionRate }) => {
-                                const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
-
-                                // For mobile, show all logs in the period - order depends on view type
-                                const mobileDisplayLogs = logs; // Keep chronological for all views on mobile
-
-                                return (
-                                    <motion.div
-                                        key={habit._id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="card p-4"
-                                    >
-                                        {/* Habit Header */}
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", colors.bg)}>
-                                                <HabitIcon name={habit.icon} className={colors.text} size={24} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-black dark:text-white truncate">
-                                                    {habit.title}
-                                                </p>
-                                                <div className="flex items-center gap-2 mt-0.5">
+                            <div className="overflow-x-auto scrollbar-hide">
+                                <div className="min-w-max">
+                                    {/* Date Header Row */}
+                                    <div className="flex border-b border-black/5 bg-black/[0.02] dark:border-white/5 dark:bg-white/[0.02] py-4">
+                                        <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">Habits</span>
+                                        </div>
+                                        <div className="flex">
+                                            {days.map((day) => (
+                                                <div key={day.toISOString()} className="w-12 flex flex-col items-center flex-shrink-0">
+                                                    <span className="text-[9px] font-black text-black/40 dark:text-white/40 uppercase tracking-tighter">
+                                                        {format(day, "EEE")}
+                                                    </span>
                                                     <span className={cn(
-                                                        "text-xs font-bold px-2 py-0.5 rounded-full",
-                                                        completionRate >= 80
-                                                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                                            : completionRate >= 50
-                                                                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                                                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                                        "text-[13px] font-black mt-1 flex items-center justify-center w-7 h-7 rounded-full transition-colors",
+                                                        isToday(day)
+                                                            ? "bg-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30"
+                                                            : "text-black/60 dark:text-white/60"
                                                     )}>
-                                                        {completionRate}%
+                                                        {format(day, "d")}
                                                     </span>
                                                 </div>
-                                            </div>
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id)}
-                                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-black/40 hover:bg-black/5 dark:text-white/40 dark:hover:bg-white/5"
-                                                >
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </button>
-                                                <AnimatePresence>
-                                                    {menuOpenFor === habit._id && (
-                                                        <>
-                                                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
-                                                            <motion.div
-                                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                                animate={{ opacity: 1, scale: 1 }}
-                                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                                className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-surface-900"
-                                                            >
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setMenuOpenFor(null);
-                                                                        setEditingHabit(habit);
-                                                                        setShowForm(true);
-                                                                    }}
-                                                                    className="flex w-full items-center gap-2 px-3 py-2.5 text-sm hover:bg-black/5 dark:hover:bg-white/5"
-                                                                >
-                                                                    <Edit2 className="h-4 w-4" />
-                                                                    Edit
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setMenuOpenFor(null);
-                                                                        setDeletingHabit(habit);
-                                                                    }}
-                                                                    className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                    Delete
-                                                                </button>
-                                                            </motion.div>
-                                                        </>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
+                                            ))}
                                         </div>
+                                    </div>
 
-                                        {/* Day Grid for Mobile - Horizontally Scrollable */}
-                                        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                                            {mobileDisplayLogs.map((log, index) => {
-                                                const isFutureDay = isFuture(log.date) && !isToday(log.date);
-                                                const isTodayDate = isToday(log.date);
+                                    {/* Habit Rows */}
+                                    <div className="divide-y divide-black/5 dark:divide-white/5 pb-2">
+                                        {habitsData.map(({ habit, logs, completionRate }) => {
+                                            const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
-                                                return (
-                                                    <div key={index} className="flex flex-col items-center flex-shrink-0 w-11 snap-center">
-                                                        <span className="text-[9px] font-bold text-black/60 dark:text-white/60 mb-1">
-                                                            {format(log.date, "EEE")}
-                                                        </span>
-                                                        <motion.button
-                                                            whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
-                                                            onClick={() => handleToggle(habit._id, log.date, log.completed)}
-                                                            disabled={isFutureDay}
-                                                            className={cn(
-                                                                "flex h-11 w-11 items-center justify-center rounded-xl transition-all shadow-sm",
-                                                                log.completed
-                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
-                                                                    : "bg-black/5 dark:bg-white/5",
-                                                                isFutureDay && "opacity-30 cursor-not-allowed",
-                                                                isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"
-                                                            )}
-                                                        >
-                                                            <div className="relative">
-                                                                <span className={cn("text-xs font-bold", log.completed ? colors.checkedText : "text-black/80 dark:text-white/80")}>
-                                                                    {format(log.date, "d")}
-                                                                </span>
-                                                                {log.completed && (
-                                                                    <Check className={cn("absolute -top-1.5 -right-1.5 h-3.5 w-3.5", colors.checkedText)} strokeWidth={4} />
-                                                                )}
-                                                            </div>
-                                                        </motion.button>
+                                            return (
+                                                <div key={habit._id} className="flex items-center group">
+                                                    {/* Sticky Habit Label */}
+                                                    <div
+                                                        onClick={() => {
+                                                            setEditingHabit(habit);
+                                                            setShowForm(true);
+                                                        }}
+                                                        className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 p-3 border-r border-black/5 dark:border-white/5 flex items-center gap-2 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors"
+                                                    >
+                                                        <div className={cn("flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg shadow-sm", colors.bg)}>
+                                                            <HabitIcon name={habit.icon} className={colors.text} size={16} />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-[11px] font-black text-black dark:text-white truncate leading-tight uppercase tracking-tight">
+                                                                {habit.title}
+                                                            </p>
+                                                            <p className={cn("text-[9px] font-bold mt-0.5",
+                                                                completionRate >= 80 ? "text-green-500" :
+                                                                    completionRate >= 50 ? "text-yellow-500" : "text-red-500"
+                                                            )}>
+                                                                {completionRate}%
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
+
+                                                    {/* Toggle Buttons Grid */}
+                                                    <div className="flex">
+                                                        {logs.map((log, logIdx) => {
+                                                            const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                            const isTodayDate = isToday(log.date);
+
+                                                            return (
+                                                                <div key={logIdx} className="w-12 flex justify-center p-2">
+                                                                    <motion.button
+                                                                        whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                        onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                        disabled={isFutureDay}
+                                                                        className={cn(
+                                                                            "flex h-8 w-8 items-center justify-center rounded-lg transition-all shadow-sm",
+                                                                            log.completed
+                                                                                ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
+                                                                                : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                            isFutureDay && "opacity-20 cursor-not-allowed",
+                                                                            isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/20"
+                                                                        )}
+                                                                    >
+                                                                        {log.completed ? (
+                                                                            <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
+                                                                        ) : (
+                                                                            <span className="text-[9px] font-black opacity-40">
+                                                                                {format(log.date, "d")}
+                                                                            </span>
+                                                                        )}
+                                                                    </motion.button>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
 
