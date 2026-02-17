@@ -24,8 +24,10 @@ export async function GET(req: NextRequest) {
             isArchived: false,
         }).sort({ order: 1, createdAt: -1 });
 
-        // Get today's logs
-        const today = new Date();
+        const { searchParams } = new URL(req.url);
+        const dateStr = searchParams.get("date");
+        const today = dateStr ? new Date(dateStr) : new Date();
+
         const logs = await HabitLog.find({
             userId: session.user.id,
             date: {

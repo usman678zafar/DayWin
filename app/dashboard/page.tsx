@@ -56,9 +56,10 @@ export default function DashboardPage() {
                 const logs = data.logs || [];
 
                 const chartData = days.map((day) => {
+                    const dayStr = format(day, "yyyy-MM-dd");
                     const dayLogs = logs.filter(
                         (log: any) =>
-                            isSameDay(new Date(log.date), day) && log.completed
+                            log.date.split("T")[0] === dayStr && log.completed
                     );
                     const completed = dayLogs.length;
                     const total = habits.length;

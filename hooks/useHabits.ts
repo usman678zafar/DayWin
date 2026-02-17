@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { HabitWithLog, Habit } from "@/types";
-import { startOfDay, isToday } from "date-fns";
+import { startOfDay, isToday, format } from "date-fns";
 import toast from "react-hot-toast";
 
 interface HabitsState {
@@ -34,7 +34,8 @@ export const useHabits = create<HabitsState>((set, get) => ({
     fetchHabits: async () => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch("/api/habits");
+            const date = format(new Date(), "yyyy-MM-dd");
+            const response = await fetch(`/api/habits?date=${date}`);
             if (!response.ok) throw new Error("Failed to fetch habits");
             const data = await response.json();
             set({ habits: data.habits, isLoading: false });
@@ -128,7 +129,11 @@ export const useHabits = create<HabitsState>((set, get) => ({
             const response = await fetch(`/api/habits/${id}/complete`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ completed, count }),
+                body: JSON.stringify({
+                    completed,
+                    count,
+                    date: format(new Date(), "yyyy-MM-dd")
+                }),
             });
             if (!response.ok) throw new Error("Failed to update habit");
 
@@ -192,7 +197,7 @@ export const useHabits = create<HabitsState>((set, get) => ({
                 body: JSON.stringify({
                     completed,
                     count,
-                    date: targetDate.toISOString(),
+                    date: format(targetDate, "yyyy-MM-dd"),
                 }),
             });
 

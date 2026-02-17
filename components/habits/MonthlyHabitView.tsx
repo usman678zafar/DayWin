@@ -57,13 +57,14 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
             const data = await response.json();
             const logs = data.logs || [];
 
-            const monthDays = getDaysInMonth(month);
+            const monthlyDays = getDaysInMonth(month);
 
             const habitsWithMonthData: HabitMonthData[] = habits.map((habit) => {
-                const habitLogs: DayLog[] = monthDays.map((day) => {
+                const habitLogs: DayLog[] = monthlyDays.map((day) => {
+                    const dayStr = format(day, "yyyy-MM-dd");
                     const dayLog = logs.find(
                         (log: any) =>
-                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
+                            log.habitId === habit._id && log.date.split("T")[0] === dayStr
                     );
                     return {
                         date: day,
@@ -105,11 +106,13 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
             return;
         }
 
+        const dateStr = format(date, "yyyy-MM-dd");
+
         setHabitsData((prev) =>
             prev.map((hd) => {
                 if (hd.habit._id === habitId) {
                     const newLogs = hd.logs.map((log) =>
-                        isSameDay(log.date, date) ? { ...log, completed: !currentCompleted } : log
+                        format(log.date, "yyyy-MM-dd") === dateStr ? { ...log, completed: !currentCompleted } : log
                     );
                     const completedDays = newLogs.filter((l) => l.completed).length;
                     const totalDays = newLogs.filter((l) => !isFuture(l.date) || isToday(l.date)).length;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { isSameDay, isToday, isFuture } from "date-fns";
+import { isSameDay, isToday, isFuture, format } from "date-fns";
 import { Plus, Sparkles } from "lucide-react";
 import { HabitCard } from "./HabitCard";
 import { HabitForm } from "./HabitForm";
@@ -65,9 +65,10 @@ export function DailyHabitView({
             const data = await response.json();
             const logs = data.logs || [];
 
+            const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
             const habitsWithStatus: DayHabit[] = habits.map((habit) => {
                 const dayLog = logs.find(
-                    (log: any) => log.habitId === habit._id && isSameDay(new Date(log.date), selectedDate)
+                    (log: any) => log.habitId === habit._id && log.date.split("T")[0] === selectedDateStr
                 );
                 return {
                     ...habit,

@@ -181,9 +181,10 @@ export default function HabitsPage() {
 
             const habitsWithData: HabitData[] = habitsToFetch.map((habit) => {
                 const habitLogs: DayLog[] = daysToFetch.map((day) => {
+                    const dayStr = format(day, "yyyy-MM-dd");
                     const dayLog = logs.find(
                         (log: any) =>
-                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
+                            log.habitId === habit._id && log.date.split("T")[0] === dayStr
                     );
                     return {
                         date: day,
@@ -214,7 +215,7 @@ export default function HabitsPage() {
                 setIsLoadingLogs(false);
             }
         }
-    }, []);
+    }, [fetchHabits]);
 
     // Effect to trigger log fetching
     useEffect(() => {
@@ -300,7 +301,7 @@ export default function HabitsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     completed: !currentCompleted,
-                    date: date.toISOString(),
+                    date: format(date, "yyyy-MM-dd"),
                 }),
             });
 
