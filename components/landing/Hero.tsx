@@ -7,19 +7,15 @@ import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
 export function Hero() {
     return (
         <section className="relative overflow-hidden bg-white text-black">
-            <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 md:px-8 md:py-10">
-                <div className="rounded-2xl border border-black/10 bg-white p-4 sm:p-6 md:p-8">
+            <div className="mx-auto w-full max-w-[1400px] px-4 pt-1 pb-6 sm:px-6 md:px-8 md:pt-2 md:pb-10">
+                <div className="bg-white px-4 pt-2 pb-4 sm:px-6 sm:pt-3 sm:pb-6 md:px-8 md:pt-4 md:pb-8">
                     <div className="mb-8 flex items-center justify-between">
                         <DailyWinLogo
                             label="DAY WIN"
                             iconClassName="h-7 w-7 rounded-sm"
                             textClassName="text-[11px] tracking-[0.14em] text-black"
                         />
-                        <nav className="hidden items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-black/70 md:flex">
-                            <a href="#tracker-vision" className="hover:text-black">Tracker Vision</a>
-                            <a href="#habit-technology" className="hover:text-black">Habit Technology</a>
-                            <a href="#streak-manifesto" className="hover:text-black">Streak Manifesto</a>
-                        </nav>
+                        <div className="hidden md:block flex-1" />
                         <div className="flex items-center gap-2 sm:gap-3">
                             <a
                                 href="/login"
@@ -38,31 +34,40 @@ export function Hero() {
 
                     <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
                         <div className="max-w-[620px]">
-                            <p className="mb-4 inline-flex border border-black/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/70">
-                                Mobile Habit Tracker
-                            </p>
                             <h1 className="font-black uppercase leading-[0.9] tracking-tight text-[clamp(1.65rem,6.8vw,4.6rem)]">
-                                Track Every
+                                Win The Day.
                                 <br />
-                                <span className="text-black/65">Mobile Habit</span>
+                                <span className="text-black/65">Every Day.</span>
                                 <br />
-                                Daily
+                                Build Momentum.
                             </h1>
-                            <p className="mt-5 max-w-[560px] text-base leading-relaxed text-black/70 md:text-xl">
-                                Build streaks, log routines, and view your progress in one focused mobile-first dashboard.
+                            <p className="mt-5 max-w-[560px] text-base leading-relaxed text-black/75 md:text-xl font-medium">
+                                Elevate your daily routine with the world&apos;s most focused habit tracker. Transform small actions into consistent results through visual momentum and premium analytics.
                             </p>
-                            <div className="mt-7">
+                            <div className="mt-8 flex flex-col sm:flex-row gap-4">
                                 <a
                                     href="/signup"
-                                    className="inline-flex w-full items-center justify-center border border-black bg-black px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black sm:w-auto"
+                                    className="inline-flex items-center justify-center bg-black px-8 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-black/80 sm:w-auto rounded-none"
                                 >
-                                    Get Started
+                                    Start Your Journey
                                 </a>
+                                <div className="flex items-center gap-4 px-4 sm:px-0">
+                                    <div className="flex -space-x-2">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-surface-100 flex items-center justify-center overflow-hidden">
+                                                <div className="h-full w-full bg-gradient-to-br from-black/10 to-transparent" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                                        Joined by <span className="text-black">2,000+</span> seekers
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div className="relative">
-                            <div className="overflow-hidden rounded-2xl border border-black/15 bg-[#f5f5f5]">
+                            <div className="overflow-hidden rounded-2xl bg-[#f5f5f5]">
                                 <Image
                                     src={heroImage}
                                     alt="Habit tracker app usage preview"

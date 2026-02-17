@@ -73,13 +73,13 @@ export default function SignupPage() {
     return (
         <div className="min-h-screen bg-white text-black">
             <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 py-10 md:grid-cols-2 md:px-8">
-                <section className="hidden rounded-2xl border border-black/10 bg-black p-10 text-white md:block">
+                <section className="hidden rounded-2xl border border-white/15 bg-black p-10 text-white md:block">
                     <DailyWinLogo
                         className="mb-8"
                         label="DAY WIN"
                         textClassName="text-sm tracking-[0.15em] text-white"
                     />
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/80">
                         Start Today
                     </p>
                     <h1 className="text-5xl font-black uppercase leading-[0.9]">
@@ -89,25 +89,25 @@ export default function SignupPage() {
                         <br />
                         Daily
                     </h1>
-                    <p className="mt-6 max-w-md text-lg text-white/75">
+                    <p className="mt-6 max-w-md text-lg text-white/85">
                         Create your account to track routines, maintain streaks, and improve every day.
                     </p>
                 </section>
 
-                <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+                <section className="rounded-2xl border border-black/15 bg-white p-6 shadow-sm sm:p-8">
                     <div className="mb-8 flex items-center justify-between">
                         <DailyWinLogo
                             label="DAY WIN"
                             iconClassName="h-7 w-7 rounded-sm"
                             textClassName="text-[11px] tracking-[0.14em] text-black"
                         />
-                        <Link href="/login" className="text-xs font-semibold uppercase tracking-[0.12em] text-black/60 hover:text-black">
+                        <Link href="/login" className="text-xs font-semibold uppercase tracking-[0.12em] text-black/75 hover:text-black">
                             Already a member
                         </Link>
                     </div>
 
                     <h2 className="text-3xl font-black uppercase">Sign Up</h2>
-                    <p className="mt-2 text-sm text-black/60">Create your account and start tracking your habits.</p>
+                    <p className="mt-2 text-sm text-black/75">Create your account and start tracking your habits.</p>
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                         <Input
@@ -151,7 +151,7 @@ export default function SignupPage() {
                                     {passwordRequirements.map((req) => (
                                         <div
                                             key={req.text}
-                                            className={`flex items-center gap-2 text-sm ${req.met ? "text-black" : "text-black/45"}`}
+                                            className={`flex items-center gap-2 text-sm ${req.met ? "text-black" : "text-black/60"}`}
                                         >
                                             <span
                                                 className={`flex h-4 w-4 items-center justify-center rounded-full ${req.met ? "bg-black text-white" : "border border-black/25"}`}
@@ -170,7 +170,7 @@ export default function SignupPage() {
                         </Button>
                     </form>
 
-                    <p className="mt-6 text-center text-xs text-black/50">
+                    <p className="mt-6 text-center text-xs text-black/65">
                         By creating an account, you agree to our{" "}
                         <Link href="/terms" className="text-black hover:underline">Terms</Link> and{" "}
                         <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>.

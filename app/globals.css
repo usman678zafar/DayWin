@@ -136,11 +136,11 @@ body {
     }
 
     .btn-ghost {
-        @apply hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-600 dark:text-surface-200 font-medium px-4 py-2 rounded-xl transition-all duration-300;
+        @apply hover:bg-surface-100 dark:hover:bg-surface-800 text-black/60 dark:text-surface-200 font-medium px-4 py-2 rounded-xl transition-all duration-300;
     }
 
     .input-field {
-        @apply w-full px-4 py-3 rounded-xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-surface-900 dark:text-white placeholder:text-surface-200/50 dark:placeholder:text-surface-200/30 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300;
+        @apply w-full px-4 py-3 rounded-xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300;
     }
 
     .habit-card {

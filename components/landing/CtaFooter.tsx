@@ -8,7 +8,7 @@ export function CtaFooter() {
             <div className="absolute inset-0 opacity-[0.1] [background-image:linear-gradient(rgba(255,255,255,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.16)_1px,transparent_1px)] [background-size:44px_44px]" />
 
             <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-20 md:px-8">
-                <div className="rounded-2xl border border-white/20 bg-black p-8 md:p-10">
+                <div className="bg-black p-8 md:p-10">
                     <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr]">
                         <div>
                             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-white/70">
@@ -38,9 +38,9 @@ export function CtaFooter() {
                                     Product
                                 </h3>
                                 <ul className="space-y-3 text-white">
-                                    <li><a href="#tracker-vision" className="transition hover:text-white/70">Tracker Vision</a></li>
-                                    <li><a href="#habit-technology" className="transition hover:text-white/70">Habit Technology</a></li>
-                                    <li><a href="#streak-manifesto" className="transition hover:text-white/70">Streak Manifesto</a></li>
+                                    <li><a href="#" className="transition hover:text-white/70">Features</a></li>
+                                    <li><a href="#" className="transition hover:text-white/70">Mobile App</a></li>
+                                    <li><a href="#" className="transition hover:text-white/70">Analytics</a></li>
                                     <li><a href="#" className="transition hover:text-white/70">Changelog</a></li>
                                 </ul>
                             </div>
