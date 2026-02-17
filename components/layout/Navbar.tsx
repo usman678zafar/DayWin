@@ -16,6 +16,7 @@ import {
     Moon,
     User,
     Monitor,
+    FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DailyWinLogo } from "@/components/brand/DailyWinLogo";
@@ -25,6 +26,7 @@ const navItems = [
     { href: "/dashboard/habits", label: "Habits", icon: LayoutGrid },
     { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
     { href: "/dashboard/stats", label: "Analytics", icon: BarChart3 },
+    { href: "/dashboard/templates", label: "Templates", icon: FileText },
     { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
