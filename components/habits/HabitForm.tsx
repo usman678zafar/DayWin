@@ -841,7 +841,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                     className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-xl sm:rounded-2xl"
                                     style={{ backgroundColor: selectedColorConfig.colors.bg }}
                                 >
-                                    <SelectedIcon className="h-6 w-6 sm:h-8 sm:w-8" style={{ color: selectedColorConfig.colors.text }} />
+                                    <HabitIcon name={formData.icon} size={32} style={{ color: selectedColorConfig.colors.text }} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white truncate">
