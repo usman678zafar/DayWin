@@ -9,7 +9,7 @@ import { WeeklyChart } from "@/components/dashboard/WeeklyChart";
 import { MotivationalQuote } from "@/components/dashboard/MotivationalQuote";
 import { HabitList } from "@/components/habits/HabitList";
 import { useHabits } from "@/hooks/useHabits";
-import { Loader2, Plus, BarChart3 } from "lucide-react";
+import { Loader2, Plus, BarChart3, Activity, CheckCircle2, TrendingUp } from "lucide-react";
 import {
     startOfWeek,
     endOfWeek,
@@ -110,17 +110,26 @@ export default function DashboardPage() {
 
             {/* Stats Cards - Mobile Optimized */}
             <div className="mb-4 sm:mb-6 grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="card p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Active</p>
-                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount}</p>
+                <div className="card p-3 sm:p-4 group hover:border-primary-500/30 transition-colors">
+                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                        <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-500" />
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Active</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount}</p>
                 </div>
-                <div className="card p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Done</p>
-                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{completedCount}</p>
+                <div className="card p-3 sm:p-4 group hover:border-success-500/30 transition-colors">
+                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                        <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success-500" />
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Done</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{completedCount}</p>
                 </div>
-                <div className="card p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.12em] text-black/55 dark:text-white/55">Rate</p>
-                    <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
+                <div className="card p-3 sm:p-4 group hover:border-purple-500/30 transition-colors">
+                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                        <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-500" />
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/40 dark:text-white/40">Rate</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
                 </div>
             </div>
 

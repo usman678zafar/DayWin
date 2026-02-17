@@ -115,8 +115,12 @@ export function HabitCard({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
+                                className="flex flex-col items-center justify-center"
                             >
-                                <Check className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={3} />
+                                <span className="text-sm font-bold text-white">
+                                    {new Date().getDate()}
+                                </span>
+                                <Check className="h-3 w-3 text-white/80" strokeWidth={4} />
                             </motion.div>
                         ) : (
                             <motion.div
@@ -137,7 +141,7 @@ export function HabitCard({
                         colors.bg
                     )}
                 >
-                    <HabitIcon icon={habit.icon} size="lg" className={colors.text} />
+                    <HabitIcon name={habit.icon} size={24} className={colors.text} />
                 </div>
 
                 {/* Content */}

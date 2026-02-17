@@ -13,10 +13,11 @@ import {
     Pie,
     Cell,
 } from "recharts";
-import { Flame } from "lucide-react";
+import { Flame, Trophy, Zap, Target, Award, Loader2, Star, TrendingUp } from "lucide-react";
 import { subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { QuickStats } from "@/components/dashboard/QuickStats";
 import { DateRangePicker, DateRange } from "@/components/habits/DateRangePicker";
+import { HabitIcon } from "@/components/habits/HabitIcon";
 import { cn } from "@/lib/utils";
 
 const defaultRange: DateRange = {
@@ -174,18 +175,23 @@ export default function StatsPage() {
                         {(stats?.topHabits || []).map((habit: any, index: number) => (
                             <div
                                 key={habit.id}
-                                className="flex items-center gap-4"
+                                className="flex items-center gap-4 group"
                             >
-                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 dark:bg-surface-800 text-sm font-bold text-surface-600 dark:text-surface-200/50">
-                                    {index + 1}
+                                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-100 dark:bg-surface-800/80 border border-black/5 dark:border-white/5 transition-colors group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20">
+                                    <HabitIcon name={habit.icon || "Star"} size={20} className="text-primary-600 dark:text-primary-400" />
                                 </div>
 
-                                <div className="flex-1">
-                                    <p className="font-medium text-surface-900 dark:text-white">
-                                        {habit.title}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <div className="flex-1 h-2 bg-surface-100 dark:bg-surface-800 rounded-full overflow-hidden">
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <p className="font-bold text-sm text-surface-900 dark:text-white truncate">
+                                            {habit.title}
+                                        </p>
+                                        <span className="text-[10px] font-black text-primary-500 uppercase tracking-wider bg-primary-100 dark:bg-primary-900/30 px-1.5 py-0.5 rounded-md">
+                                            {habit.completionRate}%
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-1.5 bg-surface-100 dark:bg-surface-800 rounded-full overflow-hidden">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${habit.completionRate}%` }}
@@ -193,15 +199,12 @@ export default function StatsPage() {
                                                 className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
                                             />
                                         </div>
-                                        <span className="text-sm font-medium text-primary-500">
-                                            {habit.completionRate}%
-                                        </span>
                                     </div>
                                 </div>
                                 {habit.streak > 0 && (
-                                    <div className="flex items-center gap-1 text-orange-500">
-                                        <Flame className="w-4 h-4" />
-                                        <span className="text-sm font-semibold">{habit.streak}</span>
+                                    <div className="flex flex-col items-center justify-center min-w-[32px]">
+                                        <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+                                        <span className="text-[10px] font-black text-orange-600">{habit.streak}d</span>
                                     </div>
                                 )}
                             </div>
@@ -223,37 +226,45 @@ export default function StatsPage() {
                     className="card p-6"
                 >
                     <h3 className="card-title mb-6">Achievements</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         {[
                             {
-                                icon: "🔥",
+                                icon: Flame,
                                 title: "On Fire",
                                 description: "7 day streak",
                                 unlocked: (stats?.overview?.currentStreak || 0) >= 7,
+                                color: "text-orange-500",
+                                bg: "bg-orange-50/50 dark:bg-orange-900/10",
                             },
                             {
-                                icon: "⚡",
+                                icon: Zap,
                                 title: "Momentum",
                                 description: "30 day streak",
                                 unlocked: (stats?.overview?.longestStreak || 0) >= 30,
+                                color: "text-yellow-500",
+                                bg: "bg-yellow-50/50 dark:bg-yellow-900/10",
                             },
                             {
-                                icon: "🎯",
+                                icon: Target,
                                 title: "Focused",
                                 description: "100% weekly",
                                 unlocked: (stats?.overview?.weeklyCompletionRate || 0) === 100,
+                                color: "text-blue-500",
+                                bg: "bg-blue-50/50 dark:bg-blue-900/10",
                             },
                             {
-                                icon: "🏆",
+                                icon: Trophy,
                                 title: "Champion",
                                 description: "100 completions",
                                 unlocked: (stats?.overview?.totalCompletions || 0) >= 100,
+                                color: "text-primary-500",
+                                bg: "bg-primary-50/50 dark:bg-primary-900/10",
                             },
                         ].map((achievement) => (
                             <div
                                 key={achievement.title}
                                 className={cn(
-                                    "p-4 rounded-xl border-2 transition-all",
+                                    "p-4 rounded-xl border-2 transition-all flex flex-col items-center text-center",
                                     achievement.unlocked
                                         ? "border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20"
                                         : "border-surface-200 dark:border-surface-800 opacity-50"

@@ -32,6 +32,10 @@ import {
     CalendarDays,
     Calendar,
     Settings,
+    Activity,
+    CheckCircle2,
+    Target,
+    TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
@@ -39,6 +43,7 @@ import { HabitWithLog, Habit, habitColors, HabitType } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
+import { HabitIcon } from "@/components/habits/HabitIcon";
 import toast from "react-hot-toast";
 
 // Types
@@ -445,10 +450,10 @@ export default function HabitsPage() {
                             habitsData.map(({ habit, logs, completionRate }) => {
                                 const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
 
-                                // For mobile, show last 7 days - adjust based on view type
-                                const mobileDisplayLogs = activeType === "custom"
-                                    ? [...logs].reverse().slice(0, 7)  // Custom: most recent first
-                                    : logs.slice(-7);  // Weekly/Monthly: last 7 days chronologically
+                                // For mobile, show all logs in the period - order depends on view type
+                                const mobileDisplayLogs = activeType === "weekly"
+                                    ? logs // Chronological for weekly
+                                    : [...logs].reverse(); // Most recent first for monthly/custom on mobile
 
                                 return (
                                     <motion.div
@@ -459,8 +464,8 @@ export default function HabitsPage() {
                                     >
                                         {/* Habit Header */}
                                         <div className="flex items-center gap-3 mb-4">
-                                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl text-xl", colors.bg)}>
-                                                {habit.icon}
+                                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", colors.bg)}>
+                                                <HabitIcon name={habit.icon} className={colors.text} size={24} />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-black dark:text-white truncate">
@@ -524,14 +529,14 @@ export default function HabitsPage() {
                                             </div>
                                         </div>
 
-                                        {/* Day Grid for Mobile */}
-                                        <div className="grid grid-cols-7 gap-1.5">
+                                        {/* Day Grid for Mobile - Horizontally Scrollable */}
+                                        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x">
                                             {mobileDisplayLogs.map((log, index) => {
                                                 const isFutureDay = isFuture(log.date) && !isToday(log.date);
                                                 const isTodayDate = isToday(log.date);
 
                                                 return (
-                                                    <div key={index} className="flex flex-col items-center">
+                                                    <div key={index} className="flex flex-col items-center flex-shrink-0 w-11 snap-center">
                                                         <span className="text-[9px] font-bold text-black/60 dark:text-white/60 mb-1">
                                                             {format(log.date, "EEE")}
                                                         </span>
@@ -540,21 +545,22 @@ export default function HabitsPage() {
                                                             onClick={() => handleToggle(habit._id, log.date, log.completed)}
                                                             disabled={isFutureDay}
                                                             className={cn(
-                                                                "flex h-9 w-9 items-center justify-center rounded-lg transition-all",
+                                                                "flex h-11 w-11 items-center justify-center rounded-xl transition-all shadow-sm",
                                                                 log.completed
-                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-sm`
+                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText}`
                                                                     : "bg-black/5 dark:bg-white/5",
                                                                 isFutureDay && "opacity-30 cursor-not-allowed",
                                                                 isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"
                                                             )}
                                                         >
-                                                            {log.completed ? (
-                                                                <Check className="h-4 w-4" strokeWidth={3} />
-                                                            ) : (
-                                                                <span className="text-xs font-bold text-black/70 dark:text-white/70">
+                                                            <div className="relative">
+                                                                <span className={cn("text-xs font-bold", log.completed ? colors.checkedText : "text-black/80 dark:text-white/80")}>
                                                                     {format(log.date, "d")}
                                                                 </span>
-                                                            )}
+                                                                {log.completed && (
+                                                                    <Check className={cn("absolute -top-1.5 -right-1.5 h-3.5 w-3.5", colors.checkedText)} strokeWidth={4} />
+                                                                )}
+                                                            </div>
                                                         </motion.button>
                                                     </div>
                                                 );
@@ -602,9 +608,12 @@ export default function HabitsPage() {
                                                 </th>
                                             ))}
                                             <th className="px-4 py-4 text-center">
-                                                <span className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                                    Rate
-                                                </span>
+                                                <div className="flex items-center justify-center gap-1.5">
+                                                    <TrendingUp className="h-3 w-3 text-purple-500" />
+                                                    <span className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                                                        Rate
+                                                    </span>
+                                                </div>
                                             </th>
                                             <th className="w-12 px-2 py-4" />
                                         </tr>
@@ -669,11 +678,14 @@ export default function HabitsPage() {
                                                                         isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"
                                                                     )}
                                                                 >
-                                                                    {log.completed ? (
-                                                                        <Check className="h-4 w-4" strokeWidth={3} />
-                                                                    ) : isFutureDay ? null : (
-                                                                        <X className="h-4 w-4 opacity-40" />
-                                                                    )}
+                                                                    <div className="relative">
+                                                                        <span className={cn("text-xs font-bold transition-colors duration-200", log.completed ? colors.checkedText : "text-black/30 dark:text-white/30")}>
+                                                                            {format(log.date, "d")}
+                                                                        </span>
+                                                                        {log.completed && (
+                                                                            <Check className={cn("absolute -top-1.5 -right-1.5 h-3 w-3", colors.checkedText)} strokeWidth={4} />
+                                                                        )}
+                                                                    </div>
                                                                 </motion.button>
                                                             </td>
                                                         );
@@ -767,40 +779,40 @@ export default function HabitsPage() {
                     </div>
 
                     {/* Summary Stats - Mobile Optimized */}
-                    <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-4">
-                        <div className="card p-3 sm:p-4 text-center">
-                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
-                                {habitsData.length}
-                            </p>
-                            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                {activeType} Habits
-                            </p>
+                    <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div className="card p-3 sm:p-4 group hover:border-blue-500/30 transition-colors">
+                            <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                                <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-500" />
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Habits</p>
+                            </div>
+                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{habitsData.length}</p>
                         </div>
-                        <div className="card p-3 sm:p-4 text-center">
+                        <div className="card p-3 sm:p-4 group hover:border-success-500/30 transition-colors">
+                            <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                                <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success-500" />
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Done</p>
+                            </div>
                             <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
-                                {days.length}
-                            </p>
-                            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                Days Tracked
-                            </p>
-                        </div>
-                        <div className="card p-3 sm:p-4 text-center">
-                            <p className="text-xl sm:text-2xl font-black text-green-500">
                                 {habitsData.reduce((acc, hd) => acc + hd.logs.filter((l) => l.completed).length, 0)}
                             </p>
-                            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                Completions
-                            </p>
                         </div>
-                        <div className="card p-3 sm:p-4 text-center">
-                            <p className="text-xl sm:text-2xl font-black text-[#4D7CFE]">
+                        <div className="card p-3 sm:p-4 group hover:border-purple-500/30 transition-colors">
+                            <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                                <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-500" />
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Avg Rate</p>
+                            </div>
+                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">
                                 {habitsData.length > 0
                                     ? Math.round(habitsData.reduce((acc, hd) => acc + hd.completionRate, 0) / habitsData.length)
                                     : 0}%
                             </p>
-                            <p className="text-[10px] sm:text-xs uppercase tracking-wider text-black/50 dark:text-white/50">
-                                Avg Rate
-                            </p>
+                        </div>
+                        <div className="card p-3 sm:p-4 group hover:border-[#4D7CFE]/30 transition-colors">
+                            <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+                                <CalendarDays className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4D7CFE]" />
+                                <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/40 dark:text-white/40">Tracked</p>
+                            </div>
+                            <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{days.length}</p>
                         </div>
                     </div>
                 </>
@@ -810,10 +822,10 @@ export default function HabitsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="card py-12 sm:py-16 text-center"
                 >
-                    <div className="mx-auto mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
-                        {activeType === "weekly" && <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-black/30 dark:text-white/30" />}
-                        {activeType === "monthly" && <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-black/30 dark:text-white/30" />}
-                        {activeType === "custom" && <Settings className="h-8 w-8 sm:h-10 sm:w-10 text-black/30 dark:text-white/30" />}
+                    <div className="mx-auto mb-4 flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 shadow-inner">
+                        {activeType === "weekly" && <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
+                        {activeType === "monthly" && <Calendar className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
+                        {activeType === "custom" && <Settings className="h-8 w-8 sm:h-10 sm:w-10 text-black/40 dark:text-white/40" />}
                     </div>
                     <h3 className="mb-2 text-lg sm:text-xl font-bold text-black dark:text-white">
                         No {activeType} habits yet
@@ -858,8 +870,8 @@ export default function HabitsPage() {
                 size="sm"
             >
                 <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                        <span className="text-3xl">{deletingHabit?.icon}</span>
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30 text-red-600">
+                        <HabitIcon name={deletingHabit?.icon || "Star"} size={32} />
                     </div>
                     <p className="mb-6 text-black/60 dark:text-white/60">
                         Delete <strong>"{deletingHabit?.title}"</strong>? This will remove

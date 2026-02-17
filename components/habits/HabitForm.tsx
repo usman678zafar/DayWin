@@ -3,17 +3,12 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Dumbbell, Heart, Brain, Book, Droplets, Moon, Sun, Apple,
-    Pill, Activity, Bike, Footprints, Flame, Target, Trophy, Star,
-    Zap, Coffee, Cigarette, Wine, Music, Palette, Camera, Pen,
-    Code, Briefcase, DollarSign, PiggyBank, TrendingUp, Users,
-    MessageCircle, Phone, Home, Sparkles, Leaf, Smile, Clock,
-    Calendar, CheckCircle, ListTodo, ChevronRight, ChevronLeft,
-    Search, X, Check, CalendarDays, Settings, LucideIcon,
+    ChevronRight, ChevronLeft, Search, X, Check, CalendarDays, Settings, Calendar, Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { HabitIcon } from "./HabitIcon";
 import {
     Habit,
     HabitColor,
@@ -29,16 +24,6 @@ interface HabitFormProps {
     onCancel: () => void;
     defaultHabitType?: HabitType;
 }
-
-// Icon map for rendering
-const iconComponents: Record<string, LucideIcon> = {
-    Dumbbell, Heart, Brain, Book, Droplets, Moon, Sun, Apple,
-    Pill, Activity, Bike, Walk: Footprints, Flame, Target, Trophy, Star,
-    Zap, Coffee, Cigarette, Wine, Music, Palette, Camera, Pen,
-    Code, Briefcase, DollarSign, PiggyBank, TrendingUp, Users,
-    MessageCircle, Phone, Home, Sparkles, Leaf, Smile, Clock,
-    Calendar, CheckCircle, ListTodo, CalendarDays, Settings,
-};
 
 // Organized icons by category
 const iconsByCategory: Record<string, { name: string; label: string }[]> = {
@@ -227,8 +212,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
         setCurrentStep(step);
     };
 
-    const SelectedIcon = iconComponents[formData.icon] || Star;
-
     // Get period days based on habit type
     const getPeriodDays = () => {
         switch (formData.habitType) {
@@ -304,7 +287,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
 
                         <div className="grid gap-3 sm:gap-4">
                             {habitTypeOptions.map((option) => {
-                                const TypeIcon = iconComponents[option.icon] || Calendar;
                                 const isSelected = formData.habitType === option.value;
 
                                 return (
@@ -327,7 +309,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                     : "bg-black/5 dark:bg-white/5"
                                             )}
                                         >
-                                            <TypeIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                            <HabitIcon name={option.icon} size={24} />
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
@@ -468,7 +450,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             </label>
                             <div className="grid grid-cols-3 gap-1.5 sm:gap-2 sm:grid-cols-5">
                                 {habitCategories.map((cat) => {
-                                    const CatIcon = iconComponents[cat.icon] || Star;
                                     return (
                                         <button
                                             key={cat.value}
@@ -481,7 +462,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                     : "border-black/10 text-black/70 hover:border-black/30 dark:border-white/10 dark:text-white/70 dark:hover:border-white/30"
                                             )}
                                         >
-                                            <CatIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <HabitIcon name={cat.icon} size={20} />
                                             <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider">
                                                 {cat.label}
                                             </span>
@@ -507,13 +488,13 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             {/* Current Selection Preview */}
                             <div className="mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4">
                                 <div
-                                    className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl sm:rounded-2xl"
+                                    className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl sm:rounded-2xl transition-all duration-300 shadow-inner"
                                     style={{ backgroundColor: selectedColorConfig.colors.bg }}
                                 >
-                                    <SelectedIcon className="h-6 w-6 sm:h-8 sm:w-8" style={{ color: selectedColorConfig.colors.text }} />
+                                    <HabitIcon name={formData.icon} size={32} style={{ color: selectedColorConfig.colors.text }} />
                                 </div>
                                 <div>
-                                    <p className="text-xs sm:text-sm font-medium text-black dark:text-white">
+                                    <p className="text-xs sm:text-sm font-bold text-black dark:text-white">
                                         Selected: {formData.icon}
                                     </p>
                                     <p className="text-[10px] sm:text-xs text-black/50 dark:text-white/50">
@@ -530,7 +511,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                     </p>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                         {suggestedIcons.map((icon) => {
-                                            const IconComp = iconComponents[icon.name];
                                             return (
                                                 <button
                                                     key={icon.name}
@@ -543,7 +523,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                             : "border-black/15 text-black/70 hover:border-black/30 dark:border-white/15 dark:text-white/70 dark:hover:border-white/30"
                                                     )}
                                                 >
-                                                    {IconComp && <IconComp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                                                    <HabitIcon name={icon.name} size={16} />
                                                     <span className="text-[10px] sm:text-xs font-medium">{icon.label}</span>
                                                 </button>
                                             );
@@ -578,7 +558,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                 </p>
                                                 <div className="flex flex-wrap gap-1">
                                                     {icons.map((icon) => {
-                                                        const IconComp = iconComponents[icon.name];
                                                         return (
                                                             <button
                                                                 key={icon.name}
@@ -595,7 +574,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                                                         : "border-black/10 text-black/60 hover:border-black/30 hover:text-black dark:border-white/10 dark:text-white/60 dark:hover:border-white/30 dark:hover:text-white"
                                                                 )}
                                                             >
-                                                                {IconComp && <IconComp className="h-4 w-4 sm:h-5 sm:w-5" />}
+                                                                <HabitIcon name={icon.name} size={20} />
                                                             </button>
                                                         );
                                                     })}

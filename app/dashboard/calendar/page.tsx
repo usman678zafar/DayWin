@@ -20,6 +20,8 @@ import { ChevronLeft, ChevronRight, Check, X, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
 import { Button } from "@/components/ui/Button";
+import { HabitIcon } from "@/components/habits/HabitIcon";
+import { habitColors } from "@/types";
 
 import toast from "react-hot-toast";
 
@@ -287,42 +289,60 @@ export default function CalendarPage() {
                                         onClick={() => handleToggleHabit(habit._id, selectedDate, isCompleted)}
                                         disabled={isSelectedFuture}
                                         className={cn(
-                                            "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                                            "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left",
                                             isCompleted
-                                                ? "bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800"
-                                                : "bg-surface-50 dark:bg-surface-800/50 border border-transparent hover:border-black/10 dark:hover:border-white/10",
+                                                ? "bg-success-50/50 dark:bg-success-900/10 border border-success-200/50 dark:border-success-800/50"
+                                                : "bg-surface-50/50 dark:bg-surface-800/30 border border-transparent hover:border-black/5 dark:hover:border-white/5",
                                             isSelectedFuture && "opacity-50 cursor-not-allowed"
                                         )}
                                     >
+                                        <div className={cn(
+                                            "flex h-10 w-10 items-center justify-center rounded-xl",
+                                            habitColors[habit.color as keyof typeof habitColors]?.bg || "bg-purple-100 dark:bg-purple-900/30"
+                                        )}>
+                                            <HabitIcon
+                                                name={habit.icon}
+                                                size={20}
+                                                className={habitColors[habit.color as keyof typeof habitColors]?.text || "text-purple-600"}
+                                            />
+                                        </div>
 
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                             <p className={cn(
-                                                "font-medium",
+                                                "font-bold text-sm truncate",
                                                 isCompleted
                                                     ? "text-success-700 dark:text-success-300"
                                                     : "text-surface-900 dark:text-white"
                                             )}>
                                                 {habit.title}
                                             </p>
-                                            {habit.streak.current > 0 && (
-                                                <div className="flex items-center gap-1 mt-0.5 text-orange-500">
-                                                    <Flame className="h-3 w-3" />
-                                                    <span className="text-xs font-medium">{habit.streak.current} day streak</span>
-                                                </div>
-                                            )}
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider opacity-50 font-bold">
+                                                    {habit.category}
+                                                </span>
+                                                {habit.streak.current > 0 && (
+                                                    <div className="flex items-center gap-1 text-orange-500">
+                                                        <Flame className="h-3 w-3" />
+                                                        <span className="text-[10px] font-bold">{habit.streak.current}d</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div
                                             className={cn(
-                                                "w-7 h-7 rounded-full flex items-center justify-center transition-all",
+                                                "w-8 h-8 rounded-xl flex flex-col items-center justify-center transition-all duration-300",
                                                 isCompleted
-                                                    ? "bg-success-500 text-white"
-                                                    : "bg-surface-200 dark:bg-surface-700"
+                                                    ? "bg-gradient-to-br from-success-400 to-success-600 text-white shadow-lg shadow-success-500/20"
+                                                    : "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5"
                                             )}
                                         >
                                             {isCompleted ? (
-                                                <Check className="w-4 h-4" strokeWidth={3} />
+                                                <>
+                                                    <span className="text-[10px] font-black leading-none">{format(selectedDate, "d")}</span>
+                                                    <Check className="w-2.5 h-2.5 mt-0.5" strokeWidth={4} />
+                                                </>
                                             ) : (
-                                                <span className="w-4 h-4" />
+                                                <span className="text-[10px] font-bold opacity-40">{format(selectedDate, "d")}</span>
                                             )}
                                         </div>
                                     </motion.button>
