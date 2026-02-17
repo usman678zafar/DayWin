@@ -7,6 +7,7 @@ import dbConnect from "./mongodb";
 import User from "@/models/User";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    trustHost: true,
     adapter: MongoDBAdapter(clientPromise),
     session: {
         strategy: "jwt",
@@ -60,6 +61,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }),
     ],
     callbacks: {
+        async redirect({ url, baseUrl }) {
+            // Allows relative callback URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            // Allows callback URLs on the same origin
+            try {
+                if (new URL(url).origin === baseUrl) return url;
+            } catch (e) {
+                // Return baseUrl if URL is invalid or from different origin
+            }
+            return baseUrl;
+        },
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
