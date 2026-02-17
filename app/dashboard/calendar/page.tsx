@@ -92,7 +92,7 @@ export default function CalendarPage() {
 
     const renderHeader = () => (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-surface-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                 {format(currentMonth, "MMMM yyyy")}
             </h2>
             <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ export default function CalendarPage() {
                 {fullDays.map((day, i) => (
                     <div
                         key={day}
-                        className="py-2 sm:py-3 text-center text-[10px] sm:text-sm font-semibold text-surface-200/50"
+                        className="py-2 sm:py-3 text-center text-[10px] sm:text-sm font-black uppercase tracking-widest text-black/30 dark:text-white/30"
                     >
                         <span className="hidden sm:inline">{day}</span>
                         <span className="sm:hidden">{days[i]}</span>
@@ -175,9 +175,9 @@ export default function CalendarPage() {
                         onClick={() => setSelectedDate(cloneDay)}
                         className={cn(
                             "relative aspect-square p-0.5 sm:p-1.5 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-300",
-                            !isCurrentMonth && "opacity-30",
-                            isSelected && "ring-1 sm:ring-2 ring-primary-500",
-                            isTodayDate && "bg-primary-50 dark:bg-primary-900/20"
+                            !isCurrentMonth && "opacity-20",
+                            isSelected && "ring-2 ring-black dark:ring-white shadow-xl z-10",
+                            isTodayDate && "bg-black/[0.03] dark:bg-white/[0.05]"
                         )}
                     >
                         <div
@@ -190,10 +190,10 @@ export default function CalendarPage() {
                         >
                             <span
                                 className={cn(
-                                    "text-xs sm:text-sm font-semibold",
+                                    "text-xs sm:text-sm font-bold",
                                     isTodayDate
-                                        ? "text-primary-600 dark:text-primary-400"
-                                        : "text-surface-900 dark:text-white"
+                                        ? "text-black dark:text-white underline decoration-2 underline-offset-4"
+                                        : "text-black/70 dark:text-white/70"
                                 )}
                             >
                                 {format(day, "d")}
@@ -253,23 +253,23 @@ export default function CalendarPage() {
                     {/* Legend */}
                     <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 px-2">
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-success-100 dark:bg-success-900/30" />
-                            <span className="text-[10px] sm:text-xs text-surface-200/50">All complete</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-success-500 shadow-sm" />
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">All complete</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-yellow-100 dark:bg-yellow-900/30" />
-                            <span className="text-[10px] sm:text-xs text-surface-200/50">Partial</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-yellow-400 shadow-sm" />
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">Partial</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-red-100 dark:bg-red-900/30" />
-                            <span className="text-[10px] sm:text-xs text-surface-200/50">None</span>
+                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-red-400 shadow-sm" />
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">None</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Selected Date Details - INTERACTIVE */}
-                <div className="card p-6 h-fit sticky top-6">
-                    <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-2">
+                <div className="card p-6 h-fit sticky top-6 border-black/10 dark:border-white/10">
+                    <h3 className="text-lg font-black uppercase tracking-tight text-black dark:text-white mb-2">
                         {format(selectedDate, "EEEE, MMMM d")}
                     </h3>
 
@@ -298,8 +298,8 @@ export default function CalendarPage() {
                                         className={cn(
                                             "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left",
                                             isCompleted
-                                                ? "bg-success-50/50 dark:bg-success-900/10 border border-success-200/50 dark:border-success-800/50"
-                                                : "bg-surface-50/50 dark:bg-surface-800/30 border border-transparent hover:border-black/5 dark:hover:border-white/5",
+                                                ? "bg-black/[0.02] dark:bg-white/[0.05] border border-black/5 dark:border-white/5"
+                                                : "bg-transparent border border-transparent hover:border-black/5 dark:hover:border-white/5",
                                             isSelectedFuture && "opacity-50 cursor-not-allowed"
                                         )}
                                     >
@@ -318,13 +318,13 @@ export default function CalendarPage() {
                                             <p className={cn(
                                                 "font-bold text-sm truncate",
                                                 isCompleted
-                                                    ? "text-success-700 dark:text-success-300"
-                                                    : "text-surface-900 dark:text-white"
+                                                    ? "text-black dark:text-white"
+                                                    : "text-black/60 dark:text-white/60"
                                             )}>
                                                 {habit.title}
                                             </p>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] uppercase tracking-wider opacity-50 font-bold">
+                                                <span className="text-[10px] uppercase tracking-widest text-black/30 dark:text-white/30 font-black">
                                                     {habit.category}
                                                 </span>
                                                 {habit.streak.current > 0 && (
@@ -357,10 +357,9 @@ export default function CalendarPage() {
                             })}
                         </div>
                     ) : (
-                        <p className="text-surface-200/50 text-center py-8">
+                        <p className="text-black/30 dark:text-white/30 text-center py-8 font-medium text-sm">
                             No habits created yet
-                        </p>
-                    )}
+                        </p>)}
 
                     {/* Summary for selected date */}
                     {habits.length > 0 && !isSelectedFuture && (

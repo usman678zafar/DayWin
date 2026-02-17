@@ -24,8 +24,8 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-surface-900 px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-surface-200 dark:border-surface-800">
-                    <p className="font-semibold text-sm text-surface-900 dark:text-white">{label}</p>
+                <div className="bg-white dark:bg-surface-900 px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-black/10 dark:border-white/10">
+                    <p className="font-bold text-sm text-black dark:text-white">{label}</p>
                     <p className="text-xs text-black/50 dark:text-white/30">
                         {payload[0].value} / {payload[0].payload.total} completed
                     </p>
@@ -44,7 +44,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
             animate={{ opacity: 1, y: 0 }}
             className="card"
         >
-            <h3 className="text-base sm:text-lg font-semibold text-surface-900 dark:text-white mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-black dark:text-white mb-4 sm:mb-6">
                 This Week
             </h3>
             <div className="h-48 sm:h-64">
@@ -69,7 +69,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
                                                 ? "#a855f7"
                                                 : entry.percentage > 0
                                                     ? "#f97316"
-                                                    : "#e4e4e7"
+                                                    : "rgba(0,0,0,0.05)"
                                     }
                                 />
                             ))}
@@ -90,7 +90,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-secondary-500" />
-                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">&lt;50%</span>
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">&lt;50%</span>
                 </div>
             </div>
         </motion.div>

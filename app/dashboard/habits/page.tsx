@@ -429,7 +429,7 @@ export default function HabitsPage() {
                     >
                         Today
                     </button>
-                    <span className="text-xs sm:text-sm text-black/60 dark:text-white/60">
+                    <span className="text-xs sm:text-sm font-bold text-black/40 dark:text-white/40">
                         {days.length} days
                     </span>
                 </div>
@@ -447,20 +447,20 @@ export default function HabitsPage() {
                                 <div className="min-w-max">
                                     {/* Date Header Row */}
                                     <div className="flex border-b border-black/5 bg-black/[0.02] dark:border-white/5 dark:bg-white/[0.02] py-4">
-                                        <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">Habits</span>
+                                        <div className="w-[110px] sticky left-0 z-20 bg-white dark:bg-surface-900 px-4 flex items-end pb-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Habits</span>
                                         </div>
                                         <div className="flex">
                                             {days.map((day) => (
                                                 <div key={day.toISOString()} className="w-12 flex flex-col items-center flex-shrink-0">
-                                                    <span className="text-[9px] font-black text-black/40 dark:text-white/40 uppercase tracking-tighter">
+                                                    <span className="text-[9px] font-black text-black/30 dark:text-white/30 uppercase tracking-tighter">
                                                         {format(day, "EEE")}
                                                     </span>
                                                     <span className={cn(
                                                         "text-[13px] font-black mt-1 flex items-center justify-center w-7 h-7 rounded-full transition-colors",
                                                         isToday(day)
-                                                            ? "bg-[#4D7CFE] text-white shadow-lg shadow-[#4D7CFE]/30"
-                                                            : "text-black/60 dark:text-white/60"
+                                                            ? "bg-black text-white shadow-lg shadow-black/20 dark:bg-white dark:text-black"
+                                                            : "text-black/40 dark:text-white/40"
                                                     )}>
                                                         {format(day, "d")}
                                                     </span>
@@ -521,7 +521,7 @@ export default function HabitsPage() {
                                                                         {log.completed ? (
                                                                             <Check className={cn("h-4 w-4", colors.checkedText)} strokeWidth={4} />
                                                                         ) : (
-                                                                            <span className="text-[9px] font-black opacity-40">
+                                                                            <span className="text-[9px] font-black text-black/20 dark:text-white/20">
                                                                                 {format(log.date, "d")}
                                                                             </span>
                                                                         )}
@@ -551,22 +551,22 @@ export default function HabitsPage() {
                                     <thead>
                                         <tr className="border-b border-black/10 dark:border-white/10">
                                             <th className="sticky left-0 z-10 bg-white px-4 py-4 text-left dark:bg-surface-900">
-                                                <span className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                                                <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
                                                     Habit
                                                 </span>
                                             </th>
                                             {displayDays.map((day) => (
                                                 <th key={day.toISOString()} className={cn("px-1 py-3 text-center", getColumnWidth())}>
                                                     <div className="flex flex-col items-center">
-                                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/40">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
                                                             {format(day, "EEE")}
                                                         </span>
                                                         <span
                                                             className={cn(
                                                                 "mt-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold",
                                                                 isToday(day)
-                                                                    ? "bg-[#4D7CFE] text-white"
-                                                                    : "text-black/70 dark:text-white/70"
+                                                                    ? "bg-black text-white dark:bg-white dark:text-black"
+                                                                    : "text-black/40 dark:text-white/40"
                                                             )}
                                                         >
                                                             {format(day, "d")}
@@ -577,7 +577,7 @@ export default function HabitsPage() {
                                             <th className="px-4 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-1.5">
                                                     <TrendingUp className="h-3 w-3 text-purple-500" />
-                                                    <span className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
+                                                    <span className="text-xs font-black uppercase tracking-widest text-black/30 dark:text-white/30">
                                                         Rate
                                                     </span>
                                                 </div>
@@ -640,13 +640,13 @@ export default function HabitsPage() {
                                                                         "mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
                                                                         log.completed
                                                                             ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-md`
-                                                                            : "text-black/30 dark:text-white/30",
-                                                                        isFutureDay && "cursor-not-allowed opacity-20",
-                                                                        isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"
+                                                                            : "bg-black/[0.03] dark:bg-white/[0.03] border border-black/5 dark:border-white/5",
+                                                                        isFutureDay && "cursor-not-allowed opacity-10",
+                                                                        isTodayDate && !log.completed && "ring-2 ring-black/10 dark:ring-white/10"
                                                                     )}
                                                                 >
                                                                     <div className="relative">
-                                                                        <span className={cn("text-xs font-bold transition-colors duration-200", log.completed ? colors.checkedText : "text-black/30 dark:text-white/30")}>
+                                                                        <span className={cn("text-xs font-black transition-colors duration-200", log.completed ? colors.checkedText : "text-black/20 dark:text-white/20")}>
                                                                             {format(log.date, "d")}
                                                                         </span>
                                                                         {log.completed && (
@@ -727,20 +727,20 @@ export default function HabitsPage() {
                         {/* Legend */}
                         <div className="flex items-center justify-center gap-6 border-t border-black/10 px-4 py-4 dark:border-white/10">
                             <div className="flex items-center gap-2">
-                                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-green-400 to-green-600 text-white">
-                                    <Check className="h-3 w-3" strokeWidth={3} />
+                                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-green-600 text-white shadow-sm">
+                                    <Check className="h-3 w-3" strokeWidth={4} />
                                 </div>
-                                <span className="text-xs text-black/50 dark:text-white/50">Completed</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Completed</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="flex h-6 w-6 items-center justify-center rounded-md text-black/30 dark:text-white/30">
-                                    <X className="h-3 w-3" />
+                                <div className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-dashed border-black/10 dark:border-white/10">
+                                    <X className="h-3 w-3 text-black/20 dark:text-white/20" />
                                 </div>
-                                <span className="text-xs text-black/50 dark:text-white/50">Missed</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Missed</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="h-6 w-6 rounded-md bg-black/5 dark:bg-white/5" />
-                                <span className="text-xs text-black/50 dark:text-white/50">Future</span>
+                                <div className="h-6 w-6 rounded-md bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Future</span>
                             </div>
                         </div>
                     </div>

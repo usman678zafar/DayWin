@@ -46,9 +46,9 @@ export function HabitList() {
                 onClick={() => setShowForm(true)}
                 className="w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-dashed border-surface-300 dark:border-surface-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors group"
             >
-                <div className="flex items-center justify-center gap-2 sm:gap-3 text-surface-200/50 group-hover:text-primary-500 transition-colors">
+                <div className="flex items-center justify-center gap-2 sm:gap-3 text-black/30 dark:text-white/30 group-hover:text-primary-500 transition-colors">
                     <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-sm sm:text-base font-medium">Add new habit</span>
+                    <span className="text-sm sm:text-base font-black uppercase tracking-widest px-2 group-hover:translate-x-1 transition-transform">Add new habit</span>
                 </div>
             </motion.button>
 
@@ -125,10 +125,10 @@ export function HabitList() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center">
                         <span className="text-4xl sm:text-5xl">🌱</span>
                     </div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-surface-900 dark:text-white mb-2">
+                    <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white mb-2">
                         Start your journey
                     </h3>
-                    <p className="text-surface-200/50 mb-4 sm:mb-6 max-w-sm mx-auto text-sm sm:text-base px-4">
+                    <p className="text-black/40 dark:text-white/40 mb-4 sm:mb-6 max-w-sm mx-auto text-sm sm:text-base px-4">
                         Create your first habit and begin building a better version of yourself.
                     </p>
                     <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto mx-4 sm:mx-0">
