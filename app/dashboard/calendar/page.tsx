@@ -20,7 +20,7 @@ import { ChevronLeft, ChevronRight, Check, X, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
 import { Button } from "@/components/ui/Button";
-import { habitColors } from "@/types";
+
 import toast from "react-hot-toast";
 
 export default function CalendarPage() {
@@ -277,7 +277,7 @@ export default function CalendarPage() {
                                     (l) => l.habitId === habit._id
                                 );
                                 const isCompleted = log?.completed || false;
-                                const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
+
 
                                 return (
                                     <motion.button
@@ -294,9 +294,7 @@ export default function CalendarPage() {
                                             isSelectedFuture && "opacity-50 cursor-not-allowed"
                                         )}
                                     >
-                                        <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl text-xl", colors.bg)}>
-                                            {habit.icon}
-                                        </div>
+
                                         <div className="flex-1">
                                             <p className={cn(
                                                 "font-medium",

@@ -300,9 +300,7 @@ export default function HabitsPage() {
 
             if (!response.ok) throw new Error("Failed to update");
 
-            if (!currentCompleted) {
-                toast.success("Habit completed! 🎉", { duration: 1500 });
-            }
+
 
             fetchHabits();
         } catch (error) {

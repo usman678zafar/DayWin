@@ -4,6 +4,8 @@ import dbConnect from "@/lib/mongodb";
 import HabitLog from "@/models/HabitLog";
 import { startOfDay, endOfDay, subDays } from "date-fns";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();

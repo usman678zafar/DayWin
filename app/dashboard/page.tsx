@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
@@ -10,9 +10,22 @@ import { MotivationalQuote } from "@/components/dashboard/MotivationalQuote";
 import { HabitList } from "@/components/habits/HabitList";
 import { useHabits } from "@/hooks/useHabits";
 import { Loader2, Plus, BarChart3 } from "lucide-react";
+import {
+    startOfWeek,
+    endOfWeek,
+    eachDayOfInterval,
+    format,
+    isSameDay,
+    startOfDay,
+    endOfDay,
+} from "date-fns";
 
 export default function DashboardPage() {
     const { habits, isLoading, fetchHabits } = useHabits();
+    const [weeklyData, setWeeklyData] = useState<
+        { date: string; completed: number; total: number; percentage: number }[]
+    >([]);
+    const [isLoadingWeekly, setIsLoadingWeekly] = useState(false);
 
     useEffect(() => {
         fetchHabits();
@@ -21,15 +34,64 @@ export default function DashboardPage() {
     const completedCount = habits.filter((h) => h.todayLog?.completed).length;
     const totalCount = habits.length;
 
-    const weeklyData = [
-        { date: "Mon", completed: 4, total: 5, percentage: 80 },
-        { date: "Tue", completed: 5, total: 5, percentage: 100 },
-        { date: "Wed", completed: 3, total: 5, percentage: 60 },
-        { date: "Thu", completed: 5, total: 5, percentage: 100 },
-        { date: "Fri", completed: 4, total: 5, percentage: 80 },
-        { date: "Sat", completed: 2, total: 5, percentage: 40 },
-        { date: "Sun", completed: completedCount, total: totalCount, percentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0 },
-    ];
+    // Fetch real weekly data from logs API
+    useEffect(() => {
+        if (habits.length === 0) {
+            setWeeklyData([]);
+            return;
+        }
+
+        const fetchWeeklyLogs = async () => {
+            setIsLoadingWeekly(true);
+            try {
+                const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday
+                const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
+                const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+                const response = await fetch(
+                    `/api/logs?startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`
+                );
+                const data = await response.json();
+                const logs = data.logs || [];
+
+                const chartData = days.map((day) => {
+                    const dayLogs = logs.filter(
+                        (log: any) =>
+                            isSameDay(new Date(log.date), day) && log.completed
+                    );
+                    const completed = dayLogs.length;
+                    const total = habits.length;
+                    return {
+                        date: format(day, "EEE"),
+                        completed,
+                        total,
+                        percentage:
+                            total > 0 ? Math.round((completed / total) * 100) : 0,
+                    };
+                });
+
+                setWeeklyData(chartData);
+            } catch (error) {
+                console.error("Failed to fetch weekly data:", error);
+                // Fallback: empty data
+                const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+                const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
+                const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+                setWeeklyData(
+                    days.map((day) => ({
+                        date: format(day, "EEE"),
+                        completed: 0,
+                        total: habits.length,
+                        percentage: 0,
+                    }))
+                );
+            } finally {
+                setIsLoadingWeekly(false);
+            }
+        };
+
+        fetchWeeklyLogs();
+    }, [habits]);
 
     const currentStreak = Math.max(...habits.map((h) => h.streak?.current || 0), 0);
     const longestStreak = Math.max(...habits.map((h) => h.streak?.longest || 0), 0);

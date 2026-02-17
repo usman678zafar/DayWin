@@ -3,6 +3,12 @@
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "./theme-provider";
 import { Toaster } from "react-hot-toast";
+import { useServiceWorker } from "@/hooks/usePWA";
+
+function ServiceWorkerRegistrar() {
+    useServiceWorker();
+    return null;
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -13,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 enableSystem
                 disableTransitionOnChange
             >
+                <ServiceWorkerRegistrar />
                 {children}
                 <Toaster
                     position="top-center"

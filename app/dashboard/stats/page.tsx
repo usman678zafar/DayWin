@@ -179,7 +179,7 @@ export default function StatsPage() {
                                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 dark:bg-surface-800 text-sm font-bold text-surface-600 dark:text-surface-200/50">
                                     {index + 1}
                                 </div>
-                                <div className="text-xl">{habit.icon}</div>
+
                                 <div className="flex-1">
                                     <p className="font-medium text-surface-900 dark:text-white">
                                         {habit.title}
