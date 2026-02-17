@@ -14,11 +14,18 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-[#f3f5f8] dark:bg-[#04070f]">
-            <div className="pointer-events-none absolute inset-0 opacity-60 [background:radial-gradient(circle_at_14%_12%,rgba(0,0,0,0.06),transparent_35%),radial-gradient(circle_at_85%_88%,rgba(0,0,0,0.08),transparent_35%)] dark:opacity-30 dark:[background:radial-gradient(circle_at_14%_12%,rgba(255,255,255,0.08),transparent_35%),radial-gradient(circle_at_85%_88%,rgba(255,255,255,0.06),transparent_35%)]" />
+        <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#030305]">
+            {/* Premium Background Gradients */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-blue-500/5 blur-[120px] dark:bg-blue-500/[0.03]" />
+                <div className="absolute -bottom-[10%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple-500/5 blur-[120px] dark:bg-purple-500/[0.03]" />
+            </div>
+
             <Navbar />
             <main className="relative md:ml-72 min-h-screen pb-24 md:pb-8">
-                {children}
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
+                    {children}
+                </div>
             </main>
         </div>
     );

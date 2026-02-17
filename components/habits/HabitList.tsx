@@ -54,13 +54,15 @@ export function HabitList() {
 
             {/* Pending Habits */}
             {pendingHabits.length > 0 && (
-                <div className="space-y-3 sm:space-y-4">
-                    <h2 className="text-base sm:text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
-                        <span>To Do</span>
-                        <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs sm:text-sm">
-                            {pendingHabits.length}
-                        </span>
-                    </h2>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-1">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-black/50 dark:text-white/40 flex items-center gap-3">
+                            To Do
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/5 text-[10px] text-black/60 dark:bg-white/5 dark:text-white/40">
+                                {pendingHabits.length}
+                            </span>
+                        </h2>
+                    </div>
                     <div className="space-y-2 sm:space-y-3">
                         <AnimatePresence mode="popLayout">
                             {pendingHabits.map((habit, index) => (
@@ -83,14 +85,16 @@ export function HabitList() {
 
             {/* Completed Habits */}
             {completedHabits.length > 0 && (
-                <div className="space-y-3 sm:space-y-4">
-                    <h2 className="text-base sm:text-lg font-semibold text-surface-900 dark:text-white flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-success-500" />
-                        <span>Completed</span>
-                        <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-success-100 dark:bg-success-900/30 text-success-600 dark:text-success-400 text-xs sm:text-sm">
-                            {completedHabits.length}
-                        </span>
-                    </h2>
+                <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between px-1">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#10B981] flex items-center gap-3">
+                            <Sparkles className="w-4 h-4" />
+                            Completed
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#10B981]/10 text-[10px] text-[#10B981]">
+                                {completedHabits.length}
+                            </span>
+                        </h2>
+                    </div>
                     <div className="space-y-2 sm:space-y-3 opacity-75">
                         <AnimatePresence mode="popLayout">
                             {completedHabits.map((habit, index) => (

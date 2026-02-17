@@ -37,26 +37,26 @@
 }
 
 .dark {
-    --background: 9 9 11;
-    --foreground: 250 250 250;
-    --card: 24 24 27;
-    --card-foreground: 250 250 250;
-    --muted: 39 39 42;
-    --muted-foreground: 161 161 170;
-    --border: 39 39 42;
+    --background: 3 3 5;
+    --foreground: 240 240 245;
+    --card: 10 10 16;
+    --card-foreground: 240 240 245;
+    --muted: 20 20 28;
+    --muted-foreground: 140 140 160;
+    --border: 30 30 45;
 
-    /* Day Win Dashboard Tokens - Dark */
-    --dw-bg: #0F0F14;
-    --dw-card: #1A1A24;
-    --dw-card-border: rgba(255, 255, 255, 0.06);
+    /* Day Win Dashboard Tokens - Dark Premium */
+    --dw-bg: #030305;
+    --dw-card: #0A0A10;
+    --dw-card-border: rgba(255, 255, 255, 0.04);
     --dw-accent: #4D7CFE;
-    --dw-accent-glow: rgba(77, 124, 254, 0.2);
-    --dw-success: #22C55E;
-    --dw-success-glow: rgba(34, 197, 94, 0.2);
-    --dw-text-primary: #ffffff;
-    --dw-text-secondary: rgba(255, 255, 255, 0.6);
-    --dw-text-muted: rgba(255, 255, 255, 0.35);
-    --dw-streak: #F59E0B;
+    --dw-accent-glow: rgba(77, 124, 254, 0.15);
+    --dw-success: #10B981;
+    --dw-success-glow: rgba(16, 185, 129, 0.15);
+    --dw-text-primary: #F8FAFC;
+    --dw-text-secondary: rgba(248, 250, 252, 0.65);
+    --dw-text-muted: rgba(248, 250, 252, 0.4);
+    --dw-streak: #FBBF24;
 }
 
 * {
@@ -246,15 +246,15 @@ body {
     }
 
     .page-header {
-        @apply mb-8 rounded-2xl border border-black/10 bg-white/85 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-white/5;
+        @apply mb-10 rounded-[2.5rem] border border-black/5 bg-white/50 p-6 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01];
     }
 
     .page-title {
-        @apply text-3xl md:text-4xl font-black tracking-tight text-black dark:text-white;
+        @apply text-4xl md:text-5xl font-black tracking-[-0.04em] text-black dark:text-white;
     }
 
     .page-subtitle {
-        @apply text-black/60 dark:text-white/60 mt-2;
+        @apply text-black/40 dark:text-white/40 mt-2 font-medium;
     }
 
     .section-title {
@@ -263,12 +263,13 @@ body {
 
     /* FIXED: Removed spaces in rgba values */
     .card {
-        @apply rounded-2xl border border-black/10 bg-white/90 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-white/5;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+        @apply rounded-2xl border border-black/5 bg-white p-6 dark:border-white/[0.03] dark:bg-white/[0.02];
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     .dark .card {
-        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.32);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03), transparent);
     }
 
     .card-header {

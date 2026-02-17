@@ -34,18 +34,16 @@ export function Navbar() {
 
     return (
         <>
-            <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-72 flex-col border-r border-black/10 bg-white/85 px-5 py-5 backdrop-blur-xl dark:border-white/10 dark:bg-[#070b14]/85 z-40">
-                <Link href="/" className="mb-7">
+            <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-72 flex-col border-r border-black/5 bg-white/70 px-5 py-6 backdrop-blur-2xl dark:border-white/[0.03] dark:bg-[#030305]/70 z-40">
+                <Link href="/" className="mb-10 px-4">
                     <DailyWinLogo
                         label="DAY WIN"
-                        iconClassName="h-10 w-10 rounded-lg"
-                        textClassName="text-sm font-bold tracking-[0.14em] text-black dark:text-white"
+                        iconClassName="h-10 w-10 rounded-xl"
+                        textClassName="text-sm font-black tracking-[0.2em] text-black dark:text-white"
                     />
                 </Link>
 
-
-
-                <nav className="flex-1 space-y-2">
+                <nav className="flex-1 space-y-1.5">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -53,18 +51,18 @@ export function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition",
+                                    "relative flex items-center gap-3.5 rounded-2xl px-5 py-3.5 text-sm font-bold transition-all duration-300",
                                     isActive
-                                        ? "bg-black text-white dark:bg-white dark:text-black"
-                                        : "text-black/65 hover:bg-black/5 hover:text-black dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white"
+                                        ? "bg-black text-white shadow-lg shadow-black/10 dark:bg-white dark:text-black dark:shadow-white/10"
+                                        : "text-black/50 hover:bg-black/5 hover:text-black dark:text-white/40 dark:hover:bg-white/[0.04] dark:hover:text-white"
                                 )}
                             >
-                                <item.icon className="h-4.5 w-4.5" />
+                                <item.icon className={cn("h-5 w-5 transition-transform duration-300", isActive && "scale-110")} />
                                 <span>{item.label}</span>
                                 {isActive && (
                                     <motion.span
-                                        layoutId="nav-active-pill"
-                                        className="absolute right-3 h-2 w-2 rounded-full bg-[#e8d774] dark:bg-black"
+                                        layoutId="nav-active-indicator"
+                                        className="absolute right-4 h-1.5 w-1.5 rounded-full bg-[#4D7CFE] dark:bg-[#4D7CFE]"
                                     />
                                 )}
                             </Link>
@@ -72,115 +70,99 @@ export function Navbar() {
                     })}
                 </nav>
 
-                <div className="mt-5 rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                    <div className="mb-3 flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-sm font-bold text-white dark:bg-white dark:text-black">
-                            {session?.user?.name?.[0] || "U"}
+                <div className="mt-8 rounded-[2.5rem] border border-black/5 bg-black/5 p-4 dark:border-white/[0.03] dark:bg-white/[0.02]">
+                    <div className="mb-4 flex items-center gap-4 px-1">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black shadow-inner ring-1 ring-white/10 dark:bg-white">
+                            <span className="text-sm font-black text-white dark:text-black">
+                                {session?.user?.name?.[0] || "U"}
+                            </span>
                         </div>
                         <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-black dark:text-white">
+                            <p className="truncate text-sm font-bold text-black dark:text-white leading-tight">
                                 {session?.user?.name || "User"}
                             </p>
-                            <p className="truncate text-xs text-black/50 dark:text-white/50">
-                                {session?.user?.email || "user@example.com"}
+                            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/30">
+                                Premium Goal Member
                             </p>
                         </div>
                     </div>
 
-                    <div className="mb-3 grid grid-cols-3 gap-2">
-                        <button
-                            onClick={() => setTheme("light")}
-                            className={cn(
-                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
-                                theme === "light"
-                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
-                            )}
-                            aria-label="Light mode"
-                        >
-                            <Sun className="h-4 w-4" />
-                        </button>
-                        <button
-                            onClick={() => setTheme("dark")}
-                            className={cn(
-                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
-                                theme === "dark"
-                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
-                            )}
-                            aria-label="Dark mode"
-                        >
-                            <Moon className="h-4 w-4" />
-                        </button>
-                        <button
-                            onClick={() => setTheme("system")}
-                            className={cn(
-                                "flex items-center justify-center rounded-lg border px-2 py-2 transition",
-                                theme === "system"
-                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                    : "border-black/15 text-black/60 hover:border-black/40 dark:border-white/15 dark:text-white/60 dark:hover:border-white/40"
-                            )}
-                            aria-label="System mode"
-                        >
-                            <Monitor className="h-4 w-4" />
-                        </button>
+                    <div className="mb-4 flex items-center justify-between gap-1 p-1 bg-white/50 dark:bg-black/20 rounded-2xl border border-black/5 dark:border-white/[0.03]">
+                        {["light", "dark", "system"].map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => setTheme(t)}
+                                className={cn(
+                                    "flex flex-1 items-center justify-center rounded-xl py-2 transition-all duration-300",
+                                    theme === t
+                                        ? "bg-white text-black shadow-sm dark:bg-[#1A1A24] dark:text-white"
+                                        : "text-black/40 hover:text-black dark:text-white/30 dark:hover:text-white"
+                                )}
+                                aria-label={`${t} mode`}
+                            >
+                                {t === "light" && <Sun className="h-4 w-4" />}
+                                {t === "dark" && <Moon className="h-4 w-4" />}
+                                {t === "system" && <Monitor className="h-4 w-4" />}
+                            </button>
+                        ))}
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2.5">
                         <Link
                             href="/dashboard/settings"
-                            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-black/70 transition hover:border-black hover:text-black dark:border-white/15 dark:text-white/70 dark:hover:border-white dark:hover:text-white"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-black/5 bg-white py-3 text-[10px] font-black uppercase tracking-[0.14em] text-black transition-all hover:bg-black hover:text-white dark:border-white/[0.03] dark:bg-[#1A1A24] dark:text-white dark:hover:bg-white dark:hover:text-black shadow-sm"
                         >
                             <Settings className="h-3.5 w-3.5" />
                             Settings
                         </Link>
                         <button
                             onClick={() => signOut({ callbackUrl: "/" })}
-                            className="flex items-center justify-center rounded-lg border border-red-500/40 px-3 py-2 text-red-600 transition hover:bg-red-500 hover:text-white"
+                            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-red-500/10 bg-red-500/5 text-red-500 transition-all hover:bg-red-500 hover:text-white"
                             aria-label="Sign out"
                         >
-                            <LogOut className="h-4 w-4" />
+                            <LogOut className="h-4.5 w-4.5" />
                         </button>
                     </div>
                 </div>
             </aside>
 
-            <nav className="md:hidden fixed bottom-2 left-2 right-2 z-40 rounded-2xl border border-black/10 bg-white/92 px-2 py-2 shadow-xl backdrop-blur dark:border-white/10 dark:bg-[#0a0f19]/92">
-                <ul className="grid grid-cols-5 items-center gap-1">
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={cn(
-                                        "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-semibold transition",
-                                        isActive
-                                            ? "bg-black text-white dark:bg-white dark:text-black"
-                                            : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
-                                    )}
-                                >
-                                    <item.icon className="h-4.5 w-4.5" />
-                                    <span>{item.label}</span>
-                                </Link>
-                            </li>
-                        );
-                    })}
-                    <li>
-                        <Link
-                            href="/dashboard/settings"
-                            className={cn(
-                                "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-semibold transition",
-                                pathname === "/dashboard/settings"
-                                    ? "bg-black text-white dark:bg-white dark:text-black"
-                                    : "text-black/55 hover:text-black dark:text-white/55 dark:hover:text-white"
-                            )}
-                        >
-                            <User className="h-4.5 w-4.5" />
-                            <span>Profile</span>
-                        </Link>
-                    </li>
-                </ul>
+            {/* Premium Mobile Bottom Navigation */}
+            <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50">
+                <div className="rounded-[2.5rem] border border-black/5 bg-white/80 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl dark:border-white/[0.05] dark:bg-[#0A0A10]/90 dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <ul className="flex items-center justify-around">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href;
+                            return (
+                                <li key={item.href} className="flex-1">
+                                    <Link
+                                        href={item.href}
+                                        className={cn(
+                                            "flex flex-col items-center justify-center gap-1.5 rounded-[2rem] py-3.5 transition-all duration-500",
+                                            isActive
+                                                ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
+                                                : "text-black/40 hover:text-black dark:text-white/30 dark:hover:text-white"
+                                        )}
+                                    >
+                                        <item.icon className={cn("h-5 w-5 transition-transform duration-500", isActive && "scale-110")} />
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                        <li className="flex-1">
+                            <Link
+                                href="/dashboard/settings"
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-1.5 rounded-[2rem] py-3.5 transition-all duration-500",
+                                    pathname === "/dashboard/settings"
+                                        ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
+                                        : "text-black/40 hover:text-black dark:text-white/30 dark:hover:text-white"
+                                )}
+                            >
+                                <User className={cn("h-5 w-5 transition-transform duration-500", pathname === "/dashboard/settings" && "scale-110")} />
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </>
     );

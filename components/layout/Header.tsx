@@ -12,16 +12,16 @@ export function Header() {
 
     return (
         <motion.header
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 rounded-2xl border border-black/10 bg-white/85 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-white/5"
+            className="mb-10 rounded-[2.5rem] border border-black/5 bg-white/50 p-6 sm:p-8 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01]"
         >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black/50 dark:text-white/50">{today}</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-black dark:text-white md:text-4xl">
-                {greeting}, {session?.user?.name?.split(" ")[0] || "Champion"}
+            <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40">{today}</p>
+            <h1 className="mt-2 text-4xl sm:text-5xl font-black tracking-[-0.04em] text-black dark:text-white leading-tight">
+                {greeting}, <span className="bg-gradient-to-r from-[#4D7CFE] to-purple-500 bg-clip-text text-transparent">{session?.user?.name?.split(" ")[0] || "Champion"}</span>
             </h1>
-            <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-                Focus on momentum. Small actions today create long streaks tomorrow.
+            <p className="mt-3 text-xs sm:text-sm font-medium text-black/50 dark:text-white/40 max-w-lg">
+                Focus on momentum. Small actions today create the massive wins of tomorrow.
             </p>
         </motion.header>
     );
