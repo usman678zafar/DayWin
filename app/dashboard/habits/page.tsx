@@ -436,7 +436,7 @@ export default function HabitsPage() {
             {filteredHabits.length > 0 ? (
                 <>
                     {/* Mobile Card View */}
-                    <div className="block sm:hidden space-y-3">
+                    <div className="block md:hidden space-y-3">
                         {isLoadingLogs ? (
                             <div className="flex items-center justify-center py-16">
                                 <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
@@ -542,7 +542,7 @@ export default function HabitsPage() {
                                                             className={cn(
                                                                 "flex h-9 w-9 items-center justify-center rounded-lg transition-all",
                                                                 log.completed
-                                                                    ? `bg-gradient-to-br ${colors.gradient} text-white shadow-sm`
+                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-sm`
                                                                     : "bg-black/5 dark:bg-white/5",
                                                                 isFutureDay && "opacity-30 cursor-not-allowed",
                                                                 isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"
@@ -567,7 +567,7 @@ export default function HabitsPage() {
                     </div>
 
                     {/* Desktop Table View */}
-                    <div className="hidden sm:block card overflow-visible">
+                    <div className="hidden md:block card overflow-visible">
                         {isLoadingLogs ? (
                             <div className="flex items-center justify-center py-16">
                                 <Loader2 className="h-8 w-8 animate-spin text-black/30 dark:text-white/30" />
@@ -663,7 +663,7 @@ export default function HabitsPage() {
                                                                     className={cn(
                                                                         "mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200",
                                                                         log.completed
-                                                                            ? `bg-gradient-to-br ${colors.gradient} text-white shadow-md`
+                                                                            ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-md`
                                                                             : "text-black/30 dark:text-white/30",
                                                                         isFutureDay && "cursor-not-allowed opacity-20",
                                                                         isTodayDate && !log.completed && "ring-2 ring-[#4D7CFE]/30"

@@ -116,66 +116,78 @@ export type HabitColor =
     | "pink"
     | "rose";
 
-export const habitColors: Record<HabitColor, { bg: string; text: string; gradient: string }> = {
+export const habitColors: Record<HabitColor, { bg: string; text: string; gradient: string; checkedText: string }> = {
     violet: {
         bg: "bg-violet-100 dark:bg-violet-900/30",
         text: "text-violet-600 dark:text-violet-400",
         gradient: "from-violet-400 to-violet-600",
+        checkedText: "text-white",
     },
     purple: {
         bg: "bg-purple-100 dark:bg-purple-900/30",
         text: "text-purple-600 dark:text-purple-400",
         gradient: "from-purple-400 to-purple-600",
+        checkedText: "text-white",
     },
     blue: {
         bg: "bg-blue-100 dark:bg-blue-900/30",
         text: "text-blue-600 dark:text-blue-400",
         gradient: "from-blue-400 to-blue-600",
+        checkedText: "text-white",
     },
     cyan: {
         bg: "bg-cyan-100 dark:bg-cyan-900/30",
         text: "text-cyan-600 dark:text-cyan-400",
         gradient: "from-cyan-400 to-cyan-600",
+        checkedText: "text-white",
     },
     teal: {
         bg: "bg-teal-100 dark:bg-teal-900/30",
         text: "text-teal-600 dark:text-teal-400",
         gradient: "from-teal-400 to-teal-600",
+        checkedText: "text-white",
     },
     green: {
         bg: "bg-green-100 dark:bg-green-900/30",
         text: "text-green-600 dark:text-green-400",
         gradient: "from-green-400 to-green-600",
+        checkedText: "text-white",
     },
     lime: {
         bg: "bg-lime-100 dark:bg-lime-900/30",
         text: "text-lime-600 dark:text-lime-400",
         gradient: "from-lime-400 to-lime-600",
+        checkedText: "text-black/80",
     },
     yellow: {
         bg: "bg-yellow-100 dark:bg-yellow-900/30",
         text: "text-yellow-600 dark:text-yellow-400",
         gradient: "from-yellow-400 to-yellow-600",
+        checkedText: "text-black/80",
     },
     orange: {
         bg: "bg-orange-100 dark:bg-orange-900/30",
         text: "text-orange-600 dark:text-orange-400",
         gradient: "from-orange-400 to-orange-600",
+        checkedText: "text-white",
     },
     red: {
         bg: "bg-red-100 dark:bg-red-900/30",
         text: "text-red-600 dark:text-red-400",
         gradient: "from-red-400 to-red-600",
+        checkedText: "text-white",
     },
     pink: {
         bg: "bg-pink-100 dark:bg-pink-900/30",
         text: "text-pink-600 dark:text-pink-400",
         gradient: "from-pink-400 to-pink-600",
+        checkedText: "text-white",
     },
     rose: {
         bg: "bg-rose-100 dark:bg-rose-900/30",
         text: "text-rose-600 dark:text-rose-400",
         gradient: "from-rose-400 to-rose-600",
+        checkedText: "text-white",
     },
 };
 
