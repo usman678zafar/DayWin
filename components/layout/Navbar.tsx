@@ -25,6 +25,7 @@ const navItems = [
     { href: "/dashboard/habits", label: "Habits", icon: LayoutGrid },
     { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
     { href: "/dashboard/stats", label: "Analytics", icon: BarChart3 },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export function Navbar() {
@@ -87,42 +88,6 @@ export function Navbar() {
                         </div>
                     </div>
 
-                    <div className="mb-4 flex items-center justify-between gap-1 p-1 bg-white/50 dark:bg-black/20 rounded-2xl border border-black/5 dark:border-white/[0.03]">
-                        {["light", "dark", "system"].map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setTheme(t)}
-                                className={cn(
-                                    "flex flex-1 items-center justify-center rounded-xl py-2 transition-all duration-300",
-                                    theme === t
-                                        ? "bg-white text-black shadow-sm dark:bg-[#1A1A24] dark:text-white"
-                                        : "text-black/40 hover:text-black dark:text-white/30 dark:hover:text-white"
-                                )}
-                                aria-label={`${t} mode`}
-                            >
-                                {t === "light" && <Sun className="h-4 w-4" />}
-                                {t === "dark" && <Moon className="h-4 w-4" />}
-                                {t === "system" && <Monitor className="h-4 w-4" />}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-2.5">
-                        <Link
-                            href="/dashboard/settings"
-                            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-black/5 bg-white py-3 text-[10px] font-black uppercase tracking-[0.14em] text-black transition-all hover:bg-black hover:text-white dark:border-white/[0.03] dark:bg-[#1A1A24] dark:text-white dark:hover:bg-white dark:hover:text-black shadow-sm"
-                        >
-                            <Settings className="h-3.5 w-3.5" />
-                            Settings
-                        </Link>
-                        <button
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-red-500/10 bg-red-500/5 text-red-500 transition-all hover:bg-red-500 hover:text-white"
-                            aria-label="Sign out"
-                        >
-                            <LogOut className="h-4.5 w-4.5" />
-                        </button>
-                    </div>
                 </div>
             </aside>
 
@@ -148,19 +113,7 @@ export function Navbar() {
                                 </li>
                             );
                         })}
-                        <li className="flex-1">
-                            <Link
-                                href="/dashboard/settings"
-                                className={cn(
-                                    "flex flex-col items-center justify-center gap-1.5 rounded-[2rem] py-3.5 transition-all duration-500",
-                                    pathname === "/dashboard/settings"
-                                        ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
-                                        : "text-black/40 hover:text-black dark:text-white/30 dark:hover:text-white"
-                                )}
-                            >
-                                <User className={cn("h-5 w-5 transition-transform duration-500", pathname === "/dashboard/settings" && "scale-110")} />
-                            </Link>
-                        </li>
+
                     </ul>
                 </div>
             </nav>
