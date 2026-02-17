@@ -266,15 +266,17 @@ export default function StatsPage() {
                                 className={cn(
                                     "p-4 rounded-xl border-2 transition-all flex flex-col items-center text-center",
                                     achievement.unlocked
-                                        ? "border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20"
-                                        : "border-surface-200 dark:border-surface-800 opacity-50"
+                                        ? "border-yellow-400/50 bg-yellow-50/50 dark:bg-yellow-900/10"
+                                        : "border-black/5 dark:border-white/5 opacity-40 bg-black/5 dark:bg-white/5"
                                 )}
                             >
-                                <div className="text-3xl mb-2">{achievement.icon}</div>
-                                <p className="font-semibold text-surface-900 dark:text-white">
+                                <div className={cn("p-3 rounded-xl mb-3 shadow-inner", achievement.bg)}>
+                                    <achievement.icon className={cn("w-7 h-7 sm:w-8 sm:h-8", achievement.color)} />
+                                </div>
+                                <p className="font-bold text-black dark:text-white text-sm sm:text-base">
                                     {achievement.title}
                                 </p>
-                                <p className="text-sm text-surface-200/50">
+                                <p className="text-[10px] sm:text-xs text-black/40 dark:text-white/40 mt-1 uppercase tracking-wider font-bold">
                                     {achievement.description}
                                 </p>
                             </div>
