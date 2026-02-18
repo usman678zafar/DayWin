@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Download, Eye, FileText, CheckCircle2, Calendar, Star, Leaf, Flower2, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -253,6 +253,32 @@ const templates: TemplateProps[] = [
 
 export function TemplateGallery() {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+    const [scale, setScale] = useState(1);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const updateScale = () => {
+            if (containerRef.current && selectedTemplate) {
+                const parentWidth = containerRef.current.offsetWidth;
+                const padding = 40; // 40px total horizontal padding for safe safety buffer
+                const templateWidth = 794; // Fixed width of templates
+                const availableWidth = parentWidth - padding;
+
+                // Calculate scale to fit width, maxing out at 1
+                const newScale = Math.min(1, availableWidth / templateWidth);
+                setScale(newScale);
+            }
+        };
+
+        // Initial calculation
+        updateScale();
+
+        // Add event listener
+        window.addEventListener('resize', updateScale);
+
+        // Cleanup
+        return () => window.removeEventListener('resize', updateScale);
+    }, [selectedTemplate]);
 
     const downloadPdf = async (templateId: string) => {
 
@@ -411,8 +437,14 @@ export function TemplateGallery() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-black/50 p-8 flex items-start justify-center">
-                                <div className="shadow-2xl origin-top transform scale-[0.6] md:scale-[0.8] lg:scale-100 transition-transform">
+                            <div
+                                className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 dark:bg-black/50 p-4 md:p-8 flex items-start justify-center"
+                                ref={containerRef}
+                            >
+                                <div
+                                    className="shadow-2xl origin-top transition-transform duration-200"
+                                    style={{ transform: `scale(${scale})`, marginBottom: `${(1123 * scale) - 1123}px` }}
+                                >
                                     {templates.find((t) => t.id === selectedTemplate)?.renderForPdf()}
                                 </div>
                             </div>
