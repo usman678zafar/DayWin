@@ -11,8 +11,9 @@ export async function GET(
 ) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -20,7 +21,7 @@ export async function GET(
 
         const habit = await Habit.findOne({
             _id: params.id,
-            userId: session.user.id,
+            userId: user.id,
         });
 
         if (!habit) {
@@ -44,8 +45,9 @@ export async function PATCH(
 ) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -54,7 +56,7 @@ export async function PATCH(
         await dbConnect();
 
         const habit = await Habit.findOneAndUpdate(
-            { _id: params.id, userId: session.user.id },
+            { _id: params.id, userId: user.id },
             { $set: body },
             { new: true }
         );
@@ -80,8 +82,9 @@ export async function DELETE(
 ) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -89,7 +92,7 @@ export async function DELETE(
 
         const habit = await Habit.findOneAndDelete({
             _id: params.id,
-            userId: session.user.id,
+            userId: user.id,
         });
 
         if (!habit) {

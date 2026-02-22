@@ -10,7 +10,9 @@ export async function POST(
 ) {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -23,22 +25,25 @@ export async function POST(
         }
 
         // Check if already a member
-        if (squad.members.includes(session.user.id)) {
+        if (squad.members.includes(user.id)) {
             return NextResponse.json({ message: "Already a member" });
         }
 
         // Add to members and remove from invitedEmails if present
-        squad.members.push(session.user.id);
-        squad.invitedEmails = squad.invitedEmails.filter(
-            (email: string) => email !== session.user.email?.toLowerCase()
-        );
+        squad.members.push(user.id);
+        const userEmail = user.email?.toLowerCase();
+        if (userEmail) {
+            squad.invitedEmails = squad.invitedEmails.filter(
+                (email: string) => email.toLowerCase() !== userEmail
+            );
+        }
 
         await squad.save();
 
         // Create habits for the joining user based on templates
         for (const template of squad.habitTemplates) {
             await Habit.create({
-                userId: session.user.id,
+                userId: user.id,
                 title: template.title,
                 icon: template.icon,
                 color: template.color,

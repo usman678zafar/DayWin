@@ -11,7 +11,9 @@ export async function GET(
 ) {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -27,8 +29,8 @@ export async function GET(
         }
 
         // Check if user is a member
-        const isMember = squad.members.some((m: any) => m._id.toString() === session.user.id);
-        if (!isMember && squad.ownerId._id.toString() !== session.user.id) {
+        const isMember = squad.members.some((m: any) => m._id.toString() === user.id);
+        if (!isMember && squad.ownerId._id.toString() !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
@@ -53,7 +55,9 @@ export async function PATCH(
 ) {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -66,7 +70,7 @@ export async function PATCH(
         }
 
         // Only owner can edit
-        if (squad.ownerId.toString() !== session.user.id) {
+        if (squad.ownerId.toString() !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
@@ -86,7 +90,9 @@ export async function DELETE(
 ) {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -99,7 +105,7 @@ export async function DELETE(
         }
 
         // Only owner can delete
-        if (squad.ownerId.toString() !== session.user.id) {
+        if (squad.ownerId.toString() !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 

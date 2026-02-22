@@ -3,11 +3,14 @@ import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import Challenge from "@/models/Challenge";
 import User from "@/models/User";
+import Habit from "@/models/Habit";
 
 export async function GET() {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -15,8 +18,8 @@ export async function GET() {
 
         const squads = await Challenge.find({
             $or: [
-                { ownerId: session.user.id },
-                { members: session.user.id }
+                { ownerId: user.id },
+                { members: user.id }
             ]
         }).populate("ownerId", "name image")
             .sort({ createdAt: -1 });
@@ -31,7 +34,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user?.id) {
+        const user = session?.user;
+
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -45,18 +50,18 @@ export async function POST(req: NextRequest) {
         await dbConnect();
 
         // Find users for invited emails if they exist
-        const members = [session.user.id];
+        const members = [user.id];
         const existingUsers = await User.find({ email: { $in: invitedEmails } });
-        existingUsers.forEach(user => {
-            if (!members.includes(user._id.toString())) {
-                members.push(user._id.toString());
+        existingUsers.forEach(u => {
+            if (!members.includes(u._id.toString())) {
+                members.push(u._id.toString());
             }
         });
 
         const newSquad = await Challenge.create({
             title,
             description,
-            ownerId: session.user.id,
+            ownerId: user.id,
             members,
             invitedEmails: invitedEmails.filter((email: string) =>
                 !existingUsers.some(user => user.email === email)

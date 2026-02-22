@@ -10,8 +10,9 @@ export const revalidate = 0;
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
         await dbConnect();
 
-        const query: any = { userId: session.user.id };
+        const query: any = { userId: user.id };
 
         if (habitId) {
             query.habitId = habitId;

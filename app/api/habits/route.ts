@@ -12,15 +12,16 @@ export const revalidate = 0;
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         await dbConnect();
 
         const habits = await Habit.find({
-            userId: session.user.id,
+            userId: user.id,
             isArchived: false,
         }).sort({ order: 1, createdAt: -1 });
 
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
         const today = dateStr ? new Date(dateStr) : new Date();
 
         const logs = await HabitLog.find({
-            userId: session.user.id,
+            userId: user.id,
             date: {
                 $gte: startOfDay(today),
                 $lte: endOfDay(today),
@@ -60,8 +61,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -70,13 +72,13 @@ export async function POST(req: NextRequest) {
         await dbConnect();
 
         // Get the highest order number
-        const lastHabit = await Habit.findOne({ userId: session.user.id }).sort({
+        const lastHabit = await Habit.findOne({ userId: user.id }).sort({
             order: -1,
         });
 
         const habit = await Habit.create({
             ...body,
-            userId: session.user.id,
+            userId: user.id,
             order: lastHabit ? lastHabit.order + 1 : 0,
         });
 

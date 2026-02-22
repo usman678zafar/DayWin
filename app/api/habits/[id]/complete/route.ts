@@ -11,8 +11,9 @@ export async function POST(
 ) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -31,7 +32,7 @@ export async function POST(
         // Find or create log for the day using exact UTC date match
         let log = await HabitLog.findOne({
             habitId: params.id,
-            userId: session.user.id,
+            userId: user.id,
             date: utcDate,
         });
 
@@ -44,7 +45,7 @@ export async function POST(
         } else {
             log = await HabitLog.create({
                 habitId: params.id,
-                userId: session.user.id,
+                userId: user.id,
                 date: utcDate,
                 completed,
                 count: count ?? 1,

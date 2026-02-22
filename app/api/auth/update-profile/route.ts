@@ -6,8 +6,9 @@ import User from "@/models/User";
 export async function PUT(req: NextRequest) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -30,7 +31,7 @@ export async function PUT(req: NextRequest) {
         await dbConnect();
 
         const updatedUser = await User.findByIdAndUpdate(
-            session.user.id,
+            user.id,
             { name: name.trim() },
             { new: true }
         );

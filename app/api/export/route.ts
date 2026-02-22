@@ -11,8 +11,9 @@ export const revalidate = 0;
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
+        const user = session?.user;
 
-        if (!session?.user?.id) {
+        if (!user || !user.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -40,11 +41,11 @@ export async function GET(req: NextRequest) {
 
         // Get all habits
         const habits = await Habit.find({
-            userId: session.user.id,
+            userId: user.id,
         }).sort({ createdAt: -1 });
 
         // Get logs with date filter if applicable
-        const logQuery: any = { userId: session.user.id };
+        const logQuery: any = { userId: user.id };
         if (startDate) {
             logQuery.date = { $gte: startDate, $lte: endDate };
         }
