@@ -34,6 +34,7 @@ export interface IHabit extends Document {
     };
     completionRate: number;
     order: number;
+    squadId?: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -126,6 +127,10 @@ const HabitSchema = new Schema<IHabit>(
             type: Number,
             default: 0,
         },
+        squadId: {
+            type: Schema.Types.ObjectId,
+            ref: "Challenge",
+        },
     },
     {
         timestamps: true,
@@ -136,5 +141,6 @@ const HabitSchema = new Schema<IHabit>(
 HabitSchema.index({ userId: 1, isArchived: 1 });
 HabitSchema.index({ userId: 1, habitType: 1 });
 HabitSchema.index({ userId: 1, createdAt: -1 });
+HabitSchema.index({ squadId: 1 });
 
 export default mongoose.models.Habit || mongoose.model<IHabit>("Habit", HabitSchema);
