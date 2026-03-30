@@ -242,28 +242,28 @@ body {
 
     /* Legacy page components (kept for non-dashboard pages) */
     .page-container {
-        @apply min-h-screen pb-24 md:pb-8 px-4 md:px-8 pt-6;
+        @apply min-h-screen pb-24 md:pb-8 px-4 md:px-6 xl:px-8 pt-5 md:pt-6;
     }
 
     .page-header {
-        @apply mb-10 rounded-[2.5rem] border border-black/5 bg-white/50 p-6 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01];
+        @apply mb-6 md:mb-8 rounded-[2rem] border border-black/5 bg-white/50 p-5 md:p-6 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01];
     }
 
     .page-title {
-        @apply text-4xl md:text-5xl font-black tracking-[-0.04em] text-black dark:text-white;
+        @apply text-3xl md:text-4xl font-black tracking-[-0.04em] text-black dark:text-white;
     }
 
     .page-subtitle {
-        @apply text-black/60 dark:text-white/40 mt-2 font-medium;
+        @apply mt-2 text-sm md:text-base text-black/60 dark:text-white/40 font-medium;
     }
 
     .section-title {
-        @apply text-xl font-semibold text-black dark:text-white mb-4;
+        @apply mb-3 md:mb-4 text-lg md:text-xl font-semibold text-black dark:text-white;
     }
 
     /* FIXED: Removed spaces in rgba values */
     .card {
-        @apply rounded-2xl border border-black/5 bg-white p-6 dark:border-white/[0.03] dark:bg-white/[0.02];
+        @apply rounded-2xl border border-black/5 bg-white p-4 md:p-5 dark:border-white/[0.03] dark:bg-white/[0.02];
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 

@@ -5,6 +5,7 @@ type DailyWinLogoProps = {
     textClassName?: string;
     iconClassName?: string;
     label?: string;
+    hideLabel?: boolean;
 };
 
 export function DailyWinLogo({
@@ -12,6 +13,7 @@ export function DailyWinLogo({
     textClassName,
     iconClassName,
     label = "DAY WIN",
+    hideLabel = false,
 }: DailyWinLogoProps) {
     return (
         <div className={cn("inline-flex items-center gap-2.5", className)}>
@@ -35,9 +37,11 @@ export function DailyWinLogo({
                     </g>
                 </svg>
             </span>
-            <span className={cn("text-xs font-bold uppercase tracking-[0.16em] text-white", textClassName)}>
-                {label}
-            </span>
+            {!hideLabel && (
+                <span className={cn("text-xs font-bold uppercase tracking-[0.16em] text-white", textClassName)}>
+                    {label}
+                </span>
+            )}
         </div>
     );
 }
