@@ -1,7 +1,6 @@
-const CACHE_NAME = "daywin-v1";
+const CACHE_NAME = "daywin-v2";
 const STATIC_ASSETS = [
     "/",
-    "/dashboard",
     "/manifest.json",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
@@ -10,8 +9,20 @@ const STATIC_ASSETS = [
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
+        caches.open(CACHE_NAME).then(async (cache) => {
+            const requests = await Promise.all(
+                STATIC_ASSETS.map(async (asset) => {
+                    try {
+                        const response = await fetch(asset, { cache: "no-cache" });
+                        if (response.ok) {
+                            await cache.put(asset, response);
+                        }
+                    } catch (error) {
+                        // Ignore install-time cache failures so the worker still activates.
+                    }
+                })
+            );
+            return requests;
         })
     );
     self.skipWaiting();
@@ -34,9 +45,15 @@ self.addEventListener("activate", (event) => {
 // Fetch event - network first, fallback to cache
 self.addEventListener("fetch", (event) => {
     const { request } = event;
+    const url = new URL(request.url);
 
     // Skip non-GET requests
     if (request.method !== "GET") return;
+
+    // Only handle same-origin http(s) requests. Browser extensions and other
+    // custom schemes cannot be stored in the Cache API.
+    if (url.origin !== self.location.origin) return;
+    if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
     // Skip API requests - always go to network
     if (request.url.includes("/api/")) return;
@@ -44,10 +61,16 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
         fetch(request)
             .then((response) => {
-                // Clone the response and cache it
+                // Cache only successful basic responses.
+                if (!response.ok || response.type !== "basic") {
+                    return response;
+                }
+
                 const responseClone = response.clone();
                 caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(request, responseClone);
+                    cache.put(request, responseClone).catch(() => {
+                        // Ignore cache write failures so navigation still succeeds.
+                    });
                 });
                 return response;
             })

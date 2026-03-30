@@ -22,8 +22,8 @@ export default async function DashboardLayout({
             </div>
 
             <Navbar />
-            <main className="relative md:ml-72 min-h-screen pb-24 md:pb-8">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
+            <main className="relative min-h-screen pb-24 transition-[margin] duration-300 md:ml-20 md:peer-hover/sidebar:ml-56 xl:peer-hover/sidebar:ml-60 md:pb-8">
+                <div className="mx-auto max-w-6xl px-4 sm:px-5 lg:px-6 pt-5 md:pt-6">
                     {children}
                 </div>
             </main>
