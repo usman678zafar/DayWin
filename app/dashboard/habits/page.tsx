@@ -341,17 +341,30 @@ function HabitsPageContent() {
                                 <th className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-2 text-left border-r border-black/5 dark:border-white/5">
                                     <span className="text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Habit</span>
                                 </th>
-                                {displayDays.map((day) => (
-                                    <th key={day.toISOString()} className={cn(
-                                        "px-1 py-1.5 text-center min-w-[32px] sm:min-w-[40px]",
-                                        isToday(day) && "bg-primary-500/5 dark:bg-primary-500/10"
-                                    )}>
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-[8px] font-semibold uppercase text-black/50 dark:text-white/50 leading-none">{format(day, "EEE")}</span>
-                                            <span className={cn("text-[11px] font-semibold mt-0.5", isToday(day) ? "text-primary-600 dark:text-primary-400" : "text-black dark:text-white")}>{format(day, "d")}</span>
-                                        </div>
-                                    </th>
-                                ))}
+                                {displayDays.map((day) => {
+                                    const isFutureDay = isFuture(day) && !isToday(day);
+                                    return (
+                                        <th key={day.toISOString()} className={cn(
+                                            "px-1 py-1.5 text-center min-w-[32px] sm:min-w-[40px]",
+                                            isToday(day) && "bg-primary-500/5 dark:bg-primary-500/10"
+                                        )}>
+                                            <div className="flex flex-col items-center">
+                                                <span className={cn(
+                                                    "text-[8px] font-semibold uppercase leading-none",
+                                                    isFutureDay ? "text-black/20 dark:text-white/20" : "text-black/50 dark:text-white/50"
+                                                )}>
+                                                    {format(day, "EEE")}
+                                                </span>
+                                                <span className={cn(
+                                                    "text-[11px] font-semibold mt-0.5",
+                                                    isToday(day) ? "text-primary-600 dark:text-primary-400" : (isFutureDay ? "text-black/20 dark:text-white/20" : "text-black dark:text-white")
+                                                )}>
+                                                    {format(day, "d")}
+                                                </span>
+                                            </div>
+                                        </th>
+                                    );
+                                })}
                                 <th className="px-3 py-2 text-center bg-black/[0.03] dark:bg-white/[0.03]">
                                     <TrendingUp className="h-3 w-3 mx-auto text-purple-500" />
                                 </th>
@@ -384,6 +397,9 @@ function HabitsPageContent() {
                                             </td>
                                             {logs.map((log, lIdx) => {
                                                 const isFutureDay = isFuture(log.date) && !isToday(log.date);
+                                                const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
+                                                const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
+
                                                 return (
                                                     <td key={lIdx} className={cn("px-0.5 py-1 text-center", isToday(log.date) && "bg-primary-500/[0.02] dark:bg-primary-500/[0.05]")}>
                                                         <motion.button
@@ -395,13 +411,17 @@ function HabitsPageContent() {
                                                                 "mx-auto h-5 w-5 sm:h-6 sm:w-6 rounded-md flex items-center justify-center transition-all",
                                                                 log.completed
                                                                     ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-sm`
-                                                                    : "bg-black/[0.04] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10",
-                                                                isFutureDay && "opacity-10 cursor-not-allowed",
+                                                                    : (isFutureDay ? "bg-black/[0.02] dark:bg-white/[0.02] border-none" : "bg-black/[0.04] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10"),
                                                                 isToday(log.date) && !log.completed && "ring-1 ring-primary-500/30"
                                                             )}
                                                         >
-                                                            {log.completed && <Check className={cn("h-3 w-3", colors.checkedText)} strokeWidth={5} />}
-                                                            {!log.completed && !isFutureDay && (
+                                                            {isFutureDay ? (
+                                                                <div className="opacity-[0.08] dark:opacity-[0.05] scale-75">
+                                                                    <HabitIcon name={iconToDisplay} size={10} />
+                                                                </div>
+                                                            ) : log.completed ? (
+                                                                <Check className={cn("h-3 w-3", colors.checkedText)} strokeWidth={5} />
+                                                            ) : (
                                                                 <span className="text-[8px] font-semibold text-black/20 dark:text-white/30">{format(log.date, "d")}</span>
                                                             )}
                                                         </motion.button>
