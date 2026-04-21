@@ -20,7 +20,7 @@
     --muted-foreground: 113 113 122;
     --border: 228 228 231;
     --ring: 168 85 247;
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     /* Day Win Dashboard Tokens */
     --dw-bg: #f3f5f8;
@@ -124,27 +124,27 @@ body {
     }
 
     .card-interactive {
-        @apply bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1;
+        @apply bg-white dark:bg-surface-900 rounded-lg border border-surface-200 dark:border-surface-800 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-0.5;
     }
 
     .btn-primary {
-        @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+        @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
     }
 
     .btn-secondary {
-        @apply bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-800/80 text-surface-900 dark:text-white font-medium px-6 py-3 rounded-xl border border-surface-200 dark:border-surface-800 transition-all duration-300 active:scale-[0.98];
+        @apply bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-800/80 text-surface-900 dark:text-white font-medium px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-800 transition-all duration-300 active:scale-[0.98];
     }
 
     .btn-ghost {
-        @apply hover:bg-surface-100 dark:hover:bg-surface-800 text-black/60 dark:text-surface-200 font-medium px-4 py-2 rounded-xl transition-all duration-300;
+        @apply hover:bg-surface-100 dark:hover:bg-surface-800 text-black/60 dark:text-surface-200 font-medium px-3 py-1.5 rounded-lg transition-all duration-300;
     }
 
     .input-field {
-        @apply w-full px-4 py-3 rounded-xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300;
+        @apply w-full px-3 py-2 rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-300;
     }
 
     .habit-card {
-        @apply relative overflow-hidden rounded-2xl p-5 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer hover:-translate-y-0.5 active:scale-[0.99];
+        @apply relative overflow-hidden rounded-xl p-4 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer hover:-translate-y-0.5 active:scale-[0.99];
     }
 
     .gradient-border {
@@ -159,55 +159,13 @@ body {
             linear-gradient(135deg, #a855f7, #06b6d4, #f97316) border-box;
     }
 
-    /* Animation utilities */
-    .animate-in {
-        animation: fadeIn 0.5s ease-out forwards;
-    }
-
-    .stagger-1 {
-        animation-delay: 0.1s;
-    }
-
-    .stagger-2 {
-        animation-delay: 0.2s;
-    }
-
-    .stagger-3 {
-        animation-delay: 0.3s;
-    }
-
-    .stagger-4 {
-        animation-delay: 0.4s;
-    }
-
-    .stagger-5 {
-        animation-delay: 0.5s;
-    }
-
     /* Checkbox custom styles */
     .habit-checkbox {
-        @apply w-7 h-7 rounded-lg border-2 border-surface-300 dark:border-surface-800 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary-400 hover:scale-110 active:scale-95;
+        @apply w-6 h-6 rounded-md border-2 border-surface-300 dark:border-surface-800 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary-400 hover:scale-110 active:scale-95;
     }
 
     .habit-checkbox.completed {
         @apply bg-gradient-to-br from-success-400 to-success-500 border-success-500 shadow-lg shadow-success-500/30;
-    }
-
-    /* Progress ring animation */
-    .progress-ring {
-        transition: stroke-dashoffset 0.5s ease-out;
-        transform: rotate(-90deg);
-        transform-origin: 50% 50%;
-    }
-
-    /* Streak fire effect */
-    .streak-fire {
-        @apply relative;
-    }
-
-    .streak-fire::after {
-        content: '🔥';
-        @apply absolute -top-1 -right-1 text-lg animate-bounce-in;
     }
 }
 
@@ -218,7 +176,7 @@ body {
     .dw-page {
         min-height: 100vh;
         min-height: 100dvh;
-        padding: 0 16px 96px;
+        padding: 0 12px 64px;
         background: var(--dw-bg);
         color: var(--dw-text-primary);
     }
@@ -227,167 +185,108 @@ body {
     .dw-card {
         background: var(--dw-card);
         border: 1px solid var(--dw-card-border);
-        border-radius: 16px;
-        padding: 20px;
+        border-radius: 12px;
+        padding: 14px;
         backdrop-filter: blur(12px);
     }
 
     .dw-card-glow {
         background: var(--dw-card);
         border: 1px solid var(--dw-card-border);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 0 40px var(--dw-accent-glow), 0 8px 32px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 0 30px var(--dw-accent-glow), 0 6px 24px rgba(0, 0, 0, 0.15);
     }
 
     /* Legacy page components (kept for non-dashboard pages) */
     .page-container {
-        @apply min-h-screen pb-24 md:pb-8 px-4 md:px-6 xl:px-8 pt-5 md:pt-6;
+        @apply min-h-screen pb-20 md:pb-6 px-3 md:px-4 xl:px-6 pt-3 md:pt-4;
     }
 
     .page-header {
-        @apply mb-6 md:mb-8 rounded-[2rem] border border-black/5 bg-white/50 p-5 md:p-6 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01];
+        @apply mb-4 md:mb-5 rounded-2xl border border-black/5 bg-white/50 p-4 md:p-5 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01];
     }
 
     .page-title {
-        @apply text-3xl md:text-4xl font-black tracking-[-0.04em] text-black dark:text-white;
+        @apply text-2xl md:text-3xl font-black tracking-[-0.04em] text-black dark:text-white;
     }
 
     .page-subtitle {
-        @apply mt-2 text-sm md:text-base text-black/60 dark:text-white/40 font-medium;
+        @apply mt-1 text-xs md:text-sm text-black/60 dark:text-white/40 font-medium;
     }
 
     .section-title {
-        @apply mb-3 md:mb-4 text-lg md:text-xl font-semibold text-black dark:text-white;
+        @apply mb-2 md:mb-3 text-lg md:text-xl font-semibold text-black dark:text-white;
     }
 
-    /* FIXED: Removed spaces in rgba values */
     .card {
-        @apply rounded-2xl border border-black/5 bg-white p-4 md:p-5 dark:border-white/[0.03] dark:bg-white/[0.02];
+        @apply rounded-xl border border-black/5 bg-white p-3 md:p-4 dark:border-white/[0.03] dark:bg-white/[0.02];
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     .dark .card {
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
         background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03), transparent);
     }
 
     .card-header {
-        @apply flex items-center justify-between mb-4;
+        @apply flex items-center justify-between mb-3;
     }
 
     .card-title {
-        @apply text-lg font-semibold text-black dark:text-white;
+        @apply text-base font-semibold text-black dark:text-white;
     }
 }
 
 /* ===== Dashboard Animations ===== */
 
-/* Checkbox bounce */
 @keyframes checkBounce {
-    0% {
-        transform: scale(0);
-    }
-
-    50% {
-        transform: scale(1.3);
-    }
-
-    70% {
-        transform: scale(0.85);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(0); }
+    50% { transform: scale(1.3); }
+    70% { transform: scale(0.85); }
+    100% { transform: scale(1); }
 }
 
 .animate-check-bounce {
     animation: checkBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Streak flame pulse */
 @keyframes flamePulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        filter: brightness(1);
-    }
-
-    50% {
-        transform: scale(1.15);
-        filter: brightness(1.3);
-    }
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.15); filter: brightness(1.3); }
 }
 
 .animate-flame-pulse {
     animation: flamePulse 1.5s ease-in-out infinite;
 }
 
-/* Day Won celebration glow */
 @keyframes celebrationGlow {
-
-    0%,
-    100% {
-        box-shadow: 0 0 20px var(--dw-success-glow), 0 0 60px transparent;
-    }
-
-    50% {
-        box-shadow: 0 0 30px var(--dw-success-glow), 0 0 80px var(--dw-success-glow);
-    }
+    0%, 100% { box-shadow: 0 0 15px var(--dw-success-glow), 0 0 40px transparent; }
+    50% { box-shadow: 0 0 20px var(--dw-success-glow), 0 0 60px var(--dw-success-glow); }
 }
 
 .animate-celebration-glow {
     animation: celebrationGlow 2s ease-in-out infinite;
 }
 
-/* Smooth slide in from bottom */
 @keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-slide-in-up {
-    animation: slideInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: slideInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Progress ring gradient rotation */
-@keyframes ringGradientRotate {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* FAB pulse */
 @keyframes fabPulse {
-
-    0%,
-    100% {
-        box-shadow: 0 4px 24px var(--dw-accent-glow);
-    }
-
-    50% {
-        box-shadow: 0 4px 40px var(--dw-accent-glow), 0 0 60px var(--dw-accent-glow);
-    }
+    0%, 100% { box-shadow: 0 4px 20px var(--dw-accent-glow); }
+    50% { box-shadow: 0 4px 32px var(--dw-accent-glow), 0 0 48px var(--dw-accent-glow); }
 }
 
 .animate-fab-pulse {
     animation: fabPulse 3s ease-in-out infinite;
 }
 
-/* Confetti canvas */
 #confetti-canvas {
     position: fixed;
     top: 0;
@@ -398,58 +297,30 @@ body {
     z-index: 9999;
 }
 
-/* Toast customization */
 .toast-custom {
-    @apply bg-white dark:bg-surface-900 text-surface-900 dark:text-white border border-surface-200 dark:border-surface-800 shadow-xl rounded-xl;
+    @apply bg-white dark:bg-surface-900 text-surface-900 dark:text-white border border-surface-200 dark:border-surface-800 shadow-xl rounded-lg px-4 py-2;
 }
 
-/* Heatmap cell transitions */
 .heatmap-cell {
     transition: all 0.2s ease;
 }
 
 .heatmap-cell:hover {
-    transform: scale(1.4);
+    transform: scale(1.3);
     z-index: 10;
 }
 
-/* Habit Matrix Styles */
-.habit-matrix-scroll {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
-
 .habit-matrix-scroll::-webkit-scrollbar {
-    height: 6px;
+    height: 4px;
 }
-
-.habit-matrix-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
+.habit-matrix-scroll::-webkit-scrollbar-track { background: transparent; }
 .habit-matrix-scroll::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+    border-radius: 2px;
 }
-
 .dark .habit-matrix-scroll::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.habit-matrix-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.dark .habit-matrix-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-/* Hide scrollbar utility */
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

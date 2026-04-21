@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -16,14 +16,13 @@ import {
     isToday,
     isFuture,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Check, X, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Flame, Calendar as CalendarIcon, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
 import { Button } from "@/components/ui/Button";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import { habitColors } from "@/types";
 import { PageLoader } from "@/components/ui/PageLoader";
-
 import toast from "react-hot-toast";
 
 export default function CalendarPage() {
@@ -33,27 +32,19 @@ export default function CalendarPage() {
     const [logs, setLogs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        fetchHabits();
-    }, [fetchHabits]);
-
-    useEffect(() => {
-        fetchLogs();
-    }, [currentMonth]);
+    useEffect(() => { fetchHabits(); }, [fetchHabits]);
+    useEffect(() => { fetchLogs(); }, [currentMonth]);
 
     const fetchLogs = async () => {
         setIsLoading(true);
         const start = startOfMonth(currentMonth);
         const end = endOfMonth(currentMonth);
-
         try {
-            const response = await fetch(
-                `/api/logs?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
-            );
+            const response = await fetch(`/api/logs?startDate=${start.toISOString()}&endDate=${end.toISOString()}`);
             const data = await response.json();
             setLogs(data.logs || []);
         } catch (error) {
-            console.error("Failed to fetch logs:", error);
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
@@ -61,316 +52,207 @@ export default function CalendarPage() {
 
     const handleToggleHabit = async (habitId: string, date: Date, currentCompleted: boolean) => {
         if (isFuture(date) && !isToday(date)) {
-            toast.error("Cannot mark habits for future dates");
+            toast.error("Cannot mark future dates");
             return;
         }
 
-        // Optimistic update
         const newCompleted = !currentCompleted;
-        setLogs((prevLogs) => {
-            const existingLogIndex = prevLogs.findIndex(
-                (log) => log.habitId === habitId && isSameDay(new Date(log.date), date)
-            );
-
-            if (existingLogIndex >= 0) {
-                const newLogs = [...prevLogs];
-                newLogs[existingLogIndex] = { ...newLogs[existingLogIndex], completed: newCompleted };
-                return newLogs;
-            } else {
-                return [...prevLogs, { habitId, date, completed: newCompleted }];
+        setLogs((prev) => {
+            const idx = prev.findIndex((log) => log.habitId === habitId && isSameDay(new Date(log.date), date));
+            if (idx >= 0) {
+                const updated = [...prev];
+                updated[idx] = { ...updated[idx], completed: newCompleted };
+                return updated;
             }
+            return [...prev, { habitId, date, completed: newCompleted }];
         });
 
         try {
             await completeHabitForDate(habitId, date, newCompleted);
         } catch (error) {
-            // Revert on error
             fetchLogs();
         }
     };
 
-    const renderHeader = () => (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white">
-                {format(currentMonth, "MMMM yyyy")}
-            </h2>
-            <div className="flex items-center gap-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                >
-                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
-                <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => {
-                        setCurrentMonth(new Date());
-                        setSelectedDate(new Date());
-                    }}
-                >
-                    Today
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                >
-                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
-            </div>
-        </div>
-    );
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(monthStart);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
 
-    const renderDays = () => {
-        const days = ["S", "M", "T", "W", "T", "F", "S"];
-        const fullDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        return (
-            <div className="grid grid-cols-7 mb-2">
-                {fullDays.map((day, i) => (
-                    <div
-                        key={day}
-                        className="py-2 sm:py-3 text-center text-[10px] sm:text-sm font-black uppercase tracking-widest text-black/30 dark:text-white/30"
-                    >
-                        <span className="hidden sm:inline">{day}</span>
-                        <span className="sm:hidden">{days[i]}</span>
-                    </div>
-                ))}
-            </div>
-        );
-    };
+    const rows = [];
+    let day = startDate;
 
     const renderCells = () => {
-        const monthStart = startOfMonth(currentMonth);
-        const monthEnd = endOfMonth(monthStart);
-        const startDate = startOfWeek(monthStart);
-        const endDate = endOfWeek(monthEnd);
-
         const rows = [];
-        let days = [];
         let day = startDate;
-
         while (day <= endDate) {
+            const daysInRow = [];
             for (let i = 0; i < 7; i++) {
-                const dayLogs = logs.filter((log) =>
-                    isSameDay(new Date(log.date), day)
-                );
+                const d = day;
+                const dayLogs = logs.filter((log) => isSameDay(new Date(log.date), d));
                 const completedCount = dayLogs.filter((log) => log.completed).length;
                 const totalHabits = habits.length;
-                const completionRate = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
-                const cloneDay = day;
-                const isTodayDate = isToday(day);
-                const isSelected = isSameDay(day, selectedDate);
-                const isCurrentMonth = isSameMonth(day, monthStart);
-                const isFutureDate = isFuture(day) && !isToday(day);
+                const rate = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
+                const isSelected = isSameDay(d, selectedDate);
+                const isCurrent = isSameMonth(d, monthStart);
+                const isFutureD = isFuture(d) && !isToday(d);
 
-                days.push(
-                    <motion.div
-                        key={day.toString()}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setSelectedDate(cloneDay)}
+                daysInRow.push(
+                    <div
+                        key={d.toString()}
+                        onClick={() => setSelectedDate(d)}
                         className={cn(
-                            "relative aspect-square p-0.5 sm:p-1.5 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-300",
-                            !isCurrentMonth && "opacity-20",
-                            isSelected && "ring-2 ring-black dark:ring-white shadow-xl z-10",
-                            isTodayDate && "bg-black/[0.03] dark:bg-white/[0.05]"
+                            "relative aspect-square cursor-pointer transition-all border border-black/[0.03] dark:border-white/[0.03]",
+                            !isCurrent && "opacity-10 pointer-events-none",
+                            isSelected && "ring-1 ring-inset ring-black dark:ring-white z-10",
+                            isToday(d) && "bg-primary-500/5"
                         )}
                     >
-                        <div
-                            className={cn(
-                                "w-full h-full rounded sm:rounded-lg flex flex-col items-center justify-center",
-                                completionRate === 100 && !isFutureDate && "bg-success-100 dark:bg-success-900/30",
-                                completionRate > 0 && completionRate < 100 && !isFutureDate && "bg-yellow-100 dark:bg-yellow-900/30",
-                                completionRate === 0 && totalHabits > 0 && dayLogs.length > 0 && !isFutureDate && "bg-red-100 dark:bg-red-900/30"
-                            )}
-                        >
-                            <span
-                                className={cn(
-                                    "text-xs sm:text-sm font-bold",
-                                    isTodayDate
-                                        ? "text-black dark:text-white underline decoration-2 underline-offset-4"
-                                        : "text-black/70 dark:text-white/70"
-                                )}
-                            >
-                                {format(day, "d")}
+                        <div className={cn(
+                            "w-full h-full flex flex-col items-center justify-center p-0.5",
+                            rate === 100 && !isFutureD && "bg-green-500/20 dark:bg-green-500/10",
+                            rate > 0 && rate < 100 && !isFutureD && "bg-yellow-500/20 dark:bg-yellow-500/10",
+                            rate === 0 && dayLogs.length > 0 && !isFutureD && "bg-red-500/20 dark:bg-red-500/10"
+                        )}>
+                            <span className={cn("text-[10px] font-black", isToday(d) ? "text-primary-600 dark:text-primary-400" : "text-black/60 dark:text-white/40")}>
+                                {format(d, "d")}
                             </span>
-                            {totalHabits > 0 && isCurrentMonth && !isFutureDate && (
-                                <div className="mt-1 flex gap-0.5">
-                                    {completionRate === 100 ? (
-                                        <Check className="w-3 h-3 text-success-500" />
-                                    ) : completionRate > 0 ? (
-                                        <span className="text-[10px] text-yellow-600 dark:text-yellow-400">
-                                            {Math.round(completionRate)}%
-                                        </span>
-                                    ) : null}
-                                </div>
+                            {rate > 0 && !isFutureD && (
+                                <span className="text-[8px] font-black pointer-events-none">{Math.round(rate)}%</span>
                             )}
                         </div>
-                    </motion.div>
+                    </div>
                 );
                 day = addDays(day, 1);
             }
-            rows.push(
-                <div key={day.toString()} className="grid grid-cols-7 gap-1">
-                    {days}
-                </div>
-            );
-            days = [];
+            rows.push(<div key={day.toString()} className="grid grid-cols-7">{daysInRow}</div>);
         }
-        return <div className="space-y-1">{rows}</div>;
+        return <div className="border border-black/5 dark:border-white/5 rounded-lg overflow-hidden">{rows}</div>;
     };
 
-    const selectedDateLogs = logs.filter((log) =>
-        isSameDay(new Date(log.date), selectedDate)
-    );
+    const selectedDateLogs = logs.filter((log) => isSameDay(new Date(log.date), selectedDate));
     const isSelectedFuture = isFuture(selectedDate) && !isToday(selectedDate);
 
     return (
         <div className="page-container">
-            <div className="page-header">
-                <h1 className="page-title">Calendar</h1>
-                <p className="page-subtitle">Track completion patterns across every day. Click any date to view and edit habits.</p>
+            {/* Very Compact Calendar Header */}
+            <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-sm font-black uppercase tracking-widest text-black/40 dark:text-white/40 flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4" /> Calendar
+                    </h1>
+                    <div className="h-4 w-px bg-black/10 dark:bg-white/10" />
+                    <h2 className="text-sm font-black text-black dark:text-white">{format(currentMonth, "MMMM yyyy")}</h2>
+                </div>
+
+                <div className="flex items-center gap-1">
+                    <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5">
+                        <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => { setCurrentMonth(new Date()); setSelectedDate(new Date()); }} className="px-2 py-1 text-[10px] font-black uppercase tracking-widest hover:bg-black/5 rounded">Today</button>
+                    <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5">
+                        <ChevronRight className="h-4 w-4" />
+                    </button>
+                </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
-                {/* Calendar */}
-                <div className="lg:col-span-2">
-                    <div className="card p-3 sm:p-6">
-                        {renderHeader()}
-                        {renderDays()}
-                        {isLoading ? (
-                            <PageLoader fullScreen={false} className="py-20 bg-transparent dark:bg-transparent" />
-                        ) : (
-                            renderCells()
-                        )}
-                    </div>
+            <div className="grid lg:grid-cols-4 gap-4">
+                {/* Calendar View */}
+                <div className="lg:col-span-3">
+                    <div className="card p-2">
+                        <div className="grid grid-cols-7 mb-1">
+                            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
+                                <div key={d} className="text-center py-1 text-[8px] font-black uppercase tracking-widest text-black/20">
+                                    {d}
+                                </div>
+                            ))}
+                        </div>
+                        {isLoading ? <div className="py-20 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div> : renderCells()}
 
-                    {/* Legend */}
-                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 px-2">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-success-500 shadow-sm" />
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">All complete</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-yellow-400 shadow-sm" />
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">Partial</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-md bg-red-400 shadow-sm" />
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">None</span>
+                        {/* Legend - Mini */}
+                        <div className="flex items-center justify-center gap-4 mt-3 pb-1">
+                            {[{c: "bg-green-500/40", l: "FULL"}, {c: "bg-yellow-500/40", l: "PART"}, {c: "bg-red-500/40", l: "NONE"}].map(item => (
+                                <div key={item.l} className="flex items-center gap-1.5">
+                                    <div className={cn("w-2 h-2 rounded-full", item.c)} />
+                                    <span className="text-[9px] font-black text-black/30 tracking-widest">{item.l}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Selected Date Details - INTERACTIVE */}
-                <div className="card p-6 h-fit sticky top-6 border-black/10 dark:border-white/10">
-                    <h3 className="text-lg font-black uppercase tracking-tight text-black dark:text-white mb-2">
-                        {format(selectedDate, "EEEE, MMMM d")}
-                    </h3>
+                {/* Selected Date Details - High Density */}
+                <div className="lg:col-span-1 space-y-3">
+                    <div className="card p-3">
+                        <div className="mb-3">
+                            <h3 className="text-[11px] font-black uppercase tracking-tight text-black dark:text-white">{format(selectedDate, "EEEE, MMMM d")}</h3>
+                            {isSelectedFuture && <p className="text-[9px] font-bold text-yellow-600 dark:text-yellow-400 mt-0.5">Future date - locked</p>}
+                        </div>
 
-                    {isSelectedFuture && (
-                        <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-4">
-                            Future date - habits cannot be marked
-                        </p>
-                    )}
-
-                    {habits.length > 0 ? (
-                        <div className="space-y-3">
-                            {habits.map((habit) => {
-                                const log = selectedDateLogs.find(
-                                    (l) => l.habitId === habit._id
-                                );
-                                const isCompleted = log?.completed || false;
-
-
+                        <div className="space-y-1.5">
+                            {habits.length > 0 ? habits.map((habit) => {
+                                const isComp = selectedDateLogs.find(l => l.habitId === habit._id)?.completed || false;
+                                const col = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
                                 return (
-                                    <motion.button
+                                    <button
                                         key={habit._id}
-                                        whileHover={!isSelectedFuture ? { scale: 1.02 } : undefined}
-                                        whileTap={!isSelectedFuture ? { scale: 0.98 } : undefined}
-                                        onClick={() => handleToggleHabit(habit._id, selectedDate, isCompleted)}
+                                        onClick={() => handleToggleHabit(habit._id, selectedDate, isComp)}
                                         disabled={isSelectedFuture}
                                         className={cn(
-                                            "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left",
-                                            isCompleted
-                                                ? "bg-black/[0.02] dark:bg-white/[0.05] border border-black/5 dark:border-white/5"
-                                                : "bg-transparent border border-transparent hover:border-black/5 dark:hover:border-white/5",
-                                            isSelectedFuture && "opacity-50 cursor-not-allowed"
+                                            "w-full flex items-center gap-2 p-1.5 rounded-lg transition-all text-left",
+                                            isComp ? "bg-black/[0.02] dark:bg-white/[0.04]" : "hover:bg-black/[0.01] dark:hover:bg-white/[0.01]",
+                                            isSelectedFuture && "opacity-40"
                                         )}
                                     >
-                                        <div className={cn(
-                                            "flex h-10 w-10 items-center justify-center rounded-xl",
-                                            habitColors[habit.color as keyof typeof habitColors]?.bg || "bg-purple-100 dark:bg-purple-900/30"
-                                        )}>
-                                            <HabitIcon
-                                                name={habit.icon}
-                                                size={20}
-                                                className={habitColors[habit.color as keyof typeof habitColors]?.text || "text-purple-600"}
-                                            />
+                                        <div className={cn("flex h-7 w-7 items-center justify-center rounded-md shrink-0", col.bg)}>
+                                            <HabitIcon name={habit.icon} size={14} className={col.text} />
                                         </div>
-
                                         <div className="flex-1 min-w-0">
-                                            <p className={cn(
-                                                "font-bold text-sm truncate",
-                                                isCompleted
-                                                    ? "text-black dark:text-white"
-                                                    : "text-black/60 dark:text-white/60"
-                                            )}>
-                                                {habit.title}
-                                            </p>
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[10px] uppercase tracking-widest text-black/30 dark:text-white/30 font-black">
-                                                    {habit.category}
-                                                </span>
-                                                {habit.streak.current > 0 && (
-                                                    <div className="flex items-center gap-1 text-orange-500">
-                                                        <Flame className="h-3 w-3" />
-                                                        <span className="text-[10px] font-bold">{habit.streak.current}d</span>
-                                                    </div>
-                                                )}
+                                            <p className={cn("text-[11px] font-bold truncate", isComp ? "text-black dark:text-white" : "text-black/50 dark:text-white/40")}>{habit.title}</p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-[8px] font-black uppercase text-black/20">{habit.category}</span>
+                                                {habit.streak.current > 0 && <div className="flex items-center gap-0.5 text-orange-500"><Flame className="h-2 w-2" /><span className="text-[8px] font-bold">{habit.streak.current}d</span></div>}
                                             </div>
                                         </div>
-                                        <div
-                                            className={cn(
-                                                "w-8 h-8 rounded-xl flex flex-col items-center justify-center transition-all duration-300",
-                                                isCompleted
-                                                    ? "bg-gradient-to-br from-success-400 to-success-600 text-white shadow-lg shadow-success-500/20"
-                                                    : "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5"
-                                            )}
-                                        >
-                                            {isCompleted ? (
-                                                <>
-                                                    <span className="text-[10px] font-black leading-none">{format(selectedDate, "d")}</span>
-                                                    <Check className="w-2.5 h-2.5 mt-0.5" strokeWidth={4} />
-                                                </>
-                                            ) : (
-                                                <span className="text-[10px] font-bold opacity-40">{format(selectedDate, "d")}</span>
-                                            )}
+                                        <div className={cn("h-5 w-5 rounded-md flex items-center justify-center shrink-0 border transition-all", isComp ? "bg-black dark:bg-white border-transparent" : "border-black/5 dark:border-white/5")}>
+                                            {isComp && <Check className="h-3 w-3 text-white dark:text-black" strokeWidth={5} />}
                                         </div>
-                                    </motion.button>
+                                    </button>
                                 );
-                            })}
+                            }) : <p className="text-[10px] text-center py-4 text-black/20">No habits</p>}
                         </div>
-                    ) : (
-                        <p className="text-black/30 dark:text-white/30 text-center py-8 font-medium text-sm">
-                            No habits created yet
-                        </p>)}
 
-                    {/* Summary for selected date */}
-                    {habits.length > 0 && !isSelectedFuture && (
-                        <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-black/60 dark:text-white/60">Completion</span>
-                                <span className="font-semibold text-black dark:text-white">
-                                    {selectedDateLogs.filter(l => l.completed).length} / {habits.length}
-                                </span>
+                        {habits.length > 0 && !isSelectedFuture && (
+                            <div className="mt-3 pt-3 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 opacity-30">
+                                    <TrendingUp className="h-3 w-3" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Rate</span>
+                                </div>
+                                <span className="text-[10px] font-black">{selectedDateLogs.filter(l => l.completed).length} / {habits.length}</span>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
+}
+
+function Loader2({ className }: { className?: string }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={cn("animate-spin", className)}
+        >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+    )
 }

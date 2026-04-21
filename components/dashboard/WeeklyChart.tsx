@@ -24,13 +24,10 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-surface-900 px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-xl border border-black/10 dark:border-white/10">
-                    <p className="font-bold text-sm text-black dark:text-white">{label}</p>
-                    <p className="text-xs text-black/50 dark:text-white/30">
-                        {payload[0].value} / {payload[0].payload.total} completed
-                    </p>
-                    <p className="text-xs font-medium text-primary-500">
-                        {payload[0].payload.percentage}%
+                <div className="bg-white dark:bg-surface-900 px-3 py-2 rounded-lg shadow-xl border border-black/10 dark:border-white/10">
+                    <p className="font-semibold text-[11px] uppercase tracking-widest text-black/40">{label}</p>
+                    <p className="text-xs font-semibold text-black dark:text-white">
+                        {payload[0].value} / {payload[0].payload.total}
                     </p>
                 </div>
             );
@@ -40,25 +37,30 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card"
+            className="card p-3"
         >
-            <h3 className="text-base sm:text-lg font-bold text-black dark:text-white mb-4 sm:mb-6">
-                This Week
-            </h3>
-            <div className="h-48 sm:h-64">
+            <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Weekly Activity</h3>
+                <div className="flex gap-1">
+                   {[100, 50, 0].map(v => (
+                       <div key={v} className={cn("w-1.5 h-1.5 rounded-full", v === 100 ? "bg-green-500" : v === 50 ? "bg-purple-500" : "bg-black/5")} />
+                   ))}
+                </div>
+            </div>
+            <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} barSize={28}>
+                    <BarChart data={data} barSize={20}>
                         <XAxis
                             dataKey="date"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#71717a", fontSize: 10 }}
+                            tick={{ fill: "#71717a", fontSize: 9, fontWeight: 600 }}
                         />
                         <YAxis hide />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
-                        <Bar dataKey="completed" radius={[6, 6, 0, 0]}>
+                        <Bar dataKey="completed" radius={[4, 4, 0, 0]}>
                             {data.map((entry, index) => (
                                 <Cell
                                     key={`cell-${index}`}
@@ -77,22 +79,10 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
                     </BarChart>
                 </ResponsiveContainer>
             </div>
-
-            {/* Legend - Mobile Optimized */}
-            <div className="flex items-center justify-center gap-4 sm:gap-6 mt-3 sm:mt-4 flex-wrap">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-success-500" />
-                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">100%</span>
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary-500" />
-                    <span className="text-[10px] sm:text-xs text-black/50 dark:text-white/30">50%+</span>
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-secondary-500" />
-                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">&lt;50%</span>
-                </div>
-            </div>
         </motion.div>
     );
+}
+
+function cn(...inputs: any[]) {
+    return inputs.filter(Boolean).join(" ");
 }

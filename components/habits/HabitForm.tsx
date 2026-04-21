@@ -231,9 +231,9 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
     const steps: FormStep[] = ["type", "basics", "schedule", "review"];
 
     return (
-        <div className="space-y-4 sm:space-y-6">
-            {/* Progress Steps - Mobile Optimized */}
-            <div className="flex items-center justify-center gap-1 sm:gap-2 pb-2 overflow-x-auto">
+        <div className="space-y-3 sm:space-y-4">
+            {/* Progress Steps - Ultra Compact */}
+            <div className="flex items-center justify-center gap-1 pb-1 overflow-x-auto">
                 {steps.map((step, index) => (
                     <button
                         key={step}
@@ -246,27 +246,24 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         }}
                         disabled={step !== "type" && step !== "basics" && !formData.title.trim()}
                         className={cn(
-                            "flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition whitespace-nowrap",
+                            "flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-widest transition whitespace-nowrap",
                             currentStep === step
                                 ? "bg-black text-white dark:bg-white dark:text-black"
-                                : "text-black/60 hover:text-black dark:text-white/40 dark:hover:text-white/70"
+                                : "text-black/30 hover:text-black/60 dark:text-white/30 dark:hover:text-white/60"
                         )}
                     >
                         <span
                             className={cn(
-                                "flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full text-[9px] sm:text-[10px]",
+                                "flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px]",
                                 currentStep === step
                                     ? "bg-white text-black dark:bg-black dark:text-white"
-                                    : "bg-black/10 dark:bg-white/10"
+                                    : "bg-black/5 dark:bg-white/5"
                             )}
                         >
                             {index + 1}
                         </span>
-                        <span className="hidden sm:inline">
-                            {step === "type" && "Type"}
-                            {step === "basics" && "Basics"}
-                            {step === "schedule" && "Schedule"}
-                            {step === "review" && "Review"}
+                        <span className="hidden xs:inline">
+                            {step}
                         </span>
                     </button>
                 ))}
@@ -283,11 +280,11 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         className="space-y-4 sm:space-y-6"
                     >
                         <div className="text-center">
-                            <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white">
-                                Choose Habit Type
+                            <h3 className="text-base font-semibold text-black dark:text-white uppercase tracking-tight">
+                                Select Cycle
                             </h3>
-                            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-black/80 dark:text-white/60">
-                                Select the tracking period for your habit
+                            <p className="mt-0.5 text-[10px] font-semibold text-black/30 dark:text-white/40 uppercase tracking-widest">
+                                When does this habit repeat?
                             </p>
                         </div>
 
@@ -301,48 +298,30 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                         type="button"
                                         onClick={() => setFormData({ ...formData, habitType: option.value })}
                                         className={cn(
-                                            "relative flex items-start gap-3 sm:gap-4 rounded-xl sm:rounded-2xl border-2 p-4 sm:p-5 text-left transition-all",
+                                            "relative flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all",
                                             isSelected
                                                 ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                                                : "border-black/5 hover:border-black/10 dark:border-white/5 dark:hover:border-white/10"
                                         )}
                                     >
                                         <div
                                             className={cn(
-                                                "flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-xl",
+                                                "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg",
                                                 isSelected
                                                     ? "bg-white/20 dark:bg-black/20"
                                                     : "bg-black/5 dark:bg-white/5"
                                             )}
                                         >
-                                            <HabitIcon name={option.icon} size={24} />
+                                            <HabitIcon name={option.icon} size={20} />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-base sm:text-lg font-bold">{option.label}</p>
+                                            <div className="flex items-baseline gap-2">
+                                                <p className="text-sm font-semibold uppercase tracking-tight">{option.label}</p>
                                                 {option.value !== "custom" && (
-                                                    <span
-                                                        className={cn(
-                                                            "rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold",
-                                                            isSelected
-                                                                ? "bg-white/20 dark:bg-black/20"
-                                                                : "bg-black/10 dark:bg-white/10"
-                                                        )}
-                                                    >
-                                                        {option.periodDays} days
-                                                    </span>
+                                                    <span className="text-[9px] font-semibold opacity-30">{option.periodDays}D</span>
                                                 )}
                                             </div>
-                                            <p
-                                                className={cn(
-                                                    "mt-0.5 sm:mt-1 text-xs sm:text-sm",
-                                                    isSelected
-                                                        ? "text-white/70 dark:text-black/70"
-                                                        : "text-black/70 dark:text-white/60"
-                                                )}
-                                            >
-                                                {option.description}
-                                            </p>
+                                            <p className="text-[11px] font-medium opacity-60 leading-tight">{option.description}</p>
                                         </div>
                                         {isSelected && (
                                             <div className="absolute right-3 sm:right-4 top-3 sm:top-4">
@@ -434,212 +413,88 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         exit={{ opacity: 0, x: 20 }}
                         className="space-y-4 sm:space-y-6"
                     >
-                        {/* Habit Type Badge */}
-                        <div className="flex items-center justify-center">
-                            <span className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-black/5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/70 dark:bg-white/5 dark:text-white/70">
-                                {formData.habitType === "weekly" && <CalendarDays className="h-3 w-3 sm:h-3.5 sm:w-3.5" />}
-                                {formData.habitType === "monthly" && <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />}
-                                {formData.habitType === "custom" && <Settings className="h-3 w-3 sm:h-3.5 sm:w-3.5" />}
-                                {formData.habitType} habit ({getPeriodDays()} days)
+                        {/* Habit Type Badge - Mini */}
+                        <div className="flex justify-center">
+                            <span className="flex items-center gap-1 rounded bg-black/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40">
+                                {formData.habitType} ({getPeriodDays()}D)
                             </span>
                         </div>
 
                         {/* Habit Name */}
                         <div>
-                            <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                What habit do you want to build?
+                            <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-black/30 dark:text-white/40">
+                                Habit Name
                             </label>
-                            <Input
-                                placeholder="e.g., Read for 30 minutes"
+                            <input
+                                placeholder="e.g., Meditation"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="text-base sm:text-lg"
+                                className="w-full bg-black/[0.03] dark:bg-white/[0.03] border-none rounded-lg px-3 py-2 text-sm font-semibold uppercase tracking-tight outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 text-black dark:text-white"
                                 autoFocus
                             />
                         </div>
 
-                        {/* Category - Mobile Optimized Grid */}
+                        {/* Category */}
                         <div>
-                            <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
+                            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-widest text-black/30 dark:text-white/40">
                                 Category
                             </label>
-                            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 sm:grid-cols-5">
-                                {habitCategories.map((cat) => {
-                                    return (
-                                        <button
-                                            key={cat.value}
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, category: cat.value })}
-                                            className={cn(
-                                                "flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl border-2 p-2 sm:p-3 transition",
-                                                formData.category === cat.value
-                                                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                    : "border-black/10 text-black/70 hover:border-black/30 dark:border-white/10 dark:text-white/70 dark:hover:border-white/30"
-                                            )}
-                                        >
-                                            <HabitIcon name={cat.icon} size={20} />
-                                            <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider">
-                                                {cat.label}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                            <div className="flex flex-wrap gap-1">
+                                {habitCategories.map((cat) => (
+                                    <button
+                                        key={cat.value}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, category: cat.value })}
+                                        className={cn(
+                                            "rounded-md border px-2 py-1 text-[9px] font-semibold uppercase tracking-widest transition",
+                                            formData.category === cat.value
+                                                ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
+                                                : "bg-transparent text-black/30 border-black/5 hover:border-black/10 dark:text-white/40 dark:border-white/10 dark:hover:border-white/20"
+                                        )}
+                                    >
+                                        {cat.label}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Icon Selection */}
+
+
+                        {/* Color Selection - Minimal row */}
                         <div>
-                            <div className="mb-2 sm:mb-3 flex items-center justify-between">
-                                <label className="text-xs sm:text-sm font-semibold text-black dark:text-white">Icon</label>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAllIcons(!showAllIcons)}
-                                    className="text-[10px] sm:text-xs font-bold text-black/70 hover:text-black dark:text-white/60 dark:hover:text-white"
-                                >
-                                    {showAllIcons ? "Show less" : "Browse all"}
-                                </button>
-                            </div>
-
-                            {/* Current Selection Preview */}
-                            <div className="mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4">
-                                <div
-                                    className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl sm:rounded-2xl transition-all duration-300 shadow-inner"
-                                    style={{ backgroundColor: selectedColorConfig.colors.bg }}
-                                >
-                                    <HabitIcon name={formData.icon} size={32} style={{ color: selectedColorConfig.colors.text }} />
-                                </div>
-                                <div>
-                                    <p className="text-xs sm:text-sm font-bold text-black dark:text-white">
-                                        Selected: {formData.icon}
-                                    </p>
-                                    <p className="text-[10px] sm:text-xs text-black/50 dark:text-white/50">
-                                        Click an icon below to change
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Quick Suggestions */}
-                            {!showAllIcons && (
-                                <div className="rounded-lg sm:rounded-xl border border-black/10 bg-white/50 p-3 sm:p-4 dark:border-white/10 dark:bg-white/5">
-                                    <p className="mb-2 sm:mb-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-black/60 dark:text-white/50">
-                                        Suggested for {formData.category}
-                                    </p>
-                                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                        {suggestedIcons.map((icon) => {
-                                            return (
-                                                <button
-                                                    key={icon.name}
-                                                    type="button"
-                                                    onClick={() => setFormData({ ...formData, icon: icon.name })}
-                                                    className={cn(
-                                                        "flex items-center gap-1.5 sm:gap-2 rounded-lg border px-2 sm:px-3 py-1.5 sm:py-2 transition",
-                                                        formData.icon === icon.name
-                                                            ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                            : "border-black/15 text-black/70 hover:border-black/30 dark:border-white/15 dark:text-white/70 dark:hover:border-white/30"
-                                                    )}
-                                                >
-                                                    <HabitIcon name={icon.name} size={16} />
-                                                    <span className="text-[10px] sm:text-xs font-medium">{icon.label}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* All Icons Browser */}
-                            {showAllIcons && (
-                                <div className="rounded-lg sm:rounded-xl border border-black/10 bg-white/50 p-3 sm:p-4 dark:border-white/10 dark:bg-white/5">
-                                    <div className="mb-3 sm:mb-4">
-                                        <Input
-                                            placeholder="Search icons..."
-                                            value={iconSearch}
-                                            onChange={(e) => setIconSearch(e.target.value)}
-                                            leftIcon={<Search className="h-4 w-4" />}
-                                            rightIcon={
-                                                iconSearch && (
-                                                    <button onClick={() => setIconSearch("")}>
-                                                        <X className="h-4 w-4" />
-                                                    </button>
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                    <div className="max-h-48 sm:max-h-64 space-y-3 sm:space-y-4 overflow-y-auto">
-                                        {Object.entries(filteredIcons).map(([category, icons]) => (
-                                            <div key={category}>
-                                                <p className="mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/40">
-                                                    {category}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {icons.map((icon) => {
-                                                        return (
-                                                            <button
-                                                                key={icon.name}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setFormData({ ...formData, icon: icon.name });
-                                                                    setShowAllIcons(false);
-                                                                }}
-                                                                title={icon.label}
-                                                                className={cn(
-                                                                    "flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border transition",
-                                                                    formData.icon === icon.name
-                                                                        ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                                        : "border-black/10 text-black/60 hover:border-black/30 hover:text-black dark:border-white/10 dark:text-white/60 dark:hover:border-white/30 dark:hover:text-white"
-                                                                )}
-                                                            >
-                                                                <HabitIcon name={icon.name} size={20} />
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Color Selection - Mobile Optimized */}
-                        <div>
-                            <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                Color Theme
+                            <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-black/30 dark:text-white/40">
+                                Theme
                             </label>
-                            <div className="flex flex-wrap gap-2 sm:gap-3">
+                            <div className="flex flex-wrap gap-1">
                                 {colorOptions.map((color) => (
                                     <button
                                         key={color.value}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, color: color.value })}
-                                        title={color.label}
                                         className={cn(
-                                            "relative h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl transition-all duration-200",
+                                            "h-5 w-5 rounded-full transition-all border-2",
                                             formData.color === color.value
-                                                ? "scale-110 ring-2 ring-black ring-offset-2 dark:ring-white dark:ring-offset-surface-900"
-                                                : "hover:scale-105"
+                                                ? "border-black scale-110"
+                                                : "border-transparent opacity-40 hover:opacity-100"
                                         )}
-                                        style={{
-                                            background: `linear-gradient(135deg, ${color.colors.from} 0%, ${color.colors.to} 100%)`,
-                                        }}
+                                        style={{ backgroundColor: color.colors.from }}
                                     >
                                         {formData.color === color.value && (
-                                            <span className="absolute inset-0 flex items-center justify-center">
-                                                <Check className="h-4 w-4 sm:h-5 sm:w-5 text-white drop-shadow-md" strokeWidth={3} />
-                                            </span>
+                                            <div className="h-1 w-1 bg-white rounded-full mx-auto" />
                                         )}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Navigation */}
-                        <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
+                        {/* Navigation - Compact */}
+                        <div className="flex gap-2 pt-2">
                             <Button
                                 type="button"
                                 variant="secondary"
                                 onClick={() => goToStep("type")}
-                                leftIcon={<ChevronLeft className="h-4 w-4" />}
+                                leftIcon={<ChevronLeft className="h-3 w-3" />}
+                                size="sm"
                             >
                                 Back
                             </Button>
@@ -648,9 +503,10 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                 onClick={() => goToStep("schedule")}
                                 disabled={!formData.title.trim()}
                                 className="flex-1"
-                                rightIcon={<ChevronRight className="h-4 w-4" />}
+                                size="sm"
+                                rightIcon={<ChevronRight className="h-3 w-3" />}
                             >
-                                Continue
+                                CONTINUE
                             </Button>
                         </div>
                     </motion.div>
@@ -665,12 +521,12 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         exit={{ opacity: 0, x: -20 }}
                         className="space-y-4 sm:space-y-6"
                     >
-                        {/* Frequency Type */}
+                        {/* Frequency Type - Compact */}
                         <div>
-                            <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                How often within the {getPeriodDays()}-day period?
+                            <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30">
+                                Cycle Frequency
                             </label>
-                            <div className="grid gap-2 sm:gap-3 sm:grid-cols-3">
+                            <div className="grid gap-1.5 sm:grid-cols-3">
                                 {frequencyOptions.map((option) => (
                                     <button
                                         key={option.value}
@@ -682,48 +538,39 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                             })
                                         }
                                         className={cn(
-                                            "rounded-lg sm:rounded-xl border-2 p-3 sm:p-4 text-left transition",
+                                            "rounded-xl border-2 p-2.5 text-left transition",
                                             formData.frequency.type === option.value
                                                 ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                                                : "border-black/5 hover:border-black/10 dark:border-white/5 dark:hover:border-white/10"
                                         )}
                                     >
-                                        <p className="text-sm sm:text-base font-semibold">{option.label}</p>
-                                        <p
-                                            className={cn(
-                                                "mt-0.5 text-[10px] sm:text-xs",
-                                                formData.frequency.type === option.value
-                                                    ? "text-white/70 dark:text-black/70"
-                                                    : "text-black/70 dark:text-white/50"
-                                            )}
-                                        >
-                                            {option.description}
-                                        </p>
+                                        <p className="text-[11px] font-semibold uppercase tracking-tight">{option.label}</p>
+                                        <p className="text-[9px] font-medium opacity-50 leading-none mt-0.5">{option.description}</p>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Days of Week for Weekly Frequency */}
+                        {/* Days of Week - Compact */}
                         {formData.frequency.type === "weekly" && (
                             <div>
-                                <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                    Which days?
+                                <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30">
+                                    Specific Days
                                 </label>
-                                <div className="flex justify-between gap-1 sm:gap-2">
+                                <div className="flex justify-between gap-1">
                                     {daysOfWeek.map((day) => (
                                         <button
                                             key={day.value}
                                             type="button"
                                             onClick={() => toggleDay(day.value)}
                                             className={cn(
-                                                "flex h-10 w-10 sm:h-12 sm:w-12 flex-col items-center justify-center rounded-lg sm:rounded-xl border-2 text-[10px] sm:text-xs font-semibold transition",
+                                                "flex h-9 w-9 flex-col items-center justify-center rounded-lg border-2 text-[10px] font-semibold transition",
                                                 formData.frequency.daysOfWeek?.includes(day.value)
                                                     ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                                                    : "border-black/15 text-black/80 hover:border-black/30 dark:border-white/15 dark:text-white/60 dark:hover:border-white/30"
+                                                    : "border-black/10 text-black/40 hover:border-black/20 dark:border-white/10 dark:text-white/30"
                                             )}
                                         >
-                                            {day.label}
+                                            {day.label[0]}
                                         </button>
                                     ))}
                                 </div>
@@ -758,43 +605,33 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             </div>
                         )}
 
-                        {/* Daily Target */}
+                        {/* Daily Target - Compact */}
                         <div>
-                            <label className="mb-2 sm:mb-3 block text-xs sm:text-sm font-semibold text-black dark:text-white">
-                                Daily target (optional)
+                            <label className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/50">
+                                Goal Target (Daily)
                             </label>
-                            <div className="flex items-center gap-3 sm:gap-4">
-                                <div className="flex items-center rounded-lg sm:rounded-xl border border-black/15 dark:border-white/15">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            setFormData({
-                                                ...formData,
-                                                targetCount: Math.max(1, formData.targetCount - 1),
-                                            })
-                                        }
-                                        className="px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg font-bold text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                                        onClick={() => setFormData({ ...formData, targetCount: Math.max(1, formData.targetCount - 1) })}
+                                        className="px-3 py-1.5 text-base font-semibold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white"
                                     >
                                         −
                                     </button>
-                                    <span className="min-w-[2.5rem] sm:min-w-[3rem] text-center text-lg sm:text-xl font-bold text-black dark:text-white">
+                                    <span className="min-w-[2rem] text-center text-sm font-semibold text-black dark:text-white">
                                         {formData.targetCount}
                                     </span>
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            setFormData({
-                                                ...formData,
-                                                targetCount: Math.min(100, formData.targetCount + 1),
-                                            })
-                                        }
-                                        className="px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg font-bold text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                                        onClick={() => setFormData({ ...formData, targetCount: Math.min(100, formData.targetCount + 1) })}
+                                        className="px-3 py-1.5 text-base font-semibold text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white"
                                     >
                                         +
                                     </button>
                                 </div>
-                                <span className="text-xs sm:text-sm font-bold text-black/70 dark:text-white/60">
-                                    {formData.targetCount === 1 ? "time per day" : "times per day"}
+                                <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+                                    per day
                                 </span>
                             </div>
                         </div>
@@ -812,13 +649,14 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             />
                         </div>
 
-                        {/* Navigation */}
-                        <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
+                        {/* Navigation - Compact */}
+                        <div className="flex gap-2 pt-2">
                             <Button
                                 type="button"
                                 variant="secondary"
                                 onClick={() => goToStep("basics")}
-                                leftIcon={<ChevronLeft className="h-4 w-4" />}
+                                leftIcon={<ChevronLeft className="h-3 w-3" />}
+                                size="sm"
                             >
                                 Back
                             </Button>
@@ -826,7 +664,8 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                 type="button"
                                 onClick={() => goToStep("review")}
                                 className="flex-1"
-                                rightIcon={<ChevronRight className="h-4 w-4" />}
+                                size="sm"
+                                rightIcon={<ChevronRight className="h-3 w-3" />}
                             >
                                 Review
                             </Button>
@@ -844,91 +683,60 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         className="space-y-4 sm:space-y-6"
                     >
                         <div className="text-center">
-                            <p className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-black/60 dark:text-white/50">
+                            <p className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-black/60 dark:text-white/50">
                                 Review your habit
                             </p>
                         </div>
 
-                        {/* Preview Card */}
-                        <div className="rounded-xl sm:rounded-2xl border border-black/10 bg-white p-4 sm:p-6 dark:border-white/10 dark:bg-white/5">
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div
-                                    className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-xl sm:rounded-2xl"
-                                    style={{ backgroundColor: selectedColorConfig.colors.bg }}
-                                >
-                                    <HabitIcon name={formData.icon} size={32} style={{ color: selectedColorConfig.colors.text }} />
-                                </div>
+                        {/* Preview Card - Compact Text-Only */}
+                        <div className="rounded-xl border border-black/10 bg-white p-3 dark:border-white/10 dark:bg-white/5">
+                            <div className="flex items-center gap-3">
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white truncate">
+                                    <h3 className="text-sm font-semibold uppercase tracking-tight text-black dark:text-white truncate">
                                         {formData.title}
                                     </h3>
-                                    {formData.description && (
-                                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-black/80 dark:text-white/60 line-clamp-2">
-                                            {formData.description}
-                                        </p>
-                                    )}
                                 </div>
                             </div>
 
-                            <div className="mt-4 sm:mt-6 grid gap-3 sm:gap-4 grid-cols-2">
-                                {/* Habit Type */}
-                                <div className="rounded-lg sm:rounded-xl bg-black/5 p-3 sm:p-4 dark:bg-white/5">
-                                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                        Type
-                                    </p>
-                                    <p className="mt-0.5 sm:mt-1 text-sm sm:text-base font-semibold capitalize text-black dark:text-white">
-                                        {formData.habitType}
-                                    </p>
-                                </div>
-
-                                {/* Category */}
-                                <div className="rounded-lg sm:rounded-xl bg-black/5 p-3 sm:p-4 dark:bg-white/5">
-                                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                        Category
-                                    </p>
-                                    <p className="mt-0.5 sm:mt-1 text-sm sm:text-base font-semibold text-black dark:text-white">
-                                        {habitCategories.find((c) => c.value === formData.category)?.label}
-                                    </p>
-                                </div>
-
-                                {/* Frequency */}
-                                <div className="rounded-lg sm:rounded-xl bg-black/5 p-3 sm:p-4 dark:bg-white/5">
-                                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                        Frequency
-                                    </p>
-                                    <p className="mt-0.5 sm:mt-1 text-sm sm:text-base font-semibold text-black dark:text-white">
-                                        {formData.frequency.type === "daily" && "Every day"}
-                                        {formData.frequency.type === "weekly" &&
-                                            `${formData.frequency.daysOfWeek?.length} days/week`}
-                                        {formData.frequency.type === "custom" &&
-                                            `${formData.frequency.timesPerPeriod}x per period`}
-                                    </p>
-                                </div>
-
-                                {/* Period */}
-                                <div className="rounded-lg sm:rounded-xl bg-black/5 p-3 sm:p-4 dark:bg-white/5">
-                                    <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/50">
-                                        Period
-                                    </p>
-                                    <p className="mt-0.5 sm:mt-1 text-sm sm:text-base font-semibold text-black dark:text-white">
-                                        {getPeriodDays()} days
-                                    </p>
-                                </div>
+                            <div className="mt-3 grid gap-2 grid-cols-2">
+                                {/* Summary Grid - Pro Labels */}
+                                {[
+                                    { label: "Cycle", value: formData.habitType },
+                                    { label: "Category", value: habitCategories.find((c) => c.value === formData.category)?.label },
+                                    { 
+                                        label: "Frequency", 
+                                        value: formData.frequency.type === "daily" ? "Daily" : 
+                                               formData.frequency.type === "weekly" ? `${formData.frequency.daysOfWeek?.length} Days` :
+                                               `${formData.frequency.timesPerPeriod}x Period`
+                                    },
+                                    { label: "Period", value: `${getPeriodDays()} Days` }
+                                ].map((item, i) => (
+                                    <div key={i} className="rounded-lg bg-black/[0.03] p-2 dark:bg-white/5">
+                                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+                                            {item.label}
+                                        </p>
+                                        <p className="mt-0.5 text-[11px] font-semibold uppercase text-black dark:text-white">
+                                            {item.value}
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
+                        {/* Navigation - Compact */}
+                        <div className="flex gap-2 pt-2 border-t border-black/5 dark:border-white/5">
                             <Button
                                 type="button"
                                 variant="secondary"
                                 onClick={() => goToStep("schedule")}
-                                leftIcon={<ChevronLeft className="h-4 w-4" />}
+                                leftIcon={<ChevronLeft className="h-3 w-3" />}
+                                size="sm"
+                                className="dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
                             >
-                                Back
+                                BACK
                             </Button>
-                            <Button type="button" onClick={handleSubmit} isLoading={isLoading} className="flex-1">
-                                {habit?._id ? "Save Changes" : "Create Habit"}
+                            <Button type="button" onClick={handleSubmit} isLoading={isLoading} className="flex-1 dark:bg-white dark:text-black dark:hover:bg-white/90" size="sm">
+                                {habit?._id ? "SAVE" : "CREATE"}
                             </Button>
                         </div>
                     </motion.div>

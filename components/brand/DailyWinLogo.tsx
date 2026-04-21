@@ -38,7 +38,7 @@ export function DailyWinLogo({
                 </svg>
             </span>
             {!hideLabel && (
-                <span className={cn("text-xs font-bold uppercase tracking-[0.16em] text-white", textClassName)}>
+                <span className={cn("text-[11px] font-semibold uppercase tracking-[0.16em] text-black dark:text-white", textClassName)}>
                     {label}
                 </span>
             )}

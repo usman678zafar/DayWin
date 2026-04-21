@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
@@ -73,11 +73,11 @@ export default function StatsPage() {
 
     return (
         <div className="page-container">
-            <div className="page-header">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="mb-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="page-title">Statistics</h1>
-                        <p className="page-subtitle">Deep performance metrics across habits, streaks, and consistency.</p>
+                        <h1 className="text-xl sm:text-2xl font-semibold text-black dark:text-white">Statistics</h1>
+                        <p className="text-[10px] sm:text-xs font-semibold text-black/40 dark:text-white/40 uppercase tracking-widest mt-0.5">Deep performance metrics</p>
                     </div>
                     <DateRangePicker value={dateRange} onChange={setDateRange} />
                 </div>
@@ -86,15 +86,15 @@ export default function StatsPage() {
             {/* Overview Stats */}
             <QuickStats stats={stats?.overview || {}} />
 
-            <div className="grid lg:grid-cols-2 gap-6 mt-8">
+            <div className="grid lg:grid-cols-2 gap-4 mt-6">
                 {/* Weekly Completion Chart */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="card p-6"
+                    className="card p-4"
                 >
-                    <h3 className="card-title mb-6">Progress Over Time</h3>
-                    <div className="h-64">
+                    <h3 className="text-xs font-semibold uppercase tracking-widest text-black/50 dark:text-white/40 mb-4">Progress Over Time</h3>
+                    <div className="h-48">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={stats?.dailyData || []}>
                                 <defs>
@@ -107,7 +107,7 @@ export default function StatsPage() {
                                     dataKey="date"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: "#71717a", fontSize: 12 }}
+                                    tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: "600" }}
                                 />
                                 <YAxis hide />
                                 <Tooltip content={<CustomTooltip />} />
@@ -125,13 +125,13 @@ export default function StatsPage() {
 
                 {/* Completion Rate Pie Chart */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="card p-6"
+                    className="card p-4"
                 >
-                    <h3 className="card-title mb-6">Completion Rate ({dateRange.label})</h3>
-                    <div className="h-64 flex items-center justify-center relative">
+                    <h3 className="text-xs font-semibold uppercase tracking-widest text-black/50 dark:text-white/40 mb-4">Completion Rate</h3>
+                    <div className="h-48 flex items-center justify-center relative">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -152,10 +152,10 @@ export default function StatsPage() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute text-center">
-                            <div className="text-4xl font-bold text-surface-900 dark:text-white">
+                            <div className="text-2xl font-semibold text-surface-900 dark:text-white">
                                 {stats?.overview?.weeklyCompletionRate || 0}%
                             </div>
-                            <div className="text-sm text-surface-200/50">Completion</div>
+                            <div className="text-[10px] uppercase font-semibold tracking-widest text-black/40 dark:text-white/30">SCORE</div>
                         </div>
                     </div>
                 </motion.div>
@@ -180,10 +180,10 @@ export default function StatsPage() {
 
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
-                                        <p className="font-bold text-sm text-surface-900 dark:text-white truncate">
+                                        <p className="font-semibold text-sm text-surface-900 dark:text-white truncate">
                                             {habit.title}
                                         </p>
-                                        <span className="text-[10px] font-black text-primary-500 uppercase tracking-wider bg-primary-100 dark:bg-primary-900/30 px-1.5 py-0.5 rounded-md">
+                                        <span className="text-[10px] font-semibold text-primary-500 uppercase tracking-wider bg-primary-100 dark:bg-primary-900/30 px-1.5 py-0.5 rounded-md">
                                             {habit.completionRate}%
                                         </span>
                                     </div>
@@ -201,14 +201,14 @@ export default function StatsPage() {
                                 {habit.streak > 0 && (
                                     <div className="flex flex-col items-center justify-center min-w-[32px]">
                                         <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
-                                        <span className="text-[10px] font-black text-orange-600">{habit.streak}d</span>
+                                        <span className="text-[10px] font-semibold text-orange-600">{habit.streak}d</span>
                                     </div>
                                 )}
                             </div>
                         ))}
 
                         {(!stats?.topHabits || stats.topHabits.length === 0) && (
-                            <p className="text-center text-surface-200/50 py-8">
+                            <p className="text-center text-black/40 dark:text-white/30 py-8 text-xs font-semibold uppercase tracking-widest">
                                 Complete some habits to see your stats!
                             </p>
                         )}
@@ -270,10 +270,10 @@ export default function StatsPage() {
                                 <div className={cn("p-3 rounded-xl mb-3 shadow-inner", achievement.bg)}>
                                     <achievement.icon className={cn("w-7 h-7 sm:w-8 sm:h-8", achievement.color)} />
                                 </div>
-                                <p className="font-bold text-black dark:text-white text-sm sm:text-base">
+                                <p className="font-semibold text-black dark:text-white text-sm sm:text-base">
                                     {achievement.title}
                                 </p>
-                                <p className="text-[10px] sm:text-xs text-black/40 dark:text-white/40 mt-1 uppercase tracking-wider font-bold">
+                                <p className="text-[10px] sm:text-xs text-black/50 dark:text-white/50 mt-1 uppercase tracking-wider font-semibold">
                                     {achievement.description}
                                 </p>
                             </div>

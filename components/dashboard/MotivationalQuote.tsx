@@ -1,14 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RefreshCw } from "lucide-react";
 
 const quotes = [
-    { text: "Small daily improvements are the key to staggering long-term results.", author: "Unknown" },
+    { text: "Small daily improvements are the key to staggering results.", author: "James Clear" },
     { text: "Excellence is not an act, but a habit.", author: "Aristotle" },
-    { text: "The secret of your future is hidden in your daily routine.", author: "Mike Murdock" },
-    { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
+    { text: "The secret of your future is hidden in your routine.", author: "Mike Murdock" },
+    { text: "Success is the sum of small efforts repeated daily.", author: "Robert Collier" },
     { text: "Habits are the compound interest of self-improvement.", author: "James Clear" },
 ];
 
@@ -31,36 +31,35 @@ export function MotivationalQuote() {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card relative overflow-hidden"
+            className="card p-3 relative overflow-hidden"
         >
-            <div className="mb-3 sm:mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-1.5 sm:gap-2 text-black/75 dark:text-white/65">
-                    <Sparkles className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.12em]">Daily Motivation</span>
+            <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-black/30 dark:text-white/20">
+                    <Sparkles className="h-3 w-3" />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Daily Motivation</span>
                 </div>
                 <button
                     onClick={changeQuote}
                     disabled={isChanging}
-                    className="rounded-lg border border-black/15 p-1.5 sm:p-2 text-black/70 transition hover:border-black hover:text-black dark:border-white/15 dark:text-white/70 dark:hover:border-white dark:hover:text-white"
-                    aria-label="Refresh quote"
+                    className="rounded p-1 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                 >
-                    <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isChanging ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3 w-3 ${isChanging ? "animate-spin" : ""}`} />
                 </button>
             </div>
 
             <AnimatePresence mode="wait">
                 <motion.div
                     key={quote.text}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.02 }}
                 >
-                    <p className="text-base sm:text-lg font-semibold leading-relaxed text-black dark:text-white">
+                    <p className="text-xs sm:text-sm font-bold leading-tight text-black dark:text-white">
                         "{quote.text}"
                     </p>
-                    <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-black/65 dark:text-white/55">- {quote.author}</p>
+                    <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-black/20 dark:text-white/10">- {quote.author}</p>
                 </motion.div>
             </AnimatePresence>
         </motion.div>

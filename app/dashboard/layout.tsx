@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -22,8 +22,8 @@ export default async function DashboardLayout({
             </div>
 
             <Navbar />
-            <main className="relative min-h-screen pb-24 transition-[margin] duration-300 md:ml-20 md:peer-hover/sidebar:ml-56 xl:peer-hover/sidebar:ml-60 md:pb-8">
-                <div className="mx-auto max-w-6xl px-4 sm:px-5 lg:px-6 pt-5 md:pt-6">
+            <main className="relative min-h-screen pb-24 transition-all duration-300 md:ml-60 md:pb-8">
+                <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-6 pt-4 md:pt-5">
                     {children}
                 </div>
             </main>

@@ -56,8 +56,8 @@ export function Modal({
                         >
                             {/* Header */}
                             {title && (
-                                <div className="flex items-center justify-between border-b border-surface-200 px-4 py-3 dark:border-surface-800 sm:px-6 sm:py-4">
-                                    <h2 className="text-lg font-semibold text-surface-900 dark:text-white sm:text-xl">
+                                <div className="flex items-center justify-between border-b border-surface-200 px-4 py-2 dark:border-surface-800">
+                                    <h2 className="text-[14px] font-black uppercase tracking-widest text-surface-900 dark:text-white">
                                         {title}
                                     </h2>
                                     <button
@@ -70,7 +70,7 @@ export function Modal({
                             )}
 
                             {/* Content */}
-                            <div className="max-h-[calc(92svh-72px)] overflow-y-auto p-4 sm:max-h-[calc(92svh-88px)] sm:p-6">
+                            <div className="max-h-[calc(92svh-50px)] overflow-y-auto p-3 sm:p-4">
                                 {children}
                             </div>
                         </motion.div>

@@ -11,8 +11,7 @@ import {
     Clock,
     User as UserIcon,
     Loader2,
-    Search,
-    Filter
+    Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,9 +20,7 @@ export default function SquadsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        fetchSquads();
-    }, []);
+    useEffect(() => { fetchSquads(); }, []);
 
     const fetchSquads = async () => {
         try {
@@ -42,132 +39,98 @@ export default function SquadsPage() {
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header Section */}
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="page-container space-y-4">
+            {/* Header Section - Compact */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-surface-900 dark:text-white sm:text-4xl">
+                    <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-surface-900 dark:text-white">
                         Your <span className="bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">Squads</span>
                     </h1>
-                    <p className="mt-2 text-surface-500 dark:text-surface-400">
-                        Collaborate and compete with friends to build better habits together.
-                    </p>
+                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Collaborate & Compete</p>
                 </div>
                 <Link
                     href="/dashboard/squads/new"
-                    className="flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-6 py-4 text-sm font-bold text-white shadow-xl shadow-primary-500/20 transition-all duration-300 hover:bg-primary-700 hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary-700"
                 >
-                    <Plus className="h-5 w-5" />
-                    Create New Squad
+                    <Plus className="h-3.5 w-3.5" />
+                    New Squad
                 </Link>
             </div>
 
-            {/* Quick Stats & Search */}
-            <div className="grid gap-6 md:grid-cols-12">
+            {/* Quick Stats & Search - Compact */}
+            <div className="grid gap-3 md:grid-cols-12">
                 <div className="md:col-span-8">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-surface-400 transition-colors group-focus-within:text-primary-500" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/40 dark:text-white/40 transition-colors group-focus-within:text-primary-500" />
                         <input
                             type="text"
                             placeholder="Search your squads..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-2xl border border-surface-200/50 bg-white/50 py-4 pl-12 pr-4 text-sm outline-none backdrop-blur-sm transition-all focus:border-primary-500/50 focus:ring-4 focus:ring-primary-500/5 dark:border-white/[0.05] dark:bg-white/[0.02]"
+                            className="w-full rounded-xl border border-surface-200/50 bg-white/50 py-2 pl-9 pr-4 text-[12px] font-semibold outline-none backdrop-blur-sm transition-all focus:border-primary-500/50 dark:border-white/[0.05] dark:bg-white/[0.02]"
                         />
                     </div>
                 </div>
-                <div className="md:col-span-4 flex gap-4">
-                    <div className="flex-1 rounded-2xl border border-surface-200/50 bg-white/50 p-4 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-surface-400">Total Teams</p>
-                        <p className="text-2xl font-black text-surface-900 dark:text-white">{squads.length}</p>
+                <div className="md:col-span-4 flex gap-3">
+                    <div className="flex-1 rounded-xl border border-surface-200/50 bg-white/50 p-2 dark:border-white/[0.05] dark:bg-white/[0.02]">
+                        <p className="text-[8px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Total</p>
+                        <p className="text-lg font-semibold text-surface-900 dark:text-white leading-tight">{squads.length}</p>
                     </div>
-                    <div className="flex-1 rounded-2xl border border-surface-200/50 bg-white/50 p-4 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-surface-400">Active Now</p>
-                        <p className="text-2xl font-black text-primary-600">{squads.filter(s => s.status === 'active').length}</p>
+                    <div className="flex-1 rounded-xl border border-surface-200/50 bg-white/50 p-2 dark:border-white/[0.05] dark:bg-white/[0.02]">
+                        <p className="text-[8px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Active</p>
+                        <p className="text-lg font-semibold text-primary-600 leading-tight">{squads.filter(s => s.status === 'active').length}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Squads Grid */}
+            {/* Squads Grid - High Density */}
             {loading ? (
-                <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-                    <p className="text-sm font-medium text-surface-500">Loading your squads...</p>
+                <div className="flex min-h-[200px] flex-col items-center justify-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
                 </div>
             ) : filteredSquads.length > 0 ? (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredSquads.map((squad, index) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            key={squad._id}
-                        >
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={squad._id}>
                             <Link
                                 href={`/dashboard/squads/${squad._id}`}
-                                className="group block relative overflow-hidden rounded-3xl border border-surface-200/50 bg-white/50 p-6 backdrop-blur-sm transition-all duration-500 hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-500/10 dark:border-white/[0.05] dark:bg-white/[0.02]"
+                                className="group block relative overflow-hidden rounded-2xl border border-surface-200/50 bg-white/50 p-3 backdrop-blur-sm transition-all duration-300 hover:border-primary-500/30 dark:border-white/[0.05] dark:bg-white/[0.02]"
                             >
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100/50 text-primary-600 dark:bg-primary-900/20">
-                                        <Users className="h-6 w-6" />
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100/50 text-primary-600 dark:bg-primary-900/20">
+                                        <Users className="h-4 w-4" />
                                     </div>
-                                    <div className="flex -space-x-3">
+                                    <div className="flex -space-x-2">
                                         {squad.members.slice(0, 3).map((member: any, i: number) => (
-                                            <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-surface-100 dark:border-[#0A0A0F] dark:bg-surface-800 flex items-center justify-center overflow-hidden">
+                                            <div key={i} className="h-6 w-6 rounded-full border border-white bg-surface-100 dark:border-[#0A0A0F] dark:bg-surface-800 flex items-center justify-center overflow-hidden">
                                                 {member.image ? (
                                                     <img src={member.image} alt="" className="h-full w-full object-cover" />
-                                                ) : (
-                                                    <UserIcon className="h-4 w-4 text-surface-400" />
-                                                )}
+                                                ) : <UserIcon className="h-3 w-3 text-surface-400" />}
                                             </div>
                                         ))}
-                                        {squad.members.length > 3 && (
-                                            <div className="h-8 w-8 rounded-full border-2 border-white bg-primary-600 text-[10px] font-bold text-white flex items-center justify-center dark:border-[#0A0A0F]">
-                                                +{squad.members.length - 3}
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
-
-                                <h3 className="text-xl font-bold text-surface-900 dark:text-white group-hover:text-primary-600 transition-colors">
-                                    {squad.title}
-                                </h3>
-                                <p className="mt-2 line-clamp-2 text-sm text-surface-500 dark:text-surface-400">
-                                    {squad.description || "No description provided."}
-                                </p>
-
-                                <div className="mt-8 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex items-center gap-1.5 text-xs font-bold text-surface-400">
-                                            <Trophy className="h-3.5 w-3.5" />
-                                            {squad.habitTemplates?.length || 0} Habits
+                                <h3 className="text-sm font-semibold text-surface-900 dark:text-white group-hover:text-primary-600 transition-colors uppercase tracking-tight">{squad.title}</h3>
+                                <p className="mt-1 line-clamp-1 text-[11px] font-semibold text-black/60 dark:text-white/50 uppercase tracking-tight">{squad.description || "No description."}</p>
+                                <div className="mt-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-1 text-[9px] font-semibold uppercase text-black/50 dark:text-white/50">
+                                            <Trophy className="h-3 w-3" /> {squad.habitTemplates?.length || 0}
                                         </div>
-                                        <div className="flex items-center gap-1.5 text-xs font-bold text-surface-400">
-                                            <Clock className="h-3.5 w-3.5" />
-                                            {new Date(squad.startDate).toLocaleDateString()}
+                                        <div className="flex items-center gap-1 text-[9px] font-semibold uppercase text-black/50 dark:text-white/50">
+                                            <Clock className="h-3 w-3" /> {new Date(squad.startDate).toLocaleDateString()}
                                         </div>
                                     </div>
-                                    <ChevronRight className="h-5 w-5 text-surface-300 transition-transform group-hover:translate-x-1" />
+                                    <ChevronRight className="h-4 w-4 text-black/20 dark:text-white/20 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </Link>
                         </motion.div>
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center rounded-[2.5rem] border-2 border-dashed border-surface-200 p-12 text-center dark:border-white/10">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-50 text-surface-400 dark:bg-white/[0.02]">
-                        <Users className="h-8 w-8" />
-                    </div>
-                    <h3 className="mt-6 text-xl font-bold text-surface-900 dark:text-white">No squads found</h3>
-                    <p className="mx-auto mt-2 max-w-sm text-sm text-surface-500 dark:text-surface-400">
-                        Join a squad or create your own to start building habits with your friends.
-                    </p>
-                    <Link
-                        href="/dashboard/squads/new"
-                        className="mt-8 rounded-2xl bg-surface-900 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-black dark:bg-white dark:text-black dark:hover:bg-surface-200"
-                    >
-                        Get Started
-                    </Link>
+                <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-surface-200 p-8 text-center dark:border-white/10">
+                    <h3 className="text-sm font-semibold text-surface-900 dark:text-white">No squads found</h3>
+                    <Link href="/dashboard/squads/new" className="mt-4 rounded-lg bg-surface-900 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-white dark:bg-white dark:text-black">Get Started</Link>
                 </div>
             )}
         </div>
