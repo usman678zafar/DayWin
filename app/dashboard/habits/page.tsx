@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     format,
@@ -63,13 +64,48 @@ const habitTypeTabs: { value: HabitType; label: string; icon: React.ElementType;
 ];
 
 export default function HabitsPage() {
+    return (
+        <Suspense fallback={<PageLoader />}>
+            <HabitsPageContent />
+        </Suspense>
+    );
+}
+
+function HabitsPageContent() {
     const { habits, fetchHabits, addHabit, updateHabit, deleteHabit } = useHabits();
 
-    // Active habit type tab
-    const [activeType, setActiveType] = useState<HabitType>("weekly");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
-    // Date navigation state
-    const [currentDate, setCurrentDate] = useState(new Date());
+
+    // DERIVED STATE: URL is the single source of truth
+    const activeType = (searchParams.get("type") as HabitType) || "weekly";
+    const currentDate = useMemo(() => {
+        const dateParam = searchParams.get("date");
+        if (!dateParam) return new Date();
+        const parsed = new Date(dateParam);
+        return isNaN(parsed.getTime()) ? new Date() : parsed;
+    }, [searchParams]);
+
+    // Navigation handlers
+    const updateURL = useCallback((updates: { type?: string; date?: Date }, shouldPush = false) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (updates.type) params.set("type", updates.type);
+        if (updates.date) params.set("date", format(updates.date, "yyyy-MM-dd"));
+        
+        const url = `${pathname}?${params.toString()}`;
+        if (shouldPush) router.push(url, { scroll: false });
+        else router.replace(url, { scroll: false });
+    }, [searchParams, pathname, router]);
+
+    const handleTabChange = (type: HabitType) => {
+        updateURL({ type }, true);
+    };
+
+    const handleDateChange = (date: Date) => {
+        updateURL({ date }, false);
+    };
 
     // Data state
     const [habitsData, setHabitsData] = useState<HabitData[]>([]);
@@ -220,18 +256,22 @@ export default function HabitsPage() {
     };
 
     const goToPrevious = () => {
-        if (activeType === "weekly") setCurrentDate(subWeeks(currentDate, 1));
-        else if (activeType === "monthly") setCurrentDate(subMonths(currentDate, 1));
-        else setCurrentDate(subDays(currentDate, 14));
+        let newDate;
+        if (activeType === "weekly") newDate = subWeeks(currentDate, 1);
+        else if (activeType === "monthly") newDate = subMonths(currentDate, 1);
+        else newDate = subDays(currentDate, 14);
+        handleDateChange(newDate);
     };
 
     const goToNext = () => {
-        if (activeType === "weekly") setCurrentDate(addWeeks(currentDate, 1));
-        else if (activeType === "monthly") setCurrentDate(addMonths(currentDate, 1));
-        else setCurrentDate(addDays(currentDate, 14));
+        let newDate;
+        if (activeType === "weekly") newDate = addWeeks(currentDate, 1);
+        else if (activeType === "monthly") newDate = addMonths(currentDate, 1);
+        else newDate = addDays(currentDate, 14);
+        handleDateChange(newDate);
     };
     const goToToday = () => {
-        setCurrentDate(new Date());
+        handleDateChange(new Date());
     };
 
     // Form handlers
@@ -261,7 +301,7 @@ export default function HabitsPage() {
                     {habitTypeTabs.map((tab) => (
                         <button
                             key={tab.value}
-                            onClick={() => { setActiveType(tab.value); setCurrentDate(new Date()); }}
+                            onClick={() => handleTabChange(tab.value)}
                             className={cn(
                                 "px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-md transition-all",
                                 activeType === tab.value
