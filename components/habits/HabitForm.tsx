@@ -444,7 +444,10 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                     <button
                                         key={cat.value}
                                         type="button"
-                                        onClick={() => setFormData({ ...formData, category: cat.value })}
+                                        onClick={() => {
+                                            const newIcon = formData.icon === "Star" || !formData.icon ? cat.icon : formData.icon;
+                                            setFormData({ ...formData, category: cat.value, icon: newIcon });
+                                        }}
                                         className={cn(
                                             "rounded-md border px-2 py-1 text-[9px] font-semibold uppercase tracking-widest transition",
                                             formData.category === cat.value
@@ -457,8 +460,6 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                 ))}
                             </div>
                         </div>
-
-
 
                         {/* Color Selection - Minimal row */}
                         <div>

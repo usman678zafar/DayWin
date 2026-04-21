@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
-import { HabitWithLog, Habit, habitColors, HabitType } from "@/types";
+import { HabitWithLog, Habit, habitColors, HabitType, habitCategories } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
@@ -332,7 +332,11 @@ export default function HabitsPage() {
                                                             <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
                                                         </svg>
                                                         <div className="absolute inset-0 flex items-center justify-center">
-                                                            <HabitIcon name={habit.icon} size={11} className={colors.text} />
+                                                            {(() => {
+                                                                const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
+                                                                const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
+                                                                return <HabitIcon name={iconToDisplay} size={11} className={colors.text} />;
+                                                            })()}
                                                         </div>
                                                     </div>
                                                     <span className="truncate text-[11px] font-semibold text-black dark:text-white">{habit.title}</span>

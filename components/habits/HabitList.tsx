@@ -48,7 +48,7 @@ export function HabitList() {
             >
                 <div className="flex items-center justify-center gap-2 sm:gap-3 text-black/30 dark:text-white/30 group-hover:text-primary-500 transition-colors">
                     <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-sm sm:text-base font-black uppercase tracking-widest px-2 group-hover:translate-x-1 transition-transform">Add new habit</span>
+                    <span className="text-sm sm:text-base font-semibold uppercase tracking-widest px-2 group-hover:translate-x-1 transition-transform">Add new habit</span>
                 </div>
             </motion.button>
 
@@ -56,7 +56,7 @@ export function HabitList() {
             {pendingHabits.length > 0 && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-1">
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/40 flex items-center gap-3">
+                        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60 dark:text-white/40 flex items-center gap-3">
                             To Do
                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/5 text-[10px] text-black/80 dark:bg-white/5 dark:text-white/40">
                                 {pendingHabits.length}
@@ -87,7 +87,7 @@ export function HabitList() {
             {completedHabits.length > 0 && (
                 <div className="space-y-4 pt-4">
                     <div className="flex items-center justify-between px-1">
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#10B981] flex items-center gap-3">
+                        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#10B981] flex items-center gap-3">
                             <Sparkles className="w-4 h-4" />
                             Completed
                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#10B981]/10 text-[10px] text-[#10B981]">
@@ -125,7 +125,7 @@ export function HabitList() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center">
                         <span className="text-4xl sm:text-5xl">🌱</span>
                     </div>
-                    <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-2">
                         Start your journey
                     </h3>
                     <p className="text-black/40 dark:text-white/40 mb-4 sm:mb-6 max-w-sm mx-auto text-sm sm:text-base px-4">

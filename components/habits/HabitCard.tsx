@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MoreVertical, Flame, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HabitWithLog, habitColors } from "@/types";
+import { HabitWithLog, habitColors, habitCategories } from "@/types";
 import { HabitIcon } from "./HabitIcon";
 import { fireSmallConfetti, fireStreakConfetti } from "@/lib/confetti";
 
@@ -94,7 +94,7 @@ export function HabitCard({
                             >
                                 <Flame className="mx-auto h-12 w-12" strokeWidth={2.5} />
                             </motion.div>
-                            <p className="mt-2 text-xl font-black italic tracking-tighter uppercase whitespace-nowrap">
+                            <p className="mt-2 text-xl font-semibold italic tracking-tighter uppercase whitespace-nowrap">
                                 {habit.streak.current} DAY STREAK!
                             </p>
                         </div>
@@ -125,7 +125,7 @@ export function HabitCard({
                                 exit={{ scale: 0, rotate: 45 }}
                                 className="flex flex-col items-center justify-center"
                             >
-                                <span className="text-lg font-black text-white leading-none">
+                                <span className="text-lg font-semibold text-white leading-none">
                                     {new Date().getDate()}
                                 </span>
                                 <Check className="mt-0.5 h-4 w-4 text-white/90" strokeWidth={4} />
@@ -135,9 +135,10 @@ export function HabitCard({
                                 key="empty"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="text-xl font-black text-black/40 dark:text-white/10"
                             >
-                                {new Date().getDate()}
+                                <div className="text-xl font-semibold text-black/40 dark:text-white/10">
+                                    {new Date().getDate()}
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -147,7 +148,7 @@ export function HabitCard({
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border",
+                            "text-[10px] font-semibold uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border",
                             colors.text,
                             colors.bg.replace("/10", "/05"),
                             "border-current/20"
@@ -157,13 +158,13 @@ export function HabitCard({
                         {habit.streak.current > 0 && (
                             <div className="flex items-center gap-1 text-[#FBBF24]">
                                 <Flame className="h-3 w-3" fill="currentColor" />
-                                <span className="text-[10px] font-black">{habit.streak.current}</span>
+                                <span className="text-[10px] font-semibold">{habit.streak.current}</span>
                             </div>
                         )}
                     </div>
                     <h3
                         className={cn(
-                            "font-black text-sm sm:text-lg text-black transition-all duration-500 dark:text-white truncate tracking-tight",
+                            "font-semibold text-sm sm:text-lg text-black transition-all duration-500 dark:text-white truncate tracking-tight",
                             isCompleted && "opacity-60 line-through decoration-2"
                         )}
                     >
@@ -180,7 +181,13 @@ export function HabitCard({
                             "shadow-inner"
                         )}
                     >
-                        <HabitIcon name={habit.icon} size={20} className={colors.text} />
+                        <HabitIcon
+                            name={habit.icon && habit.icon !== "Star"
+                                ? habit.icon
+                                : (habitCategories.find(c => c.value === habit.category)?.icon || "Star")}
+                            size={18}
+                            className={colors.text}
+                        />
                     </div>
 
                     <div className="relative">
@@ -209,7 +216,7 @@ export function HabitCard({
                                                 setShowMenu(false);
                                                 onEdit();
                                             }}
-                                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-black/70 transition-all hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/5"
+                                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-black/70 transition-all hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/5"
                                         >
                                             <Edit className="h-4 w-4" />
                                             <span>Edit Habit</span>
@@ -236,8 +243,8 @@ export function HabitCard({
             {habit.targetCount > 1 && (
                 <div className="mt-4 sm:mt-5">
                     <div className="mb-2 flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-black/70 dark:text-white/20">Momentum</span>
-                        <span className={cn("text-xs font-black", colors.text)}>
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/20">Momentum</span>
+                        <span className={cn("text-xs font-semibold", colors.text)}>
                             {habit.todayLog?.count ?? 0} <span className="opacity-60">/ {habit.targetCount}</span>
                         </span>
                     </div>
