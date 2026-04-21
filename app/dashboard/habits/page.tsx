@@ -417,7 +417,7 @@ export default function HabitsPage() {
                 <HabitForm habit={editingHabit || undefined} onSubmit={handleSubmit} onCancel={() => { setShowForm(false); setEditingHabit(null); }} />
             </Modal>
 
-            <Modal isOpen={!!deletingHabit} onClose={() => setDeletingHabit(null)} title="Delete Habit" size="xs">
+            <Modal isOpen={!!deletingHabit} onClose={() => setDeletingHabit(null)} title="Delete Habit" size="sm">
                 <div className="text-center p-2">
                     <p className="text-sm font-semibold text-black dark:text-white mb-4">Delete "{deletingHabit?.title}"?</p>
                     <div className="flex gap-2">
