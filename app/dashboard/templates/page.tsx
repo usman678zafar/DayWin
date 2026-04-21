@@ -7,45 +7,40 @@ import { TemplateGallery } from "@/components/templates/TemplateGallery";
 export default function TemplatesPage() {
     return (
         <div className="page-container">
-            {/* Header Section */}
-            <div className="mb-12">
+            {/* Header Section - Compact */}
+            <div className="mb-6">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 mb-4"
+                    className="flex items-center gap-2 mb-1"
                 >
-                    <div className="h-6 w-6 rounded-lg bg-black dark:bg-white flex items-center justify-center">
-                        <FileText className="h-3.5 w-3.5 text-white dark:text-black" />
+                    <div className="h-5 w-5 rounded-md bg-black dark:bg-white flex items-center justify-center">
+                        <FileText className="h-3 w-3 text-white dark:text-black" />
                     </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-black/40 dark:text-white/40">Resource Library</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Resource Library</span>
                 </motion.div>
 
                 <motion.h1
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-4xl md:text-5xl font-black text-black dark:text-white mb-4 tracking-tighter"
+                    className="text-xl md:text-2xl font-black text-black dark:text-white mb-1 tracking-tight"
                 >
                     Premium <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4D7CFE] to-purple-500">Habit Templates.</span>
                 </motion.h1>
 
                 <motion.p
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="max-w-2xl text-lg text-black/60 dark:text-white/40 font-medium leading-relaxed"
+                    className="max-w-xl text-[11px] sm:text-xs text-black/60 dark:text-white/40 font-medium"
                 >
-                    Sometimes analog is better. Download our high-resolution, designer-crafted habit trackers
-                    ready for printing. Perfect for your desk, fridge, or bullet journal.
+                    Designer-crafted habit trackers ready for printing. Perfect for your desk or journal.
                 </motion.p>
             </div>
 
             {/* Main Content */}
             <TemplateGallery />
-
-
         </div>
     );
 }
-
-

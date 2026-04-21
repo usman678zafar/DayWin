@@ -110,7 +110,7 @@ export function HabitCard({
                     onClick={handleComplete}
                     disabled={isLoading || disabled}
                     className={cn(
-                        "relative flex h-14 w-14 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl transition-all duration-500",
+                        "relative flex h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl sm:rounded-2xl transition-all duration-500",
                         isCompleted
                             ? `bg-gradient-to-br ${colors.gradient} shadow-2xl ${colors.checkedText.replace("text-", "shadow-")}/20`
                             : "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10"
@@ -163,7 +163,7 @@ export function HabitCard({
                     </div>
                     <h3
                         className={cn(
-                            "font-black text-base sm:text-xl text-black transition-all duration-500 dark:text-white truncate tracking-tight",
+                            "font-black text-sm sm:text-lg text-black transition-all duration-500 dark:text-white truncate tracking-tight",
                             isCompleted && "opacity-60 line-through decoration-2"
                         )}
                     >
@@ -175,12 +175,12 @@ export function HabitCard({
                 <div className="flex items-center gap-2">
                     <div
                         className={cn(
-                            "hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-500",
+                            "hidden sm:flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-500",
                             isCompleted ? "bg-black/5 dark:bg-white/5 opacity-50" : colors.bg,
                             "shadow-inner"
                         )}
                     >
-                        <HabitIcon name={habit.icon} size={24} className={colors.text} />
+                        <HabitIcon name={habit.icon} size={20} className={colors.text} />
                     </div>
 
                     <div className="relative">
@@ -234,7 +234,7 @@ export function HabitCard({
 
             {/* Premium Progress Bar */}
             {habit.targetCount > 1 && (
-                <div className="mt-5 sm:mt-6">
+                <div className="mt-4 sm:mt-5">
                     <div className="mb-2 flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-widest text-black/70 dark:text-white/20">Momentum</span>
                         <span className={cn("text-xs font-black", colors.text)}>

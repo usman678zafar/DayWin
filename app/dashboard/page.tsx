@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
@@ -105,40 +105,40 @@ export default function DashboardPage() {
         <div className="page-container">
             <Header />
 
-            {/* Stats Cards - Mobile Optimized */}
-            <div className="mb-4 sm:mb-6 grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="card p-3 sm:p-4 group hover:border-primary-500/30 transition-colors">
-                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
-                        <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Active</p>
+            {/* Stats Cards - Ultra Compact */}
+            <div className="mb-2 sm:mb-3 grid grid-cols-3 gap-1.5">
+                <div className="card p-2 group hover:border-primary-500/30 transition-colors">
+                    <div className="flex items-center gap-1 mb-1">
+                        <Activity className="h-2.5 w-2.5 text-blue-500" />
+                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Active</p>
                     </div>
-                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount}</p>
+                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{totalCount}</p>
                 </div>
-                <div className="card p-3 sm:p-4 group hover:border-success-500/30 transition-colors">
-                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
-                        <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Done</p>
+                <div className="card p-2 group hover:border-success-500/30 transition-colors">
+                    <div className="flex items-center gap-1 mb-1">
+                        <CheckCircle2 className="h-2.5 w-2.5 text-success-500" />
+                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Done</p>
                     </div>
-                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{completedCount}</p>
+                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{completedCount}</p>
                 </div>
-                <div className="card p-3 sm:p-4 group hover:border-purple-500/30 transition-colors">
-                    <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
-                        <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-purple-500" />
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-black/60 dark:text-white/40">Rate</p>
+                <div className="card p-2 group hover:border-purple-500/30 transition-colors">
+                    <div className="flex items-center gap-1 mb-1">
+                        <TrendingUp className="h-2.5 w-2.5 text-purple-500" />
+                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Rate</p>
                     </div>
-                    <p className="text-2xl sm:text-3xl font-black text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
+                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
                 </div>
             </div>
 
-            {/* Action Buttons - Mobile Optimized */}
-            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <Link href="/dashboard/habits" className="inline-flex items-center justify-center gap-2 rounded-xl border border-black bg-black px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white">
-                    <Plus className="h-4 w-4" />
+            {/* Action Buttons - Compact */}
+            <div className="mb-3 flex flex-col sm:flex-row gap-1.5">
+                <Link href="/dashboard/habits" className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-black bg-black px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-white hover:bg-black/80 transition-all">
+                    <Plus className="h-3 w-3" />
                     New Habit
                 </Link>
-                <Link href="/dashboard/stats" className="inline-flex items-center justify-center gap-2 rounded-xl border border-black/25 px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-[0.12em] text-black transition hover:border-black dark:border-white/25 dark:text-white dark:hover:border-white">
-                    <BarChart3 className="h-4 w-4" />
-                    View Analytics
+                <Link href="/dashboard/stats" className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                    <BarChart3 className="h-3 w-3" />
+                    Analytics
                 </Link>
             </div>
 
@@ -153,11 +153,11 @@ export default function DashboardPage() {
                     />
 
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
+                        transition={{ delay: 0.1 }}
                     >
-                        <h2 className="section-title">Today&apos;s Habits</h2>
+                        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-2">Today&apos;s Habits</h2>
                         <HabitList />
                     </motion.div>
                 </div>

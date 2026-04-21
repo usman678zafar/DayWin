@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -189,34 +189,27 @@ export default function SettingsPage() {
 
     return (
         <div className="page-container max-w-3xl">
-            <div className="page-header">
-                <h1 className="page-title">Settings</h1>
-                <p className="page-subtitle">Control profile, theme, notifications, and data in one place.</p>
+            <div className="mb-4">
+                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">Settings</h1>
+                <p className="text-[10px] sm:text-xs font-bold text-black/40 dark:text-white/40 uppercase tracking-widest mt-0.5">Control your experience</p>
             </div>
 
             <div className="space-y-6">
                 {/* Profile Section */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="card p-6"
+                    className="card p-4"
                 >
-                    <div className="flex items-center gap-3 mb-6">
-                        <User className="w-5 h-5 text-primary-500" />
-                        <h2 className="text-lg font-semibold text-surface-900 dark:text-white">
-                            Profile
-                        </h2>
-                    </div>
-
-                    <div className="flex items-center gap-6 mb-6">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white text-3xl font-bold">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white text-xl font-bold">
                             {session?.user?.name?.[0] || "U"}
                         </div>
                         <div>
                             <p className="font-semibold text-surface-900 dark:text-white">
                                 {session?.user?.name}
                             </p>
-                            <p className="text-sm text-black/50 dark:text-white/40">
+                            <p className="text-sm text-black/60 dark:text-white/60">
                                 {session?.user?.email}
                             </p>
                         </div>
@@ -269,15 +262,15 @@ export default function SettingsPage() {
                                         "w-6 h-6",
                                         theme === t.value
                                             ? "text-primary-500"
-                                            : "text-black/30 dark:text-white/20"
+                                            : "text-black/40 dark:text-white/40"
                                     )}
                                 />
                                 <span
                                     className={cn(
-                                        "text-sm font-medium",
+                                        "text-sm font-black uppercase tracking-tight",
                                         theme === t.value
                                             ? "text-primary-600 dark:text-primary-400"
-                                            : "text-black/60 dark:text-white/40"
+                                            : "text-black/60 dark:text-white/50"
                                     )}
                                 >
                                     {t.label}
@@ -325,7 +318,7 @@ export default function SettingsPage() {
                                         <p className="font-medium text-black dark:text-white">
                                             {item.label}
                                         </p>
-                                        <p className="text-sm text-black/50 dark:text-white/40">
+                                        <p className="text-sm text-black/60 dark:text-white/50">
                                             {item.description}
                                         </p>
                                     </div>
@@ -366,7 +359,7 @@ export default function SettingsPage() {
                                 setShowExportModal(true);
                             }}
                             variant="secondary"
-                            className="w-full justify-between py-6 h-auto"
+                            className="w-full justify-between py-3 h-auto"
                         >
                             <div className="flex items-center gap-3 text-left">
                                 <FileSpreadsheet className="w-5 h-5 text-green-500" />
@@ -374,7 +367,7 @@ export default function SettingsPage() {
                                     <p className="font-medium text-black dark:text-white">
                                         Export as CSV
                                     </p>
-                                    <p className="text-sm text-black/50 dark:text-white/40">
+                                    <p className="text-xs font-bold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
                                         Spreadsheet compatible with analysis
                                     </p>
                                 </div>
@@ -388,7 +381,7 @@ export default function SettingsPage() {
                                 setShowExportModal(true);
                             }}
                             variant="secondary"
-                            className="w-full justify-between py-6 h-auto"
+                            className="w-full justify-between py-3 h-auto"
                         >
                             <div className="flex items-center gap-3 text-left">
                                 <FileJson className="w-5 h-5 text-blue-500" />
@@ -396,7 +389,7 @@ export default function SettingsPage() {
                                     <p className="font-medium text-black dark:text-white">
                                         Export as JSON
                                     </p>
-                                    <p className="text-sm text-black/50 dark:text-white/40">
+                                    <p className="text-xs font-bold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
                                         Raw data and stats for developers
                                     </p>
                                 </div>
@@ -438,12 +431,12 @@ export default function SettingsPage() {
                 size="md"
             >
                 <div className="space-y-6">
-                    <p className="text-sm text-black/60 dark:text-white/40">
+                    <p className="text-sm font-bold text-black/60 dark:text-white/50">
                         Choose the data range and format for your export. The exported file will include a detailed analysis summary.
                     </p>
 
                     <div className="space-y-4">
-                        <label className="text-sm font-black uppercase tracking-wider text-black/40 dark:text-white/30">
+                        <label className="text-xs font-black uppercase tracking-wider text-black/50 dark:text-white/40">
                             Select Range
                         </label>
                         <div className="grid grid-cols-2 gap-2">

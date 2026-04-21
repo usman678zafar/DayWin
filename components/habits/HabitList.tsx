@@ -38,7 +38,7 @@ export function HabitList() {
     const completedHabits = habits.filter((h) => h.todayLog?.completed);
 
     return (
-        <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-4 sm:space-y-6">
             {/* Add Habit Button - Mobile Optimized */}
             <motion.button
                 whileHover={{ scale: 1.02 }}
