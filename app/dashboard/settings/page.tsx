@@ -190,8 +190,8 @@ export default function SettingsPage() {
     return (
         <div className="page-container max-w-3xl">
             <div className="mb-4">
-                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">Settings</h1>
-                <p className="text-[10px] sm:text-xs font-bold text-black/40 dark:text-white/40 uppercase tracking-widest mt-0.5">Control your experience</p>
+                <h1 className="text-xl sm:text-2xl font-semibold text-black dark:text-white">Settings</h1>
+                <p className="text-[10px] sm:text-xs font-semibold text-black/40 dark:text-white/40 uppercase tracking-widest mt-0.5">Control your experience</p>
             </div>
 
             <div className="space-y-6">
@@ -202,7 +202,7 @@ export default function SettingsPage() {
                     className="card p-4"
                 >
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white text-xl font-bold">
+                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-white text-xl font-semibold">
                             {session?.user?.name?.[0] || "U"}
                         </div>
                         <div>
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                                 />
                                 <span
                                     className={cn(
-                                        "text-sm font-black uppercase tracking-tight",
+                                        "text-sm font-semibold uppercase tracking-tight",
                                         theme === t.value
                                             ? "text-primary-600 dark:text-primary-400"
                                             : "text-black/60 dark:text-white/50"
@@ -367,7 +367,7 @@ export default function SettingsPage() {
                                     <p className="font-medium text-black dark:text-white">
                                         Export as CSV
                                     </p>
-                                    <p className="text-xs font-bold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
+                                    <p className="text-xs font-semibold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
                                         Spreadsheet compatible with analysis
                                     </p>
                                 </div>
@@ -389,7 +389,7 @@ export default function SettingsPage() {
                                     <p className="font-medium text-black dark:text-white">
                                         Export as JSON
                                     </p>
-                                    <p className="text-xs font-bold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
+                                    <p className="text-xs font-semibold text-black/50 dark:text-white/50 uppercase tracking-tight mt-0.5">
                                         Raw data and stats for developers
                                     </p>
                                 </div>
@@ -431,12 +431,12 @@ export default function SettingsPage() {
                 size="md"
             >
                 <div className="space-y-6">
-                    <p className="text-sm font-bold text-black/60 dark:text-white/50">
+                    <p className="text-sm font-semibold text-black/60 dark:text-white/50">
                         Choose the data range and format for your export. The exported file will include a detailed analysis summary.
                     </p>
 
                     <div className="space-y-4">
-                        <label className="text-xs font-black uppercase tracking-wider text-black/50 dark:text-white/40">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/40">
                             Select Range
                         </label>
                         <div className="grid grid-cols-2 gap-2">
@@ -450,7 +450,7 @@ export default function SettingsPage() {
                                     key={opt.value}
                                     onClick={() => setExportRange(opt.value as any)}
                                     className={cn(
-                                        "flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-bold",
+                                        "flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-semibold",
                                         exportRange === opt.value
                                             ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
                                             : "border-black/5 dark:border-white/5 text-black/60 dark:text-white/40 hover:border-black/10 dark:hover:border-white/10"

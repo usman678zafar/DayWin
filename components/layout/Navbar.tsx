@@ -55,7 +55,7 @@ export function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    "relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-bold transition-all duration-300 group overflow-hidden",
+                                    "relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-semibold transition-all duration-300 group overflow-hidden",
                                     isActive
                                         ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/25 dark:shadow-primary-500/15"
                                         : "text-surface-500 hover:bg-surface-100 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-white/[0.05] dark:hover:text-white"
@@ -66,31 +66,34 @@ export function Navbar() {
                             </Link>
                         );
                     })}
+                </nav>
 
+                <div className="mt-4 space-y-2">
                     <button
                         type="button"
                         onClick={() => signOut({ callbackUrl: "/" })}
-                        className="relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-bold text-surface-500 transition-all duration-300 group overflow-hidden hover:bg-surface-100 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-white/[0.05] dark:hover:text-white"
+                        className="relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[11px] font-semibold text-black/50 hover:text-black dark:text-white/40 dark:hover:text-white transition-all duration-300 group"
                     >
-                        <LogOut className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                        <span className="whitespace-nowrap">Sign Out</span>
+                        <LogOut className="h-3.5 w-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                        <span className="whitespace-nowrap uppercase tracking-widest">Sign Out</span>
                     </button>
-                </nav>
 
-                <div className="mt-4">
                     <div className="relative overflow-hidden rounded-xl border border-surface-200/50 bg-white/50 p-2.5 dark:border-white/[0.05] dark:bg-white/[0.02] backdrop-blur-sm">
                         <div className="flex items-center gap-2.5">
                             <div className="relative h-8 w-8 flex-shrink-0">
-                                <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white dark:bg-[#1A1A20] border border-primary-500/10 shadow-sm font-black text-xs text-primary-600">
-                                    {session?.user?.name?.[0] || "U"}
+                                <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white dark:bg-[#1A1A20] border border-primary-500/10 shadow-sm overflow-hidden">
+                                    {session?.user?.image ? (
+                                        <img src={session.user.image} alt="" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <span className="font-semibold text-xs text-primary-600">
+                                            {session?.user?.name?.[0] || "U"}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="truncate text-[11px] font-bold text-surface-900 dark:text-surface-100 uppercase tracking-tight">
+                                <p className="truncate text-[11px] font-semibold text-surface-900 dark:text-surface-100 uppercase tracking-tight">
                                     {session?.user?.name || "User"}
-                                </p>
-                                <p className="truncate text-[9px] font-black uppercase tracking-wider text-primary-500">
-                                    Premium Pro
                                 </p>
                             </div>
                         </div>
@@ -116,7 +119,7 @@ export function Navbar() {
                                         )}
                                     >
                                         <item.icon className="h-4 w-4" />
-                                        <span className="text-[9px] font-black uppercase tracking-tighter">{item.label}</span>
+                                        <span className="text-[9px] font-semibold uppercase tracking-tighter">{item.label}</span>
                                     </Link>
                                 </li>
                             );
