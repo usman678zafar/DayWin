@@ -406,7 +406,7 @@ export default function HabitsPage() {
                 <div className="flex gap-4">
                     <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-green-500" />
-                        <span className="text-[10px] font-bold text-black/40 dark:text-white/40 uppercase">Success > 80%</span>
+                        <span className="text-[10px] font-semibold text-black/40 dark:text-white/40 uppercase">Success {" > "} 80%</span>
                     </div>
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-black/30 dark:text-white/30">Momentum Tracking Active</span>
@@ -419,7 +419,7 @@ export default function HabitsPage() {
 
             <Modal isOpen={!!deletingHabit} onClose={() => setDeletingHabit(null)} title="Delete Habit" size="xs">
                 <div className="text-center p-2">
-                    <p className="text-sm font-bold text-black dark:text-white mb-4">Delete "{deletingHabit?.title}"?</p>
+                    <p className="text-sm font-semibold text-black dark:text-white mb-4">Delete "{deletingHabit?.title}"?</p>
                     <div className="flex gap-2">
                         <Button variant="secondary" onClick={() => setDeletingHabit(null)} className="flex-1 h-8 text-[10px] uppercase font-semibold">Cancel</Button>
                         <Button variant="danger" onClick={handleDelete} className="flex-1 h-8 text-[10px] uppercase font-semibold">Delete</Button>
