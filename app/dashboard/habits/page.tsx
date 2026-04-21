@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -223,6 +223,26 @@ function HabitsPageContent() {
         }
     }, [dateRange, days]);
 
+    // Grouping logic for high-density matrix
+    const groupedHabits = useMemo(() => {
+        const groups: Record<string, { label: string, items: HabitData[], days: Date[] }> = {};
+        habitsData.forEach((hd) => {
+            const start = new Date(hd.habit.startDate);
+            const end = hd.habit.endDate ? new Date(hd.habit.endDate) : new Date();
+            const startStr = format(start, "MMM d");
+            const endStr = hd.habit.endDate ? format(end, "MMM d") : "Ongoing";
+            const key = `${startStr} - ${endStr}`;
+            
+            if (!groups[key]) {
+                const groupDays = eachDayOfInterval({ start, end });
+                if (activeType === "custom") groupDays.reverse();
+                groups[key] = { label: key, items: [], days: groupDays };
+            }
+            groups[key].items.push(hd);
+        });
+        return Object.values(groups);
+    }, [habitsData, activeType]);
+
     useEffect(() => {
         fetchLogs(filteredHabits, activeType);
     }, [filteredHabits, activeType, fetchLogs]);
@@ -314,155 +334,182 @@ function HabitsPageContent() {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                    <button onClick={goToPrevious} className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5">
-                        <ChevronLeft className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="text-[11px] font-semibold uppercase tracking-tight">
-                        {activeType === "monthly" ? format(currentDate, "MMMM yyyy") : `${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d")}`}
-                    </span>
-                    <button onClick={goToNext} className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5">
-                        <ChevronRight className="h-3.5 w-3.5" />
-                    </button>
-                    <button onClick={() => setCurrentDate(new Date())} className="ml-1 text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white">Today</button>
-                </div>
+
 
                 <Button onClick={() => setShowForm(true)} className="h-7 px-3 text-[10px] font-semibold uppercase tracking-widest">
                     <Plus className="h-3 w-3 mr-1" /> New Habit
                 </Button>
             </div>
 
-            {/* Matrix - High Density */}
-            <div className="card overflow-hidden">
-                <div className="overflow-x-auto scrollbar-hide">
-                    <table className="w-full min-w-max border-collapse">
-                        <thead>
-                            <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.01]">
-                                <th className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-2 text-left border-r border-black/5 dark:border-white/5">
-                                    <span className="text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Habit</span>
-                                </th>
-                                {displayDays.map((day) => {
-                                    const isFutureDay = isFuture(day) && !isToday(day);
-                                    return (
-                                        <th key={day.toISOString()} className={cn(
-                                            "px-1 py-1.5 text-center min-w-[32px] sm:min-w-[40px]",
-                                            isToday(day) && "bg-primary-500/5 dark:bg-primary-500/10"
-                                        )}>
-                                            <div className="flex flex-col items-center">
-                                                <span className={cn(
-                                                    "text-[8px] font-semibold uppercase leading-none",
-                                                    isFutureDay ? "text-black/20 dark:text-white/20" : "text-black/50 dark:text-white/50"
-                                                )}>
-                                                    {format(day, "EEE")}
-                                                </span>
-                                                <span className={cn(
-                                                    "text-[11px] font-semibold mt-0.5",
-                                                    isToday(day) ? "text-primary-600 dark:text-primary-400" : (isFutureDay ? "text-black/20 dark:text-white/20" : "text-black dark:text-white")
-                                                )}>
-                                                    {format(day, "d")}
-                                                </span>
-                                            </div>
-                                        </th>
-                                    );
-                                })}
-                                <th className="px-3 py-2 text-center bg-black/[0.03] dark:bg-white/[0.03]">
-                                    <TrendingUp className="h-3 w-3 mx-auto text-purple-500" />
-                                </th>
-                                <th className="w-8" />
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                            {habitsData.length > 0 ? (
-                                habitsData.map(({ habit, logs, completionRate }, rowIndex) => {
-                                    const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
-                                    return (
-                                        <tr key={habit._id} className="group hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors">
-                                            <td className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-1.5 border-r border-black/5 dark:border-white/5 group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02]">
-                                                <div className="flex items-center gap-2 max-w-[120px] sm:max-w-[180px]">
-                                                    <div className="relative h-8 w-8 flex-shrink-0">
-                                                        <svg className="h-8 w-8 -rotate-90 transform" viewBox="0 0 36 36">
-                                                            <circle cx="18" cy="18" r="16" fill="none" className="stroke-black/5 dark:stroke-white/5" strokeWidth="3" />
-                                                            <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
-                                                        </svg>
-                                                        <div className="absolute inset-0 flex items-center justify-center">
-                                                            {(() => {
-                                                                const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
-                                                                const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
-                                                                return <HabitIcon name={iconToDisplay} size={11} className={colors.text} />;
-                                                            })()}
-                                                        </div>
-                                                    </div>
-                                                    <span className="truncate text-[11px] font-semibold text-black dark:text-white">{habit.title}</span>
-                                                </div>
-                                            </td>
-                                            {logs.map((log, lIdx) => {
-                                                const isFutureDay = isFuture(log.date) && !isToday(log.date);
-                                                const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
-                                                const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
+            {/* Matrix Sections */}
+            <div className="space-y-6">
+                {groupedHabits.length > 0 ? (
+                    groupedHabits.map((group) => (
+                        <div key={group.label} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* Section Header */}
+                            <div className="flex items-center gap-3 mb-2.5 px-1">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-primary-500 shadow-sm shadow-primary-500/50" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/60">
+                                        Cycle: {group.label}
+                                    </span>
+                                </div>
+                                <div className="h-px flex-1 bg-gradient-to-r from-black/10 to-transparent dark:from-white/10 dark:to-transparent" />
+                                <span className="text-[9px] font-bold text-black/30 dark:text-white/30 uppercase tracking-widest">
+                                    {group.items.length} Active Habits
+                                </span>
+                            </div>
 
+                            <div className="card overflow-hidden border-black/[0.03] dark:border-white/[0.03] shadow-sm">
+                                <div className="overflow-x-auto scrollbar-hide">
+                                    <table className="w-full min-w-max border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.01]">
+                                                <th className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-2 text-left border-r border-black/5 dark:border-white/5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40">Habit</span>
+                                                </th>
+                                                {group.days.map((day) => {
+                                                    const isFutureDay = isFuture(day) && !isToday(day);
+                                                    return (
+                                                        <th key={day.toISOString()} className={cn(
+                                                            "px-1 py-1.5 text-center min-w-[32px] sm:min-w-[40px] transition-colors",
+                                                            isToday(day) && "bg-primary-500/5 dark:bg-primary-500/10"
+                                                        )}>
+                                                            <div className="flex flex-col items-center">
+                                                                <span className={cn(
+                                                                    "text-[8px] font-bold uppercase leading-none mb-0.5",
+                                                                    isFutureDay ? "text-black/15 dark:text-white/15" : "text-black/40 dark:text-white/40"
+                                                                )}>
+                                                                    {format(day, "EEE")}
+                                                                </span>
+                                                                <span className={cn(
+                                                                    "text-[11px] font-bold",
+                                                                    isToday(day) ? "text-primary-600 dark:text-primary-400" : (isFutureDay ? "text-black/15 dark:text-white/15" : "text-black/80 dark:text-white/80")
+                                                                )}>
+                                                                    {format(day, "d")}
+                                                                </span>
+                                                            </div>
+                                                        </th>
+                                                    );
+                                                })}
+                                                <th className="px-3 py-2 text-center bg-black/[0.03] dark:bg-white/[0.03] border-l border-black/5 dark:border-white/5">
+                                                    <TrendingUp className="h-3 w-3 mx-auto text-purple-400" />
+                                                </th>
+                                                <th className="w-10 border-l border-black/5 dark:border-white/5" />
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-black/5 dark:divide-white/5">
+                                            {group.items.map(({ habit, logs, completionRate }) => {
+                                                const colors = habitColors[habit.color as keyof typeof habitColors] || habitColors.purple;
                                                 return (
-                                                    <td key={lIdx} className={cn("px-0.5 py-1 text-center", isToday(log.date) && "bg-primary-500/[0.02] dark:bg-primary-500/[0.05]")}>
-                                                        <motion.button
-                                                            whileHover={!isFutureDay ? { scale: 1.1 } : undefined}
-                                                            whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
-                                                            onClick={() => handleToggle(habit._id, log.date, log.completed)}
-                                                            disabled={isFutureDay}
-                                                            className={cn(
-                                                                "mx-auto h-5 w-5 sm:h-6 sm:w-6 rounded-md flex items-center justify-center transition-all",
-                                                                log.completed
-                                                                    ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-sm`
-                                                                    : (isFutureDay ? "bg-black/[0.02] dark:bg-white/[0.02] border-none" : "bg-black/[0.04] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10"),
-                                                                isToday(log.date) && !log.completed && "ring-1 ring-primary-500/30"
-                                                            )}
-                                                        >
-                                                            {isFutureDay ? (
-                                                                <div className="opacity-[0.08] dark:opacity-[0.05] scale-75">
-                                                                    <HabitIcon name={iconToDisplay} size={10} />
+                                                    <tr key={habit._id} className="group hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors">
+                                                        <td className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-1.5 border-r border-black/5 dark:border-white/5 group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                                            <div className="flex items-center gap-2.5 max-w-[120px] sm:max-w-[180px]">
+                                                                <div className="relative h-8 w-8 flex-shrink-0">
+                                                                    <svg className="h-8 w-8 -rotate-90 transform" viewBox="0 0 36 36">
+                                                                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-black/5 dark:stroke-white/5" strokeWidth="3" />
+                                                                        <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
+                                                                    </svg>
+                                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                                        {(() => {
+                                                                            const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
+                                                                            const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
+                                                                            return <HabitIcon name={iconToDisplay} size={11} className={colors.text} />;
+                                                                        })()}
+                                                                    </div>
                                                                 </div>
-                                                            ) : log.completed ? (
-                                                                <Check className={cn("h-3 w-3", colors.checkedText)} strokeWidth={5} />
-                                                            ) : (
-                                                                <span className="text-[8px] font-semibold text-black/20 dark:text-white/30">{format(log.date, "d")}</span>
-                                                            )}
-                                                        </motion.button>
-                                                    </td>
+                                                                <span className="truncate text-[11px] font-bold text-black/90 dark:text-white/90">{habit.title}</span>
+                                                            </div>
+                                                        </td>
+                                                        {group.days.map((date, dIdx) => {
+                                                            const log = logs.find((l) => isSameDay(new Date(l.date), date));
+                                                            const isFutureDay = isFuture(date) && !isToday(date);
+                                                            const categoryIcon = habitCategories.find(c => c.value === habit.category)?.icon || "Star";
+                                                            const iconToDisplay = habit.icon && habit.icon !== "Star" ? habit.icon : categoryIcon;
+
+                                                            return (
+                                                                <td key={dIdx} className={cn("px-0.5 py-1 text-center", isToday(date) && "bg-primary-500/[0.02] dark:bg-primary-500/[0.05]")}>
+                                                                    <div className="flex items-center justify-center">
+                                                                        {log ? (
+                                                                            <motion.button
+                                                                                whileHover={!isFutureDay ? { scale: 1.1 } : undefined}
+                                                                                whileTap={!isFutureDay ? { scale: 0.9 } : undefined}
+                                                                                onClick={() => handleToggle(habit._id, log.date, log.completed)}
+                                                                                disabled={isFutureDay}
+                                                                                className={cn(
+                                                                                    "mx-auto h-5 w-5 sm:h-6 sm:w-6 rounded-[5px] flex items-center justify-center transition-all",
+                                                                                    log.completed
+                                                                                        ? `bg-gradient-to-br ${colors.gradient} ${colors.checkedText} shadow-sm`
+                                                                                        : (isFutureDay ? "bg-black/[0.02] dark:bg-white/[0.02] border-none" : "bg-black/[0.04] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10"),
+                                                                                    isToday(date) && !log.completed && "ring-1 ring-primary-500/30"
+                                                                                )}
+                                                                            >
+                                                                                {isFutureDay ? (
+                                                                                    <div className="opacity-[0.08] dark:opacity-[0.05] scale-75">
+                                                                                        <HabitIcon name={iconToDisplay} size={10} />
+                                                                                    </div>
+                                                                                ) : log.completed ? (
+                                                                                    <Check className={cn("h-3 w-3", colors.checkedText)} strokeWidth={5} />
+                                                                                ) : (
+                                                                                    <span className="text-[8px] font-bold text-black/20 dark:text-white/30">{format(date, "d")}</span>
+                                                                                )}
+                                                                            </motion.button>
+                                                                        ) : (
+                                                                            <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-[5px] bg-black/[0.01] dark:bg-white/[0.01]" />
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                            );
+                                                        })}
+                                                        <td className="px-2 py-1.5 text-center bg-black/[0.02] dark:bg-white/[0.02] border-l border-black/5 dark:border-white/5">
+                                                            <span className={cn(
+                                                                "text-[10px] font-bold",
+                                                                completionRate >= 80 ? "text-green-500" : completionRate >= 50 ? "text-yellow-500" : "text-red-400"
+                                                            )}>{completionRate}%</span>
+                                                        </td>
+                                                        <td className="px-1 py-1.5 align-middle border-l border-black/5 dark:border-white/5">
+                                                            <div className="relative flex justify-center">
+                                                                <button 
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id);
+                                                                    }} 
+                                                                    className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-black/20 hover:text-black/60 dark:text-white/20 dark:hover:text-white/60 transition-all"
+                                                                >
+                                                                    <MoreVertical className="h-3.5 w-3.5" />
+                                                                </button>
+                                                                <AnimatePresence>
+                                                                    {menuOpenFor === habit._id && (
+                                                                        <>
+                                                                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
+                                                                            <motion.div 
+                                                                                initial={{ opacity: 0, scale: 0.95, y: -10 }} 
+                                                                                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                                                                                exit={{ opacity: 0, scale: 0.95, y: -10 }} 
+                                                                                className="absolute right-0 bottom-full z-[100] mb-1 w-32 bg-white dark:bg-surface-900 border border-black/10 dark:border-white/10 rounded-lg shadow-2xl p-1 backdrop-blur-xl"
+                                                                            >
+                                                                                <button onClick={() => { setEditingHabit(habit); setShowForm(true); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-bold hover:bg-black/5 dark:hover:bg-white/5 rounded"><Edit2 className="h-3 w-3" /> Edit</button>
+                                                                                <button onClick={() => { setDeletingHabit(habit); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"><Trash2 className="h-3 w-3" /> Delete</button>
+                                                                            </motion.div>
+                                                                        </>
+                                                                    )}
+                                                                </AnimatePresence>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                                                 );
                                             })}
-                                            <td className="px-2 py-1.5 text-center bg-black/[0.02] dark:bg-white/[0.02]">
-                                                <span className={cn(
-                                                    "text-[10px] font-semibold",
-                                                    completionRate >= 80 ? "text-green-500" : completionRate >= 50 ? "text-yellow-500" : "text-red-400"
-                                                )}>{completionRate}%</span>
-                                            </td>
-                                            <td className="px-1 py-1.5">
-                                                <div className="relative">
-                                                    <button onClick={() => setMenuOpenFor(menuOpenFor === habit._id ? null : habit._id)} className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <MoreVertical className="h-3.5 w-3.5 text-black/40 dark:text-white/40" />
-                                                    </button>
-                                                    <AnimatePresence>
-                                                        {menuOpenFor === habit._id && (
-                                                            <>
-                                                                <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
-                                                                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute right-0 top-full z-20 mt-1 w-32 bg-white dark:bg-surface-900 border border-black/10 dark:border-white/10 rounded-lg shadow-xl p-1">
-                                                                    <button onClick={() => { setEditingHabit(habit); setShowForm(true); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-semibold hover:bg-black/5 dark:hover:bg-white/5 rounded"><Edit2 className="h-3 w-3" /> Edit</button>
-                                                                    <button onClick={() => { setDeletingHabit(habit); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"><Trash2 className="h-3 w-3" /> Delete</button>
-                                                                </motion.div>
-                                                            </>
-                                                        )}
-                                                    </AnimatePresence>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            ) : (
-                                <tr>
-                                    <td colSpan={displayDays.length + 3} className="py-12 text-center text-[11px] font-semibold text-black/40 dark:text-white/40 uppercase">No habits found for this category</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="card p-12 text-center">
+                        <span className="text-[11px] font-bold text-black/40 dark:text-white/40 uppercase tracking-widest">No habits found for this category</span>
+                    </div>
+                )}
             </div>
 
             {/* Summary Row - Compact */}
