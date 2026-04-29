@@ -41,51 +41,38 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
     const [isLoading, setIsLoading] = useState(true);
     const [expandedHabit, setExpandedHabit] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchMonthLogs();
-    }, [month, habits]);
-
     const fetchMonthLogs = async () => {
         setIsLoading(true);
         try {
             const start = startOfMonth(month);
             const end = endOfMonth(month);
-
             const response = await fetch(
                 `/api/logs?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
             );
             const data = await response.json();
             const logs = data.logs || [];
 
-            const monthlyDays = getDaysInMonth(month);
-
-            const habitsWithMonthData: HabitMonthData[] = habits.map((habit) => {
-                const habitLogs: DayLog[] = monthlyDays.map((day) => {
-                    const dayLog = logs.find(
-                        (log: any) =>
-                            log.habitId === habit._id && isSameDay(new Date(log.date), day)
-                    );
-                    return {
-                        date: day,
-                        completed: dayLog?.completed || false,
-                    };
-                });
-
-                const completedDays = habitLogs.filter((l) => l.completed).length;
-                const totalDays = habitLogs.filter((l) => !isFuture(l.date) || isToday(l.date)).length;
-                const completionRate = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
-
-                return { habit, logs: habitLogs, completionRate };
+            const habitsWithLogs = habits.map((habit) => {
+                const habitLogs = logs.filter((log: any) => log.habitId === habit._id);
+                const completedDays = habitLogs.map((log: any) => new Date(log.date));
+                return {
+                    ...habit,
+                    completedDays,
+                };
             });
 
-            setHabitsData(habitsWithMonthData);
+            setHabitsData(habitsWithLogs);
         } catch (error) {
-            console.error("Failed to fetch month logs:", error);
-            toast.error("Failed to load monthly data");
+            console.error(error);
+            toast.error("Failed to fetch month logs");
         } finally {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchMonthLogs();
+    }, [month, habits, fetchMonthLogs]);
 
     const getDaysInMonth = (date: Date): Date[] => {
         const start = startOfMonth(date);

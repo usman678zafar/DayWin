@@ -39,28 +39,29 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card p-3"
+            transition={{ delay: 0.2 }}
+            className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-slate-50 to-white p-6 dark:from-slate-950/20 dark:to-white/[0.02] dark:border-white/5"
         >
-            <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-[11px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Weekly Activity</h3>
-                <div className="flex gap-1">
+            <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-black/40 dark:text-white/40">Weekly Activity</h3>
+                <div className="flex gap-1.5">
                    {[100, 50, 0].map(v => (
-                       <div key={v} className={cn("w-1.5 h-1.5 rounded-full", v === 100 ? "bg-green-500" : v === 50 ? "bg-purple-500" : "bg-black/5")} />
+                       <div key={v} className={cn("h-1.5 w-1.5 rounded-full", v === 100 ? "bg-green-500" : v === 50 ? "bg-purple-500" : "bg-black/5")} />
                    ))}
                 </div>
             </div>
-            <div className="h-40">
+            <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} barSize={20}>
+                    <BarChart data={data} barSize={24}>
                         <XAxis
                             dataKey="date"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#71717a", fontSize: 9, fontWeight: 600 }}
+                            tick={{ fill: "#71717a", fontSize: 11, fontWeight: 600 }}
                         />
                         <YAxis hide />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
-                        <Bar dataKey="completed" radius={[4, 4, 0, 0]}>
+                        <Bar dataKey="completed" radius={[6, 6, 0, 0]}>
                             {data.map((entry, index) => (
                                 <Cell
                                     key={`cell-${index}`}

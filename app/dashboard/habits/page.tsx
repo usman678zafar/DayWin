@@ -9,20 +9,13 @@ import {
     endOfWeek,
     startOfMonth,
     endOfMonth,
-    addWeeks,
-    subWeeks,
-    addMonths,
-    subMonths,
     eachDayOfInterval,
     isSameDay,
     isToday,
     isFuture,
     subDays,
-    addDays,
 } from "date-fns";
 import {
-    ChevronLeft,
-    ChevronRight,
     Plus,
     Check,
     MoreVertical,
@@ -65,7 +58,7 @@ const habitTypeTabs: { value: HabitType; label: string; icon: React.ElementType;
 
 export default function HabitsPage() {
     return (
-        <Suspense fallback={<PageLoader />}>
+        <Suspense fallback={<PageLoader fullScreen={false} />}>
             <HabitsPageContent />
         </Suspense>
     );
@@ -103,9 +96,6 @@ function HabitsPageContent() {
         updateURL({ type }, true);
     };
 
-    const handleDateChange = (date: Date) => {
-        updateURL({ date }, false);
-    };
 
     // Data state
     const [habitsData, setHabitsData] = useState<HabitData[]>([]);
@@ -156,10 +146,7 @@ function HabitsPageContent() {
         return eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
     }, [dateRange]);
 
-    const displayDays = useMemo(() => {
-        if (activeType === "custom") return [...days].reverse();
-        return days;
-    }, [days, activeType]);
+
 
     useEffect(() => {
         fetchHabits().finally(() => setIsLoading(false));
@@ -221,10 +208,26 @@ function HabitsPageContent() {
         } finally {
             if (currentFetchId === fetchIdRef.current) setIsLoadingLogs(false);
         }
-    }, [dateRange, days]);
+    }, [dateRange, days, habitsData.length]);
 
     // Grouping logic for high-density matrix
     const groupedHabits = useMemo(() => {
+        if (habitsData.length === 0) return [];
+
+        // If Weekly or Monthly, use a single unified table for the period
+        if (activeType !== "custom") {
+            const label = activeType === "monthly" 
+                ? format(currentDate, "MMMM yyyy")
+                : `Week: ${format(dateRange.start, "MMM d")} - ${format(dateRange.end, "MMM d")}`;
+            
+            return [{
+                label,
+                items: habitsData,
+                days: days
+            }];
+        }
+
+        // Custom tab still uses intelligent cycle-based grouping
         const groups: Record<string, { label: string, items: HabitData[], days: Date[] }> = {};
         habitsData.forEach((hd) => {
             const start = new Date(hd.habit.startDate);
@@ -235,13 +238,12 @@ function HabitsPageContent() {
             
             if (!groups[key]) {
                 const groupDays = eachDayOfInterval({ start, end });
-                if (activeType === "custom") groupDays.reverse();
                 groups[key] = { label: key, items: [], days: groupDays };
             }
             groups[key].items.push(hd);
         });
         return Object.values(groups);
-    }, [habitsData, activeType]);
+    }, [habitsData, activeType, currentDate, dateRange, days]);
 
     useEffect(() => {
         fetchLogs(filteredHabits, activeType);
@@ -275,24 +277,7 @@ function HabitsPageContent() {
         }
     };
 
-    const goToPrevious = () => {
-        let newDate;
-        if (activeType === "weekly") newDate = subWeeks(currentDate, 1);
-        else if (activeType === "monthly") newDate = subMonths(currentDate, 1);
-        else newDate = subDays(currentDate, 14);
-        handleDateChange(newDate);
-    };
 
-    const goToNext = () => {
-        let newDate;
-        if (activeType === "weekly") newDate = addWeeks(currentDate, 1);
-        else if (activeType === "monthly") newDate = addMonths(currentDate, 1);
-        else newDate = addDays(currentDate, 14);
-        handleDateChange(newDate);
-    };
-    const goToToday = () => {
-        handleDateChange(new Date());
-    };
 
     // Form handlers
     const handleSubmit = async (data: Partial<Habit>) => {
@@ -311,7 +296,7 @@ function HabitsPageContent() {
             setDeletingHabit(null);
         }
     };
-    if (isLoading) return <PageLoader />;
+    if (isLoading) return <PageLoader fullScreen={false} />;
 
     return (
         <div className="page-container">
@@ -365,7 +350,7 @@ function HabitsPageContent() {
                                     <table className="w-full min-w-max border-collapse">
                                         <thead>
                                             <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.01]">
-                                                <th className="sticky left-0 z-10 bg-white dark:bg-surface-900 px-3 py-2 text-left border-r border-black/5 dark:border-white/5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                                <th className="sticky left-0 z-20 bg-white dark:bg-surface-900 px-3 py-2 text-left border-r border-black/5 dark:border-white/5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                                                     <span className="text-[9px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40">Habit</span>
                                                 </th>
                                                 {group.days.map((day) => {
@@ -392,10 +377,10 @@ function HabitsPageContent() {
                                                         </th>
                                                     );
                                                 })}
-                                                <th className="px-3 py-2 text-center bg-black/[0.03] dark:bg-white/[0.03] border-l border-black/5 dark:border-white/5">
+                                                <th className="sticky right-10 z-20 px-3 py-2 text-center bg-surface-50 dark:bg-white/[0.03] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                                                     <TrendingUp className="h-3 w-3 mx-auto text-purple-400" />
                                                 </th>
-                                                <th className="w-10 border-l border-black/5 dark:border-white/5" />
+                                                <th className="sticky right-0 z-20 w-10 bg-surface-50 dark:bg-white/[0.03] border-l border-black/5 dark:border-white/5" />
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-black/5 dark:divide-white/5">
@@ -461,13 +446,13 @@ function HabitsPageContent() {
                                                                 </td>
                                                             );
                                                         })}
-                                                        <td className="px-2 py-1.5 text-center bg-black/[0.02] dark:bg-white/[0.02] border-l border-black/5 dark:border-white/5">
+                                                        <td className="sticky right-10 z-10 px-2 py-1.5 text-center bg-white dark:bg-surface-900 group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
                                                             <span className={cn(
                                                                 "text-[10px] font-bold",
                                                                 completionRate >= 80 ? "text-green-500" : completionRate >= 50 ? "text-yellow-500" : "text-red-400"
                                                             )}>{completionRate}%</span>
                                                         </td>
-                                                        <td className="px-1 py-1.5 align-middle border-l border-black/5 dark:border-white/5">
+                                                        <td className="sticky right-0 z-10 px-1 py-1.5 align-middle bg-white dark:bg-surface-900 group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 transition-colors">
                                                             <div className="relative flex justify-center">
                                                                 <button 
                                                                     onClick={(e) => {
@@ -530,7 +515,7 @@ function HabitsPageContent() {
 
             <Modal isOpen={!!deletingHabit} onClose={() => setDeletingHabit(null)} title="Delete Habit" size="sm">
                 <div className="text-center p-2">
-                    <p className="text-sm font-semibold text-black dark:text-white mb-4">Delete "{deletingHabit?.title}"?</p>
+                    <p className="text-sm font-semibold text-black dark:text-white mb-4">Delete &quot;{deletingHabit?.title}&quot;?</p>
                     <div className="flex gap-2">
                         <Button variant="secondary" onClick={() => setDeletingHabit(null)} className="flex-1 h-8 text-[10px] uppercase font-semibold">Cancel</Button>
                         <Button variant="danger" onClick={handleDelete} className="flex-1 h-8 text-[10px] uppercase font-semibold">Delete</Button>

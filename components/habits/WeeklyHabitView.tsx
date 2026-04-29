@@ -39,16 +39,11 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
 
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(weekStart), i));
 
-    useEffect(() => {
-        fetchWeekLogs();
-    }, [weekStart, habits]);
-
     const fetchWeekLogs = async () => {
         setIsLoading(true);
         try {
             const start = startOfWeek(weekStart);
             const end = endOfWeek(weekStart);
-
             const response = await fetch(
                 `/api/logs?startDate=${start.toISOString()}&endDate=${end.toISOString()}`
             );
@@ -56,7 +51,7 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
             const logs = data.logs || [];
 
             const habitsWithWeekData: HabitWeekData[] = habits.map((habit) => {
-                const weekLogs: WeekLog[] = weekDays.map((day) => {
+                const habitLogs: DayLog[] = weekDays.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
                             log.habitId === habit._id && isSameDay(new Date(log.date), day)
@@ -64,20 +59,27 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
                     return {
                         date: day,
                         completed: dayLog?.completed || false,
-                        count: dayLog?.count || 0,
                     };
                 });
-                return { habit, logs: weekLogs };
+
+                const completedCount = habitLogs.filter((l) => l.completed).length;
+                const completionRate = Math.round((completedCount / 7) * 100);
+
+                return { habit, logs: habitLogs, completionRate };
             });
 
             setHabitsData(habitsWithWeekData);
         } catch (error) {
-            console.error("Failed to fetch week logs:", error);
-            toast.error("Failed to load weekly data");
+            console.error(error);
+            toast.error("Failed to fetch week logs");
         } finally {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchWeekLogs();
+    }, [weekStart, habits, fetchWeekLogs]);
 
     const handleToggle = async (habitId: string, date: Date, currentCompleted: boolean) => {
         if (isFuture(date) && !isToday(date)) {

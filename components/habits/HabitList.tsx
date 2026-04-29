@@ -170,7 +170,7 @@ export function HabitList() {
                         <span className="text-2xl sm:text-3xl">{deletingHabit?.icon}</span>
                     </div>
                     <p className="text-surface-600 dark:text-surface-200/50 mb-4 sm:mb-6 text-sm sm:text-base">
-                        Are you sure you want to delete <strong>"{deletingHabit?.title}"</strong>? This action cannot be undone.
+                        Are you sure you want to delete <strong>&quot;{deletingHabit?.title}&quot;</strong>? This action cannot be undone.
                     </p>
                     <div className="flex gap-2 sm:gap-3">
                         <Button

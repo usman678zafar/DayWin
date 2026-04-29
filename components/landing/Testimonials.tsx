@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const reviews = [
     {
@@ -52,7 +53,9 @@ export function Testimonials() {
                                 className="bg-white p-8 rounded-3xl shadow-xl text-left border border-gray-100"
                             >
                                 <div className="flex items-center gap-4 mb-6">
-                                    <img src={review.image} alt={review.name} className="w-12 h-12 rounded-full border-2 border-white shadow-md" />
+                                    <div className="relative w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden">
+                                        <Image src={review.image} alt={review.name} fill className="object-cover" />
+                                    </div>
                                     <div>
                                         <h4 className="font-bold text-[#1f2937]">{review.name}</h4>
                                         <p className="text-sm text-gray-500">{review.type}</p>
@@ -66,7 +69,7 @@ export function Testimonials() {
                                     ))}
                                 </div>
                                 <p className="text-gray-600 leading-relaxed italic">
-                                    "{review.text}"
+                                    &ldquo;{review.text}&rdquo;
                                 </p>
                             </motion.div>
                         ))}

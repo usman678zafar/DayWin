@@ -21,25 +21,25 @@ export default function PublicJoinPage() {
     const [loading, setLoading] = useState(true);
     const [joining, setJoining] = useState(false);
 
-    useEffect(() => {
-        if (id) fetchSquadInfo();
-    }, [id]);
-
     const fetchSquadInfo = async () => {
         try {
             // We use the same API but it should be accessible or we need a public info API
             // For now let's assume the ID is enough to fetch basic info
             const res = await fetch(`/api/squads/${id}`);
-            if (res.ok) {
-                const data = await res.json();
-                setSquad(data.squad);
-            }
+            if (!res.ok) throw new Error("Squad not found");
+            const data = await res.json();
+            setSquad(data);
         } catch (error) {
             console.error(error);
+            router.push("/dashboard/squads");
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (id) fetchSquadInfo();
+    }, [id, fetchSquadInfo]);
 
     const handleJoin = async () => {
         if (status !== "authenticated") {
@@ -90,7 +90,7 @@ export default function PublicJoinPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <p className="text-xs font-black uppercase tracking-[0.3em] text-primary-500">You've been invited</p>
+                        <p className="text-xs font-black uppercase tracking-[0.3em] text-primary-500">You&apos;ve been invited</p>
                         <h1 className="text-4xl font-black tracking-tight">{squad.title}</h1>
                     </div>
 

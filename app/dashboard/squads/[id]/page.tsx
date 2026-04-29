@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import {
     Users,
@@ -28,17 +29,13 @@ export default function SquadDetailPage() {
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (id) fetchSquadDetails();
-    }, [id]);
-
     const fetchSquadDetails = async () => {
         try {
             const res = await fetch(`/api/squads/${id}`);
             if (!res.ok) throw new Error("Squad not found");
             const data = await res.json();
-            setSquad(data.squad);
-            setLogs(data.logs);
+            setSquad(data);
+            setLogs(data.logs || []);
         } catch (error) {
             console.error(error);
             router.push("/dashboard/squads");
@@ -46,6 +43,10 @@ export default function SquadDetailPage() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (id) fetchSquadDetails();
+    }, [id, fetchSquadDetails]);
 
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to delete this squad?")) return;
@@ -173,7 +174,7 @@ export default function SquadDetailPage() {
                                     </div>
                                     <div className="relative h-14 w-14 overflow-hidden rounded-2xl border-2 border-white bg-surface-100 shadow-md dark:border-[#0A0A0F]">
                                         {member.image ? (
-                                            <img src={member.image} alt="" className="h-full w-full object-cover" />
+                                            <Image src={member.image} alt="" fill className="object-cover" />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center bg-primary-100 text-primary-600 dark:bg-primary-900/20">
                                                 <UserIcon className="h-6 w-6" />
@@ -228,7 +229,7 @@ export default function SquadDetailPage() {
                         <Trophy className="h-10 w-10 mb-4 opacity-50" />
                         <h4 className="text-xl font-bold">Squad Goals</h4>
                         <p className="mt-2 text-sm text-primary-100">
-                            The first member to reach 1000 points wins the "Champion" title for this month!
+                            The first member to reach 1000 points wins the &quot;Champion&quot; title for this month!
                         </p>
                         <button className="mt-6 flex w-full items-center justify-center rounded-xl bg-white/10 py-3 text-sm font-bold backdrop-blur-md transition-all hover:bg-white/20">
                             View Prize Details

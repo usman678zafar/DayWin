@@ -41,6 +41,33 @@ export function DailyHabitView({
     const isViewingToday = isToday(selectedDate);
     const isViewingFuture = isFuture(selectedDate) && !isToday(selectedDate);
 
+    const fetchDayLogs = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(
+                `/api/logs?startDate=${selectedDate.toISOString()}&endDate=${selectedDate.toISOString()}`
+            );
+            const data = await response.json();
+            const logs = data.logs || [];
+
+            const habitsWithStatus: DayHabit[] = habits.map((habit) => {
+                const dayLog = logs.find(
+                    (log) => log.habitId === habit.id && isSameDay(new Date(log.date), selectedDate)
+                );
+                return {
+                    ...habit,
+                    dayCompleted: dayLog?.completed || false,
+                };
+            });
+
+            setHabitsWithDayStatus(habitsWithStatus);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (isViewingToday) {
             // For today, use the todayLog from habits
@@ -54,35 +81,7 @@ export function DailyHabitView({
             // For other dates, fetch the logs
             fetchDayLogs();
         }
-    }, [selectedDate, habits]);
-
-    const fetchDayLogs = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch(
-                `/api/logs?startDate=${selectedDate.toISOString()}&endDate=${selectedDate.toISOString()}`
-            );
-            const data = await response.json();
-            const logs = data.logs || [];
-
-            const habitsWithStatus: DayHabit[] = habits.map((habit) => {
-                const dayLog = logs.find(
-                    (log: any) => log.habitId === habit._id && isSameDay(new Date(log.date), selectedDate)
-                );
-                return {
-                    ...habit,
-                    dayCompleted: dayLog?.completed || false,
-                    todayLog: dayLog || null,
-                };
-            });
-
-            setHabitsWithDayStatus(habitsWithStatus);
-        } catch (error) {
-            console.error("Failed to fetch day logs:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    }, [selectedDate, habits, fetchDayLogs, isViewingToday]);
 
     const handleComplete = async (habitId: string, completed: boolean) => {
         if (isViewingFuture) {
@@ -145,7 +144,7 @@ export function DailyHabitView({
                     className="rounded-xl border border-yellow-500/30 bg-yellow-50 p-4 text-center dark:bg-yellow-900/20"
                 >
                     <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                        You're viewing a future date. Habits cannot be marked for future dates.
+                        You&apos;re viewing a future date. Habits cannot be marked for future dates.
                     </p>
                 </motion.div>
             )}
@@ -281,7 +280,7 @@ export function DailyHabitView({
                         <span className="text-3xl">{deletingHabit?.icon}</span>
                     </div>
                     <p className="mb-6 text-black/60 dark:text-white/60">
-                        Are you sure you want to delete <strong>"{deletingHabit?.title}"</strong>? This action cannot be undone.
+                        Are you sure you want to delete <strong>&quot;{deletingHabit?.title}&quot;</strong>? This action cannot be undone.
                     </p>
                     <div className="flex gap-3">
                         <Button variant="secondary" onClick={() => setDeletingHabit(null)} className="flex-1">

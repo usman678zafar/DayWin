@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MoreVertical, Flame, Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ interface HabitCardProps {
     isCompleted?: boolean;
 }
 
-export function HabitCard({
+export const HabitCard = forwardRef<HTMLDivElement, HabitCardProps>(function HabitCard({
     habit,
     onComplete,
     onEdit,
@@ -26,7 +26,7 @@ export function HabitCard({
     index,
     disabled = false,
     isCompleted: isCompletedProp,
-}: HabitCardProps) {
+}, ref) {
     const [isCompleted, setIsCompleted] = useState(isCompletedProp ?? habit.todayLog?.completed ?? false);
     const [isLoading, setIsLoading] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
@@ -62,6 +62,7 @@ export function HabitCard({
 
     return (
         <motion.div
+            ref={ref}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
@@ -261,4 +262,4 @@ export function HabitCard({
             )}
         </motion.div>
     );
-}
+});

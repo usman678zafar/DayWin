@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
@@ -83,7 +84,7 @@ export function Navbar() {
                             <div className="relative h-8 w-8 flex-shrink-0">
                                 <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white dark:bg-[#1A1A20] border border-primary-500/10 shadow-sm overflow-hidden">
                                     {session?.user?.image ? (
-                                        <img src={session.user.image} alt="" className="h-full w-full object-cover" />
+                                        <Image src={session.user.image} alt="" fill className="object-cover" />
                                     ) : (
                                         <span className="font-semibold text-xs text-primary-600">
                                             {session?.user?.name?.[0] || "U"}

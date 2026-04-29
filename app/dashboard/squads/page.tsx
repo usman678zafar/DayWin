@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
     Users,
@@ -20,8 +21,6 @@ export default function SquadsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => { fetchSquads(); }, []);
-
     const fetchSquads = async () => {
         try {
             const res = await fetch("/api/squads");
@@ -33,6 +32,8 @@ export default function SquadsPage() {
             setLoading(false);
         }
     };
+
+    useEffect(() => { fetchSquads(); }, [fetchSquads]);
 
     const filteredSquads = squads.filter(squad =>
         squad.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -104,7 +105,7 @@ export default function SquadsPage() {
                                         {squad.members.slice(0, 3).map((member: any, i: number) => (
                                             <div key={i} className="h-6 w-6 rounded-full border border-white bg-surface-100 dark:border-[#0A0A0F] dark:bg-surface-800 flex items-center justify-center overflow-hidden">
                                                 {member.image ? (
-                                                    <img src={member.image} alt="" className="h-full w-full object-cover" />
+                                                    <Image src={member.image} alt="" fill className="object-cover" />
                                                 ) : <UserIcon className="h-3 w-3 text-surface-400" />}
                                             </div>
                                         ))}

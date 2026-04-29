@@ -66,20 +66,6 @@ export function HabitMatrixView({
     // Reverse for display (most recent first) if more than 7 days
     const displayDays = days.length > 7 ? [...days].reverse() : days;
 
-    useEffect(() => {
-        fetchLogs();
-    }, [startDate, endDate, habits]);
-
-    // Scroll to today on mount for weekly view
-    useEffect(() => {
-        if (viewMode === "weekly" && scrollContainerRef.current) {
-            const todayIndex = displayDays.findIndex((d) => isToday(d));
-            if (todayIndex !== -1) {
-                // Scroll logic can be added here if needed
-            }
-        }
-    }, [viewMode, displayDays]);
-
     const fetchLogs = async () => {
         setIsLoading(true);
         try {
@@ -119,6 +105,10 @@ export function HabitMatrixView({
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchLogs();
+    }, [startDate, endDate, habits, fetchLogs]);
 
     const handleToggle = async (
         habitId: string,
@@ -552,7 +542,7 @@ export function HabitMatrixView({
                         <span className="text-3xl">{deletingHabit?.icon}</span>
                     </div>
                     <p className="mb-6 text-black/60 dark:text-white/60">
-                        Delete <strong>"{deletingHabit?.title}"</strong>? This will remove
+                        Delete <strong>&quot;{deletingHabit?.title}&quot;</strong>? This will remove
                         all completion history. This cannot be undone.
                     </p>
                     <div className="flex gap-3">

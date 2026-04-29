@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
     AreaChart,
@@ -32,29 +32,29 @@ export default function StatsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [dateRange, setDateRange] = useState<DateRange>(defaultRange);
 
-    useEffect(() => {
-        fetchStats();
-    }, [dateRange]);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         setIsLoading(true);
         try {
             const params = new URLSearchParams({
                 startDate: dateRange.startDate.toISOString(),
-                endDate: dateRange.endDate.toISOString(),
+                endDate: dateRange.endDate.toISOString()
             });
             const response = await fetch(`/api/stats?${params}`);
             const data = await response.json();
             setStats(data);
         } catch (error) {
-            console.error("Failed to fetch stats:", error);
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [dateRange]);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
 
     if (isLoading) {
-        return <PageLoader />;
+        return <PageLoader fullScreen={false} />;
     }
 
     const CustomTooltip = ({ active, payload, label }: any) => {

@@ -98,53 +98,93 @@ export default function DashboardPage() {
     const longestStreak = Math.max(...habits.map((h) => h.streak?.longest || 0), 0);
 
     if (isLoading && habits.length === 0) {
-        return <PageLoader />;
+        return <PageLoader fullScreen={false} />;
     }
 
     return (
         <div className="page-container">
             <Header />
 
-            {/* Stats Cards - Ultra Compact */}
-            <div className="mb-2 sm:mb-3 grid grid-cols-3 gap-1.5">
-                <div className="card p-2 group hover:border-primary-500/30 transition-colors">
-                    <div className="flex items-center gap-1 mb-1">
-                        <Activity className="h-2.5 w-2.5 text-blue-500" />
-                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Active</p>
+            {/* Stats Cards - Modern & Spacious */}
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -2 }}
+                    className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-blue-50 to-white p-5 dark:from-blue-950/20 dark:to-white/[0.02] dark:border-white/5"
+                >
+                    <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl" />
+                    <div className="relative">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="rounded-lg bg-blue-500/10 p-2">
+                                <Activity className="h-5 w-5 text-blue-500" />
+                            </div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/40">Active Habits</p>
+                        </div>
+                        <p className="text-3xl font-bold text-black dark:text-white">{totalCount}</p>
                     </div>
-                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{totalCount}</p>
-                </div>
-                <div className="card p-2 group hover:border-success-500/30 transition-colors">
-                    <div className="flex items-center gap-1 mb-1">
-                        <CheckCircle2 className="h-2.5 w-2.5 text-success-500" />
-                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Done</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                    whileHover={{ y: -2 }}
+                    className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-green-50 to-white p-5 dark:from-green-950/20 dark:to-white/[0.02] dark:border-white/5"
+                >
+                    <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-green-500/10 blur-2xl" />
+                    <div className="relative">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="rounded-lg bg-green-500/10 p-2">
+                                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                            </div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/40">Completed</p>
+                        </div>
+                        <p className="text-3xl font-bold text-black dark:text-white">{completedCount}</p>
                     </div>
-                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{completedCount}</p>
-                </div>
-                <div className="card p-2 group hover:border-purple-500/30 transition-colors">
-                    <div className="flex items-center gap-1 mb-1">
-                        <TrendingUp className="h-2.5 w-2.5 text-purple-500" />
-                        <p className="text-[9px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/40">Rate</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    whileHover={{ y: -2 }}
+                    className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-purple-50 to-white p-5 dark:from-purple-950/20 dark:to-white/[0.02] dark:border-white/5"
+                >
+                    <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-purple-500/10 blur-2xl" />
+                    <div className="relative">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="rounded-lg bg-purple-500/10 p-2">
+                                <TrendingUp className="h-5 w-5 text-purple-500" />
+                            </div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-black/50 dark:text-white/40">Success Rate</p>
+                        </div>
+                        <p className="text-3xl font-bold text-black dark:text-white">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
                     </div>
-                    <p className="text-lg font-semibold text-black dark:text-white leading-none">{totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0}%</p>
-                </div>
+                </motion.div>
             </div>
 
-            {/* Action Buttons - Compact */}
-            <div className="mb-3 flex flex-col sm:flex-row gap-1.5">
-                <Link href="/dashboard/habits" className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-black bg-black px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-white hover:bg-black/80 transition-all">
-                    <Plus className="h-3 w-3" />
+            {/* Action Buttons - Modern */}
+            <div className="mb-8 flex flex-col sm:flex-row gap-3">
+                <Link
+                    href="/dashboard/habits"
+                    className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-black/80 hover:shadow-xl hover:shadow-black/30 active:scale-[0.98] dark:bg-white dark:text-black dark:shadow-white/10 dark:hover:bg-white/90"
+                >
+                    <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
                     New Habit
                 </Link>
-                <Link href="/dashboard/stats" className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-black/10 dark:border-white/10 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                    <BarChart3 className="h-3 w-3" />
+                <Link
+                    href="/dashboard/stats"
+                    className="group inline-flex items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-6 py-3 text-sm font-semibold text-black/60 shadow-sm transition-all hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.02] dark:text-white/60 dark:hover:bg-white/5 dark:hover:text-white"
+                >
+                    <BarChart3 className="h-4 w-4" />
                     Analytics
                 </Link>
             </div>
 
-            {/* Main Content Grid - Mobile Stack */}
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            {/* Main Content Grid */}
+            <div className="grid gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-6">
                     <DailyProgress
                         completed={completedCount}
                         total={totalCount}
@@ -155,14 +195,14 @@ export default function DashboardPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
+                        transition={{ delay: 0.15 }}
                     >
-                        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-2">Today&apos;s Habits</h2>
+                        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-black/40 dark:text-white/40">Today&apos;s Habits</h2>
                         <HabitList />
                     </motion.div>
                 </div>
 
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-6">
                     <MotivationalQuote />
                     <WeeklyChart data={weeklyData} />
                 </div>

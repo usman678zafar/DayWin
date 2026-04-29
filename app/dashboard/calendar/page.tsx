@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
     format,
@@ -33,9 +33,8 @@ export default function CalendarPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => { fetchHabits(); }, [fetchHabits]);
-    useEffect(() => { fetchLogs(); }, [currentMonth]);
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         setIsLoading(true);
         const start = startOfMonth(currentMonth);
         const end = endOfMonth(currentMonth);
@@ -48,7 +47,9 @@ export default function CalendarPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentMonth]);
+
+    useEffect(() => { fetchLogs(); }, [currentMonth, fetchLogs]);
 
     const handleToggleHabit = async (habitId: string, date: Date, currentCompleted: boolean) => {
         if (isFuture(date) && !isToday(date)) {
