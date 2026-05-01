@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import {
     Users,
@@ -95,7 +94,7 @@ export default function SquadsPage() {
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={squad._id}>
                             <Link
                                 href={`/dashboard/squads/${squad._id}`}
-                                className="group block relative overflow-hidden rounded-2xl border border-surface-200/50 bg-white/50 p-3 backdrop-blur-sm transition-all duration-300 hover:border-primary-500/30 dark:border-white/[0.05] dark:bg-white/[0.02]"
+                                className="group block relative overflow-hidden rounded-2xl border border-surface-200/50 bg-white/50 p-3 backdrop-blur-sm transition-all duration-300 hover:border-primary-500/30 hover:shadow-lg hover:shadow-primary-500/5 dark:border-white/[0.05] dark:bg-white/[0.02]"
                             >
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100/50 text-primary-600 dark:bg-primary-900/20">
@@ -103,12 +102,17 @@ export default function SquadsPage() {
                                     </div>
                                     <div className="flex -space-x-2">
                                         {squad.members.slice(0, 3).map((member: any, i: number) => (
-                                            <div key={i} className="h-6 w-6 rounded-full border border-white bg-surface-100 dark:border-[#0A0A0F] dark:bg-surface-800 flex items-center justify-center overflow-hidden">
+                                            <div key={i} className="h-6 w-6 rounded-full border border-white bg-surface-100 dark:border-[#0A0A0F] dark:bg-surface-800 flex items-center justify-center overflow-hidden flex-shrink-0">
                                                 {member.image ? (
-                                                    <Image src={member.image} alt="" fill className="object-cover" />
+                                                    <img src={member.image} alt="" className="h-full w-full object-cover" />
                                                 ) : <UserIcon className="h-3 w-3 text-surface-400" />}
                                             </div>
                                         ))}
+                                        {squad.members.length > 3 && (
+                                            <div className="h-6 w-6 rounded-full border border-white bg-surface-200 text-[8px] font-black text-surface-600 dark:border-[#0A0A0F] dark:bg-white/10 flex items-center justify-center">
+                                                +{squad.members.length - 3}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <h3 className="text-sm font-semibold text-surface-900 dark:text-white group-hover:text-primary-600 transition-colors uppercase tracking-tight">{squad.title}</h3>
@@ -116,10 +120,12 @@ export default function SquadsPage() {
                                 <div className="mt-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center gap-1 text-[9px] font-semibold uppercase text-black/50 dark:text-white/50">
-                                            <Trophy className="h-3 w-3" /> {squad.habitTemplates?.length || 0}
+                                            <Trophy className="h-3 w-3" /> {squad.habitTemplates?.length || 0} habits
                                         </div>
                                         <div className="flex items-center gap-1 text-[9px] font-semibold uppercase text-black/50 dark:text-white/50">
-                                            <Clock className="h-3 w-3" /> {new Date(squad.startDate).toLocaleDateString()}
+                                            <Clock className="h-3 w-3" />
+                                            {new Date(squad.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                            {squad.endDate ? ` → ${new Date(squad.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : " → ongoing"}
                                         </div>
                                     </div>
                                     <ChevronRight className="h-4 w-4 text-black/20 dark:text-white/20 group-hover:translate-x-1 transition-transform" />

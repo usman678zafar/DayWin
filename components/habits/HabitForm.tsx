@@ -25,6 +25,7 @@ interface HabitFormProps {
     onSubmit: (data: Partial<Habit>) => Promise<void>;
     onCancel: () => void;
     defaultHabitType?: HabitType;
+    isSquadHabit?: boolean;
 }
 
 // Organized icons by category
@@ -127,11 +128,18 @@ const daysOfWeek = [
 
 type FormStep = "type" | "basics" | "schedule" | "review";
 
-export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: HabitFormProps) {
+export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType, isSquadHabit }: HabitFormProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [currentStep, setCurrentStep] = useState<FormStep>("type");
+    const [currentStep, setCurrentStep] = useState<FormStep>(isSquadHabit ? "basics" : "type");
     const [iconSearch, setIconSearch] = useState("");
     const [showAllIcons, setShowAllIcons] = useState(false);
+
+    // Sync currentStep with isSquadHabit
+    useEffect(() => {
+        if (isSquadHabit && currentStep === "type") {
+            setCurrentStep("basics");
+        }
+    }, [isSquadHabit, currentStep]);
 
     const [formData, setFormData] = useState({
         title: habit?.title || "",
@@ -139,7 +147,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
         icon: habit?.icon || "Star",
         color: (habit?.color as HabitColor) || "purple",
         category: (habit?.category as HabitCategory) || "other",
-        habitType: (habit?.habitType as HabitType) || defaultHabitType || "weekly",
+        habitType: (habit?.habitType as HabitType) || defaultHabitType || (isSquadHabit ? "custom" : "weekly"),
         customPeriodDays: habit?.customPeriodDays || 14,
         frequency: {
             type: habit?.frequency?.type || "daily",
@@ -228,7 +236,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
         }
     };
 
-    const steps: FormStep[] = ["type", "basics", "schedule", "review"];
+    const steps: FormStep[] = isSquadHabit ? ["basics", "schedule", "review"] : ["type", "basics", "schedule", "review"];
 
     return (
         <div className="space-y-3 sm:space-y-4">
@@ -270,8 +278,8 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
             </div>
 
             <AnimatePresence mode="wait">
-                {/* Step 1: Habit Type Selection */}
-                {currentStep === "type" && (
+                {/* Step 1: Habit Type Selection (Disabled for squad habits) */}
+                {currentStep === "type" && !isSquadHabit && (
                     <motion.div
                         key="type"
                         initial={{ opacity: 0, x: -20 }}
@@ -333,7 +341,8 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             })}
                         </div>
 
-                        {/* Tracking Period Date Range Picker - Always shown */}
+                        {/* Tracking Period Date Range Picker - Hidden for squad habits */}
+                        {!isSquadHabit && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -383,6 +392,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                                 </div>
                             </div>
                         </motion.div>
+                        )}
 
                         {/* Next Button */}
                         <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
@@ -410,12 +420,14 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                         exit={{ opacity: 0, x: 20 }}
                         className="space-y-4 sm:space-y-6"
                     >
-                        {/* Habit Type Badge - Mini */}
+                        {/* Habit Type Badge - Mini (hidden for squad habits) */}
+                        {!isSquadHabit && (
                         <div className="flex justify-center">
                             <span className="flex items-center gap-1 rounded bg-black/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40">
                                 {formData.habitType} ({getPeriodDays()}D)
                             </span>
                         </div>
+                        )}
 
                         {/* Habit Name */}
                         <div>
