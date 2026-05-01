@@ -14,8 +14,6 @@ import {
     Share2,
     User as UserIcon,
     Loader2,
-    CheckCircle2,
-    Crown,
     X,
     Plus,
     Edit2,
@@ -28,19 +26,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
-import { Habit, habitColors, habitCategories } from "@/types";
+import { Habit, habitColors } from "@/types";
 import { 
     format, 
-    startOfWeek, 
-    endOfWeek, 
     eachDayOfInterval, 
-    isSameDay, 
     isToday, 
     isFuture,
-    addDays
 } from "date-fns";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import toast from "react-hot-toast";
+import { SquadDetailSkeleton } from "@/components/ui/PageSkeletons";
 
 export default function SquadDetailPage() {
     const { id } = useParams();
@@ -201,12 +196,7 @@ export default function SquadDetailPage() {
     }, [squad]);
 
     if (loading) {
-        return (
-            <div className="flex min-h-[600px] flex-col items-center justify-center gap-4">
-                <Loader2 className="h-10 w-10 animate-spin text-primary-600" />
-                <p className="font-bold text-surface-500">Loading squad details...</p>
-            </div>
-        );
+        return <SquadDetailSkeleton />;
     }
 
     if (!squad) return null;
@@ -274,7 +264,7 @@ export default function SquadDetailPage() {
                                 {(squad.members || []).slice(0, 4).map((member: any, i: number) => (
                                     <div key={i} className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white bg-surface-100 dark:border-[#0A0A0F]">
                                         {member.image ? (
-                                            <Image src={member.image} alt="" fill className="object-cover" />
+                                            <Image src={member.image} alt="" fill sizes="32px" className="object-cover" />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center bg-surface-200 text-surface-500 dark:bg-white/10 dark:text-surface-300">
                                                 <UserIcon className="h-4 w-4" />
@@ -354,10 +344,15 @@ export default function SquadDetailPage() {
                                                 </div>
                                             </th>
                                         ))}
-                                        <th className="sticky right-10 z-20 px-3 py-3 text-center bg-white dark:bg-[#0A0A0F] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                        <th className={cn(
+                                            "sticky z-20 px-3 py-3 text-center bg-white dark:bg-[#0A0A0F] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]",
+                                            isOwner ? "right-10" : "right-0"
+                                        )}>
                                             <TrendingUp className="h-3 w-3 mx-auto text-primary-400" />
                                         </th>
-                                        <th className="sticky right-0 z-20 w-10 bg-white dark:bg-[#0A0A0F] border-l border-black/5 dark:border-white/5" />
+                                        {isOwner && (
+                                            <th className="sticky right-0 z-20 w-10 bg-white dark:bg-[#0A0A0F] border-l border-black/5 dark:border-white/5" />
+                                        )}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-surface-100 dark:divide-white/5">
@@ -367,7 +362,8 @@ export default function SquadDetailPage() {
                                         const colors = habitColors[template.color as keyof typeof habitColors] || habitColors.purple;
                                         const habitLogs = habit ? logs.filter(l => l.habitId === habit._id) : [];
                                         const completedCount = habitLogs.filter(l => l.completed).length;
-                                        const completionRate = Math.round((completedCount / days.filter(d => !isFuture(d) || isToday(d)).length) * 100);
+                                        const elapsedDays = days.filter(d => !isFuture(d) || isToday(d)).length;
+                                        const completionRate = elapsedDays > 0 ? Math.round((completedCount / elapsedDays) * 100) : 0;
 
                                         return (
                                             <tr key={index} className="group hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors">
@@ -423,13 +419,20 @@ export default function SquadDetailPage() {
                                                         </td>
                                                     );
                                                 })}
-                                                <td className="sticky right-10 z-10 px-2 py-2 text-center bg-white dark:bg-[#0A0A0F] group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
+                                                <td className={cn(
+                                                    "sticky z-10 px-2 py-2 text-center bg-white dark:bg-[#0A0A0F] group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors",
+                                                    isOwner ? "right-10" : "right-0"
+                                                )}>
                                                     <span className={cn(
                                                         "text-[10px] font-black",
                                                         completionRate >= 80 ? "text-green-500" : completionRate >= 50 ? "text-yellow-500" : "text-red-400"
                                                     )}>{completionRate}%</span>
                                                 </td>
-                                                <td className="sticky right-0 z-10 px-1 py-1.5 align-middle bg-white dark:bg-[#0A0A0F] group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 transition-colors">
+                                                {isOwner && (
+                                                <td className={cn(
+                                                    "sticky right-0 z-10 px-1 py-1.5 align-middle bg-white dark:bg-[#0A0A0F] group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-black/5 dark:border-white/5 transition-colors",
+                                                    menuOpenFor === index && "z-30"
+                                                )}>
                                                     <div className="relative flex justify-center">
                                                         <button 
                                                             onClick={(e) => {
@@ -445,10 +448,10 @@ export default function SquadDetailPage() {
                                                                 <>
                                                                     <div className="fixed inset-0 z-10" onClick={() => setMenuOpenFor(null)} />
                                                                     <motion.div 
-                                                                        initial={{ opacity: 0, scale: 0.95, y: -10 }} 
+                                                                        initial={{ opacity: 0, scale: 0.95, y: 6 }} 
                                                                         animate={{ opacity: 1, scale: 1, y: 0 }} 
-                                                                        exit={{ opacity: 0, scale: 0.95, y: -10 }} 
-                                                                        className="absolute right-0 bottom-full z-[100] mb-1 w-32 bg-white dark:bg-surface-900 border border-black/10 dark:border-white/10 rounded-lg shadow-2xl p-1 backdrop-blur-xl"
+                                                                        exit={{ opacity: 0, scale: 0.95, y: 6 }} 
+                                                                        className="absolute right-0 bottom-full z-[100] mb-1 w-32 bg-white dark:bg-surface-900 border border-black/10 dark:border-white/10 rounded-lg shadow-2xl p-1 backdrop-blur-xl origin-bottom-right"
                                                                     >
                                                                         <button onClick={() => { openHabitModal(template, index); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-bold hover:bg-black/5 dark:hover:bg-white/5 rounded text-black/70 dark:text-white/70"><Edit2 className="h-3 w-3" /> Edit</button>
                                                                         <button onClick={() => { deleteHabit(index); setMenuOpenFor(null); }} className="flex w-full items-center gap-2 px-2 py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"><Trash2 className="h-3 w-3" /> Delete</button>
@@ -458,6 +461,7 @@ export default function SquadDetailPage() {
                                                         </AnimatePresence>
                                                     </div>
                                                 </td>
+                                                )}
                                             </tr>
                                         );
                                     })}
@@ -519,7 +523,7 @@ export default function SquadDetailPage() {
                                     <div key={member._id} className="flex items-center gap-4 rounded-2xl border border-surface-100 bg-surface-50 p-3 dark:border-surface-800 dark:bg-surface-900/50">
                                         <div className="relative h-12 w-12 overflow-hidden rounded-full bg-surface-200 dark:bg-surface-800 border-2 border-white dark:border-[#0A0A0F]">
                                             {member.image ? (
-                                                <Image src={member.image} alt="" fill className="object-cover" />
+                                                <Image src={member.image} alt="" fill sizes="48px" className="object-cover" />
                                             ) : (
                                                 <div className="flex h-full w-full items-center justify-center text-surface-500">
                                                     <UserIcon className="h-5 w-5" />

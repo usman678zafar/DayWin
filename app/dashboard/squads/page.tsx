@@ -10,7 +10,6 @@ import {
     Trophy,
     Clock,
     User as UserIcon,
-    Loader2,
     Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,8 +84,28 @@ export default function SquadsPage() {
 
             {/* Squads Grid - High Density */}
             {loading ? (
-                <div className="flex min-h-[200px] flex-col items-center justify-center gap-2">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="rounded-2xl border border-black/5 dark:border-white/[0.05] p-3 space-y-3 animate-pulse">
+                            <div className="flex items-center justify-between">
+                                <div className="h-8 w-8 rounded-lg bg-black/5 dark:bg-white/5" />
+                                <div className="flex -space-x-2">
+                                    {[...Array(3)].map((_, j) => (
+                                        <div key={j} className="h-6 w-6 rounded-full bg-black/5 dark:bg-white/5 ring-2 ring-white dark:ring-[#0A0A0F]" />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="h-4 w-3/4 rounded-md bg-black/5 dark:bg-white/5" />
+                            <div className="h-3 w-full rounded-md bg-black/5 dark:bg-white/5" />
+                            <div className="flex items-center justify-between pt-1">
+                                <div className="flex gap-3">
+                                    <div className="h-3 w-16 rounded-md bg-black/5 dark:bg-white/5" />
+                                    <div className="h-3 w-20 rounded-md bg-black/5 dark:bg-white/5" />
+                                </div>
+                                <div className="h-4 w-4 rounded bg-black/5 dark:bg-white/5" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : filteredSquads.length > 0 ? (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -27,13 +27,16 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { SettingsSkeleton } from "@/components/ui/PageSkeletons";
 import { useNotifications } from "@/hooks/usePWA";
 import { Modal } from "@/components/ui/Modal";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 
 export default function SettingsPage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
+
+    if (status === "loading") return <SettingsSkeleton />;
     const { theme, setTheme } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);

@@ -10,7 +10,7 @@ import { MotivationalQuote } from "@/components/dashboard/MotivationalQuote";
 import { HabitList } from "@/components/habits/HabitList";
 import { useHabits } from "@/hooks/useHabits";
 import { Loader2, Plus, BarChart3, Activity, CheckCircle2, TrendingUp } from "lucide-react";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { DashboardSkeleton } from "@/components/ui/PageSkeletons";
 import {
     startOfWeek,
     endOfWeek,
@@ -98,7 +98,7 @@ export default function DashboardPage() {
     const longestStreak = Math.max(...habits.map((h) => h.streak?.longest || 0), 0);
 
     if (isLoading && habits.length === 0) {
-        return <PageLoader fullScreen={false} />;
+        return <DashboardSkeleton />;
     }
 
     return (

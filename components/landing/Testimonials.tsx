@@ -54,7 +54,7 @@ export function Testimonials() {
                             >
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="relative w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden">
-                                        <Image src={review.image} alt={review.name} fill className="object-cover" />
+                                        <Image src={review.image} alt={review.name} fill sizes="48px" className="object-cover" />
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-[#1f2937]">{review.name}</h4>

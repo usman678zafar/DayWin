@@ -34,7 +34,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
 import { HabitIcon } from "@/components/habits/HabitIcon";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { HabitsSkeleton } from "@/components/ui/PageSkeletons";
 import toast from "react-hot-toast";
 
 // Types
@@ -58,7 +58,7 @@ const habitTypeTabs: { value: HabitType; label: string; icon: React.ElementType;
 
 export default function HabitsPage() {
     return (
-        <Suspense fallback={<PageLoader fullScreen={false} />}>
+        <Suspense fallback={<HabitsSkeleton />}>
             <HabitsPageContent />
         </Suspense>
     );
@@ -296,7 +296,7 @@ function HabitsPageContent() {
             setDeletingHabit(null);
         }
     };
-    if (isLoading) return <PageLoader fullScreen={false} />;
+    if (isLoading) return <HabitsSkeleton />;
 
     return (
         <div className="page-container">

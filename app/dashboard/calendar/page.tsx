@@ -17,12 +17,12 @@ import {
     isFuture,
 } from "date-fns";
 import { ChevronLeft, ChevronRight, Check, Flame, Calendar as CalendarIcon, TrendingUp } from "lucide-react";
+import { CalendarCellsSkeleton } from "@/components/ui/PageSkeletons";
 import { cn } from "@/lib/utils";
 import { useHabits } from "@/hooks/useHabits";
 import { Button } from "@/components/ui/Button";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import { habitColors } from "@/types";
-import { PageLoader } from "@/components/ui/PageLoader";
 import toast from "react-hot-toast";
 
 export default function CalendarPage() {
@@ -79,9 +79,6 @@ export default function CalendarPage() {
     const monthEnd = endOfMonth(monthStart);
     const startDate = startOfWeek(monthStart);
     const endDate = endOfWeek(monthEnd);
-
-    const rows = [];
-    let day = startDate;
 
     const renderCells = () => {
         const rows = [];
@@ -168,7 +165,7 @@ export default function CalendarPage() {
                                 </div>
                             ))}
                         </div>
-                        {isLoading ? <div className="py-20 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div> : renderCells()}
+                        {isLoading ? <CalendarCellsSkeleton /> : renderCells()}
 
                         {/* Legend - Mini */}
                         <div className="flex items-center justify-center gap-4 mt-3 pb-1">
@@ -239,21 +236,3 @@ export default function CalendarPage() {
     );
 }
 
-function Loader2({ className }: { className?: string }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={cn("animate-spin", className)}
-        >
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-        </svg>
-    )
-}

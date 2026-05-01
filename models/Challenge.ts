@@ -13,7 +13,7 @@ export interface IChallenge extends Document {
         category: string;
         targetCount: number;
         frequency: {
-            type: "daily" | "weekly";
+            type: "daily" | "weekly" | "custom";
             daysOfWeek?: number[];
         };
     }[];

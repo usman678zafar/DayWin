@@ -57,9 +57,10 @@ export function MotivationalQuote() {
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={quote.text}
-                        initial={false}
+                        initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
+                        transition={{ duration: 0.22 }}
                     >
                         <p className="text-sm sm:text-base font-bold leading-relaxed text-black dark:text-white">
                             &ldquo;{quote.text}&rdquo;

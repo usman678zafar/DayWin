@@ -84,7 +84,7 @@ export function Navbar() {
                             <div className="relative h-8 w-8 flex-shrink-0">
                                 <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white dark:bg-[#1A1A20] border border-primary-500/10 shadow-sm overflow-hidden">
                                     {session?.user?.image ? (
-                                        <Image src={session.user.image} alt="" fill className="object-cover" />
+                                        <Image src={session.user.image} alt="" fill sizes="32px" className="object-cover" />
                                     ) : (
                                         <span className="font-semibold text-xs text-primary-600">
                                             {session?.user?.name?.[0] || "U"}

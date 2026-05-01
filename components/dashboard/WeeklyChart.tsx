@@ -10,6 +10,7 @@ import {
     ResponsiveContainer,
     Cell,
 } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface WeeklyChartProps {
     data: {
@@ -84,6 +85,3 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
     );
 }
 
-function cn(...inputs: any[]) {
-    return inputs.filter(Boolean).join(" ");
-}

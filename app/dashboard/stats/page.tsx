@@ -13,13 +13,13 @@ import {
     Pie,
     Cell,
 } from "recharts";
-import { Flame, Trophy, Zap, Target, Award, Loader2, Star, TrendingUp } from "lucide-react";
+import { Flame, Trophy, Zap, Target, Award, Star, TrendingUp } from "lucide-react";
 import { subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { QuickStats } from "@/components/dashboard/QuickStats";
 import { DateRangePicker, DateRange } from "@/components/habits/DateRangePicker";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import { cn } from "@/lib/utils";
-import { PageLoader } from "@/components/ui/PageLoader";
+import { StatsSkeleton } from "@/components/ui/PageSkeletons";
 
 const defaultRange: DateRange = {
     startDate: subDays(new Date(), 29),
@@ -54,7 +54,7 @@ export default function StatsPage() {
     }, [fetchStats]);
 
     if (isLoading) {
-        return <PageLoader fullScreen={false} />;
+        return <StatsSkeleton />;
     }
 
     const CustomTooltip = ({ active, payload, label }: any) => {

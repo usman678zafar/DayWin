@@ -87,7 +87,10 @@ export async function PATCH(
         // If habitTemplates were updated, sync with members' Habit records
         if (body.habitTemplates) {
             const members = [...squad.members];
-            if (!members.includes(squad.ownerId)) {
+            const ownerAlreadyInList = members.some(
+                (m: any) => m.toString() === squad.ownerId.toString()
+            );
+            if (!ownerAlreadyInList) {
                 members.push(squad.ownerId);
             }
 

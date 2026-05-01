@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronRight, ChevronLeft, Search, X, Check, CalendarDays, Settings, Calendar, Plus, CalendarRange
@@ -134,12 +134,12 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType, isSquad
     const [iconSearch, setIconSearch] = useState("");
     const [showAllIcons, setShowAllIcons] = useState(false);
 
-    // Sync currentStep with isSquadHabit
+    // If isSquadHabit changes after mount, ensure we're not on the "type" step
     useEffect(() => {
-        if (isSquadHabit && currentStep === "type") {
-            setCurrentStep("basics");
+        if (isSquadHabit) {
+            setCurrentStep(prev => prev === "type" ? "basics" : prev);
         }
-    }, [isSquadHabit, currentStep]);
+    }, [isSquadHabit]);
 
     const [formData, setFormData] = useState({
         title: habit?.title || "",
