@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { addDays } from "date-fns";
 
 export default function NewSquadPage() {
     const router = useRouter();
@@ -22,6 +24,8 @@ export default function NewSquadPage() {
     const [description, setDescription] = useState("");
     const [email, setEmail] = useState("");
     const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
+    const [startDate, setStartDate] = useState<Date>(new Date());
+    const [endDate, setEndDate] = useState<Date>(addDays(new Date(), 13));
 
     // Default habits that will be tracked in the squad
     const [habits, setHabits] = useState([
@@ -53,7 +57,9 @@ export default function NewSquadPage() {
                     title,
                     description,
                     invitedEmails,
-                    habitTemplates: habits
+                    habitTemplates: habits,
+                    startDate,
+                    endDate
                 })
             });
 
@@ -88,7 +94,7 @@ export default function NewSquadPage() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Basic Info Card */}
-                <div className="rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
+                <div className="relative z-30 rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
                     <div className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-surface-900 dark:text-white px-2">Squad Name</label>
@@ -110,11 +116,33 @@ export default function NewSquadPage() {
                                 className="w-full rounded-2xl border border-surface-200/50 bg-white px-4 py-4 text-sm outline-none transition-all focus:border-primary-500/50 focus:ring-4 focus:ring-primary-500/5 dark:border-white/[0.05] dark:bg-white/[0.05]"
                             />
                         </div>
+
+                        <div className="grid gap-6 sm:grid-cols-2 pt-2">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-surface-900 dark:text-white px-2 uppercase tracking-widest text-[10px]">Start Date</label>
+                                <DatePicker 
+                                    value={startDate} 
+                                    onChange={(date) => {
+                                        setStartDate(date);
+                                        if (date > endDate) setEndDate(addDays(date, 1));
+                                    }}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-surface-900 dark:text-white px-2 uppercase tracking-widest text-[10px]">End Date</label>
+                                <DatePicker 
+                                    value={endDate} 
+                                    onChange={(date) => {
+                                        if (date >= startDate) setEndDate(date);
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Invite Members Card */}
-                <div className="rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
+                <div className="relative z-20 rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100/50 text-orange-600 dark:bg-orange-900/20">
                             <Mail className="h-5 w-5" />
@@ -160,7 +188,7 @@ export default function NewSquadPage() {
                 </div>
 
                 {/* Habit Tracking Card */}
-                <div className="rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
+                <div className="relative z-10 rounded-[2.5rem] border border-surface-200/50 bg-white/50 p-8 backdrop-blur-sm dark:border-white/[0.05] dark:bg-white/[0.02]">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100/50 text-blue-600 dark:bg-blue-900/20">
                             <Trophy className="h-5 w-5" />

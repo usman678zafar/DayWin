@@ -36,7 +36,8 @@ import {
     eachDayOfInterval, 
     isSameDay, 
     isToday, 
-    isFuture 
+    isFuture,
+    addDays
 } from "date-fns";
 import { HabitIcon } from "@/components/habits/HabitIcon";
 import toast from "react-hot-toast";
@@ -109,7 +110,10 @@ export default function SquadDetailPage() {
             setEditingHabitData(habit);
             setEditingHabitIndex(index as number);
         } else {
-            setEditingHabitData(undefined);
+            setEditingHabitData({
+                startDate: squad?.startDate ? new Date(squad.startDate) : new Date(),
+                endDate: squad?.endDate ? new Date(squad.endDate) : undefined
+            });
             setEditingHabitIndex(null);
         }
         setIsHabitModalOpen(true);
@@ -189,10 +193,11 @@ export default function SquadDetailPage() {
 
     const isOwner = squad?.ownerId?._id === session?.user?.id;
 
-    // Matrix Days (Last 7 days)
+    // Matrix Days - Begin from squad.startDate
+    const squadStart = new Date(squad.startDate);
     const days = eachDayOfInterval({
-        start: startOfWeek(new Date(), { weekStartsOn: 1 }),
-        end: endOfWeek(new Date(), { weekStartsOn: 1 })
+        start: squadStart,
+        end: addDays(squadStart, 6)
     });
 
     return (
@@ -239,7 +244,7 @@ export default function SquadDetailPage() {
                             <div className="flex flex-wrap items-center gap-3 pt-0.5 md:ml-[52px]">
                                 <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-surface-400">
                                     <Calendar className="h-3.5 w-3.5 text-primary-500" />
-                                    Started {new Date(squad.startDate).toLocaleDateString()}
+                                    {format(new Date(squad.startDate), "MMM d, yyyy")} - {squad.endDate ? format(new Date(squad.endDate), "MMM d, yyyy") : "Ongoing"}
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-surface-400">
                                     <Trophy className="h-3.5 w-3.5 text-orange-500" />

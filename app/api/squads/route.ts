@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { title, description, invitedEmails, habitTemplates } = body;
+        const { title, description, invitedEmails, habitTemplates, startDate, endDate } = body;
 
         if (!title) {
             return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -58,6 +58,13 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Ensure habit templates have the squad dates
+        const templatesWithDates = habitTemplates.map((t: any) => ({
+            ...t,
+            startDate: startDate || new Date(),
+            endDate: endDate
+        }));
+
         const newSquad = await Challenge.create({
             title,
             description,
@@ -66,23 +73,18 @@ export async function POST(req: NextRequest) {
             invitedEmails: invitedEmails.filter((email: string) =>
                 !existingUsers.some(user => user.email === email)
             ),
-            habitTemplates,
-            startDate: new Date(),
+            habitTemplates: templatesWithDates,
+            startDate: startDate || new Date(),
+            endDate: endDate,
             status: "active"
         });
 
         // Create habits for all initial members (owner + existing users)
         for (const memberId of members) {
-            for (const template of habitTemplates) {
+            for (const template of templatesWithDates) {
                 await Habit.create({
+                    ...template,
                     userId: memberId,
-                    title: template.title,
-                    icon: template.icon,
-                    color: template.color,
-                    category: template.category,
-                    targetCount: template.targetCount,
-                    frequency: template.frequency,
-                    startDate: new Date(),
                     squadId: newSquad._id,
                 });
             }

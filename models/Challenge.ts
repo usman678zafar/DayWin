@@ -61,9 +61,11 @@ const ChallengeSchema = new Schema<IChallenge>(
                 category: String,
                 targetCount: { type: Number, default: 1 },
                 frequency: {
-                    type: { type: String, enum: ["daily", "weekly"], default: "daily" },
+                    type: { type: String, enum: ["daily", "weekly", "custom"], default: "daily" },
                     daysOfWeek: [Number],
                 },
+                startDate: Date,
+                endDate: Date,
             },
         ],
         startDate: {

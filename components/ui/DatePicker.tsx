@@ -70,7 +70,7 @@ export function DatePicker({ value, onChange, label, className, align = "left" }
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const isToday = isSameDay(day, new Date());
 
-                days.push(
+                                days.push(
                     <button
                         key={day.toString()}
                         type="button"
@@ -80,11 +80,11 @@ export function DatePicker({ value, onChange, label, className, align = "left" }
                         }}
                         disabled={!isCurrentMonth}
                         className={cn(
-                            "w-8 h-8 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all",
-                            !isCurrentMonth && "opacity-10 cursor-not-allowed",
-                            isCurrentMonth && !isSelected && "hover:bg-black/5 dark:hover:bg-white/10",
+                            "w-8 h-8 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-all",
+                            !isCurrentMonth && "text-black/10 dark:text-white/10 cursor-not-allowed",
+                            isCurrentMonth && !isSelected && "text-surface-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10",
                             isSelected && "bg-black text-white dark:bg-white dark:text-black shadow-lg",
-                            isToday && !isSelected && "ring-1 ring-black/20 dark:ring-white/20"
+                            isToday && !isSelected && "ring-1 ring-primary-500/50"
                         )}
                     >
                         {format(day, "d")}
@@ -114,7 +114,7 @@ export function DatePicker({ value, onChange, label, className, align = "left" }
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex w-full items-center gap-2 rounded-xl border border-black/15 bg-white px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-black transition hover:border-black/30 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
             >
-                <Calendar className="h-4 w-4 text-[#4D7CFE]" />
+                <Calendar className="h-4 w-4 text-primary-500" />
                 <span className="truncate">
                     {format(value, "MMM d, yyyy")}
                 </span>
@@ -127,13 +127,10 @@ export function DatePicker({ value, onChange, label, className, align = "left" }
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         className={cn(
-                            "fixed sm:absolute z-[100] mt-2 w-[calc(100vw-2.5rem)] sm:w-72 rounded-2xl border border-black/10 bg-white p-3 sm:p-4 shadow-2xl dark:border-white/10 dark:bg-[#1a1a1a]",
-                            // Mobile positioning (centered)
-                            "left-5 right-5 top-1/2 -translate-y-1/2 sm:top-full sm:translate-y-0",
-                            // Desktop positioning (based on align prop)
-                            align === "left" && "sm:left-0 sm:right-auto",
-                            align === "right" && "sm:left-auto sm:right-0",
-                            align === "center" && "sm:left-1/2 sm:-translate-x-1/2"
+                            "absolute z-[9999] mt-2 w-72 rounded-2xl border border-black/10 bg-white p-3 sm:p-4 shadow-2xl dark:border-white/10 dark:bg-[#1a1a1a]",
+                            align === "left" && "left-0 right-auto",
+                            align === "right" && "left-auto right-0",
+                            align === "center" && "left-1/2 -translate-x-1/2"
                         )}
                     >
                         {/* mobile backdrop for centered modal style */}

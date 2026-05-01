@@ -333,59 +333,56 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType }: Habit
                             })}
                         </div>
 
-                        {/* Custom Period Date Range Picker */}
-                        {formData.habitType === "custom" && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="rounded-xl border border-black/10 bg-white/50 p-3 sm:p-5 dark:border-white/10 dark:bg-white/5"
-                            >
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <CalendarRange className="h-4 w-4 text-[#4D7CFE]" />
-                                        <h4 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
-                                            Tracking Period
-                                        </h4>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                        <DatePicker
-                                            label="Start Date"
-                                            value={formData.startDate}
-                                            onChange={(date) => {
-                                                setFormData({ ...formData, startDate: date });
-                                                if (date > formData.endDate) {
-                                                    setFormData({ ...formData, startDate: date, endDate: addDays(date, 1) });
-                                                }
-                                            }}
-                                            className="relative"
-                                            align="left"
-                                        />
-                                        <DatePicker
-                                            label="End Date"
-                                            value={formData.endDate}
-                                            onChange={(date) => {
-                                                if (date >= formData.startDate) {
-                                                    setFormData({ ...formData, endDate: date });
-                                                }
-                                            }}
-                                            className="relative"
-                                            align="right"
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center justify-between px-1 pt-2">
-                                        <span className="text-xs font-semibold text-black/50 dark:text-white/40">
-                                            Total duration:
-                                        </span>
-                                        <span className="text-xs font-black text-[#4D7CFE]">
-                                            {differenceInDays(formData.endDate, formData.startDate) + 1} Days
-                                        </span>
-                                    </div>
+                        {/* Tracking Period Date Range Picker - Always shown */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="rounded-xl border border-black/10 bg-white/50 p-3 sm:p-5 dark:border-white/10 dark:bg-white/5"
+                        >
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <CalendarRange className="h-4 w-4 text-[#4D7CFE]" />
+                                    <h4 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
+                                        Tracking Period
+                                    </h4>
                                 </div>
-                            </motion.div>
-                        )}
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                    <DatePicker
+                                        label="Start Date"
+                                        value={formData.startDate}
+                                        onChange={(date) => {
+                                            setFormData({ ...formData, startDate: date });
+                                            if (date > formData.endDate) {
+                                                setFormData({ ...formData, startDate: date, endDate: addDays(date, 1) });
+                                            }
+                                        }}
+                                        className="relative"
+                                        align="left"
+                                    />
+                                    <DatePicker
+                                        label="End Date"
+                                        value={formData.endDate}
+                                        onChange={(date) => {
+                                            if (date >= formData.startDate) {
+                                                setFormData({ ...formData, endDate: date });
+                                            }
+                                        }}
+                                        className="relative"
+                                        align="right"
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between px-1 pt-2">
+                                    <span className="text-xs font-semibold text-black/50 dark:text-white/40">
+                                        Total duration:
+                                    </span>
+                                    <span className="text-xs font-black text-[#4D7CFE]">
+                                        {differenceInDays(formData.endDate, formData.startDate) + 1} Days
+                                    </span>
+                                </div>
+                            </div>
+                        </motion.div>
 
                         {/* Next Button */}
                         <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">

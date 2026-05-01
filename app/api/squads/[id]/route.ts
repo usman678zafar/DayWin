@@ -105,7 +105,8 @@ export async function PATCH(
                             ...template,
                             userId: memberId,
                             squadId: id,
-                            startDate: squad.startDate
+                            startDate: template.startDate || squad.startDate,
+                            endDate: template.endDate || squad.endDate
                         });
                     } else {
                         // Update existing habit properties from template
@@ -114,7 +115,9 @@ export async function PATCH(
                             color: template.color,
                             icon: template.icon,
                             frequency: template.frequency,
-                            targetCount: template.targetCount
+                            targetCount: template.targetCount,
+                            startDate: template.startDate || squad.startDate,
+                            endDate: template.endDate || squad.endDate
                         });
                     }
                 }
