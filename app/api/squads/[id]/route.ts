@@ -28,21 +28,28 @@ export async function GET(
             return NextResponse.json({ error: "Squad not found" }, { status: 404 });
         }
 
-        // Check if user is a member
+        // Check if user is a member or owner
         const isMember = squad.members.some((m: any) => m._id.toString() === user.id);
-        if (!isMember && squad.ownerId._id.toString() !== user.id) {
+        const isOwner = squad.ownerId._id.toString() === user.id;
+        
+        if (!isMember && !isOwner) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // Get habit logs for all members to build leaderboard
-        const squadHabitIds = await Habit.find({ squadId: id }).distinct("_id");
+        // Get this user's habits for this squad
+        const userHabits = await Habit.find({ 
+            squadId: id,
+            userId: user.id,
+            isArchived: false
+        });
 
+        // Get habit logs for these habits
+        const userHabitIds = userHabits.map(h => h._id);
         const logs = await HabitLog.find({
-            habitId: { $in: squadHabitIds },
-            date: { $gte: squad.startDate }
+            habitId: { $in: userHabitIds }
         }).sort({ date: -1 });
 
-        return NextResponse.json({ squad, logs });
+        return NextResponse.json({ squad, userHabits, logs });
     } catch (error) {
         console.error("GET SQUAD ERROR:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -76,6 +83,43 @@ export async function PATCH(
 
         const body = await req.json();
         const updatedSquad = await Challenge.findByIdAndUpdate(id, body, { new: true });
+
+        // If habitTemplates were updated, sync with members' Habit records
+        if (body.habitTemplates) {
+            const members = [...squad.members];
+            if (!members.includes(squad.ownerId)) {
+                members.push(squad.ownerId);
+            }
+
+            for (const template of body.habitTemplates) {
+                for (const memberId of members) {
+                    // Check if member already has this habit for this squad
+                    const existingHabit = await Habit.findOne({
+                        squadId: id,
+                        userId: memberId,
+                        title: template.title
+                    });
+
+                    if (!existingHabit) {
+                        await Habit.create({
+                            ...template,
+                            userId: memberId,
+                            squadId: id,
+                            startDate: squad.startDate
+                        });
+                    } else {
+                        // Update existing habit properties from template
+                        await Habit.findByIdAndUpdate(existingHabit._id, {
+                            category: template.category,
+                            color: template.color,
+                            icon: template.icon,
+                            frequency: template.frequency,
+                            targetCount: template.targetCount
+                        });
+                    }
+                }
+            }
+        }
 
         return NextResponse.json(updatedSquad);
     } catch (error) {

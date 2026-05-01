@@ -18,14 +18,28 @@ import {
     Crown,
     X,
     Plus,
-    Edit2
+    Edit2,
+    Check,
+    TrendingUp,
+    MoreVertical
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/Modal";
 import { HabitForm } from "@/components/habits/HabitForm";
-import { Habit } from "@/types";
+import { Habit, habitColors, habitCategories } from "@/types";
+import { 
+    format, 
+    startOfWeek, 
+    endOfWeek, 
+    eachDayOfInterval, 
+    isSameDay, 
+    isToday, 
+    isFuture 
+} from "date-fns";
+import { HabitIcon } from "@/components/habits/HabitIcon";
+import toast from "react-hot-toast";
 
 export default function SquadDetailPage() {
     const { id } = useParams();
@@ -33,6 +47,7 @@ export default function SquadDetailPage() {
     const { data: session } = useSession();
     const [squad, setSquad] = useState<any>(null);
     const [logs, setLogs] = useState<any[]>([]);
+    const [userHabits, setUserHabits] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showMembersModal, setShowMembersModal] = useState(false);
     
@@ -48,6 +63,7 @@ export default function SquadDetailPage() {
             const data = await res.json();
             setSquad(data.squad);
             setLogs(data.logs || []);
+            setUserHabits(data.userHabits || []);
         } catch (error) {
             console.error(error);
             router.push("/dashboard/squads");
@@ -55,6 +71,38 @@ export default function SquadDetailPage() {
             setLoading(false);
         }
     }, [id, router]);
+
+    const handleToggle = async (habitId: string, date: Date, currentCompleted: boolean) => {
+        if (isFuture(date) && !isToday(date)) return;
+
+        // Optimistic update
+        const dateStr = format(date, "yyyy-MM-dd");
+        const newLogs = [...logs];
+        
+        if (!currentCompleted) {
+            newLogs.push({ habitId, date: date.toISOString(), completed: true });
+        } else {
+            const index = newLogs.findIndex(l => l.habitId === habitId && format(new Date(l.date), "yyyy-MM-dd") === dateStr);
+            if (index > -1) newLogs.splice(index, 1);
+        }
+        setLogs(newLogs);
+
+        try {
+            await fetch(`/api/habits/${habitId}/complete`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ completed: !currentCompleted, date: dateStr }),
+            });
+            // Re-fetch to ensure sync
+            const res = await fetch(`/api/squads/${id}`);
+            const data = await res.json();
+            setLogs(data.logs || []);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to update");
+            fetchSquadDetails(); // Rollback
+        }
+    };
 
     const openHabitModal = (habit?: any, index?: number) => {
         if (habit) {
@@ -141,8 +189,14 @@ export default function SquadDetailPage() {
 
     const isOwner = squad?.ownerId?._id === session?.user?.id;
 
+    // Matrix Days (Last 7 days)
+    const days = eachDayOfInterval({
+        start: startOfWeek(new Date(), { weekStartsOn: 1 }),
+        end: endOfWeek(new Date(), { weekStartsOn: 1 })
+    });
+
     return (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header */}
             <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between px-1">
@@ -228,10 +282,19 @@ export default function SquadDetailPage() {
                 </div>
             </div>
 
-            {/* Squad Habits Section */}
+            {/* Daily Progress Matrix - High Density Style */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-black text-surface-900 dark:text-white">Squad <span className="text-primary-600">Habits</span></h3>
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-primary-500 shadow-sm shadow-primary-500/50" />
+                            <h3 className="text-xl font-black text-surface-900 dark:text-white">Squad <span className="text-primary-600">Habits</span></h3>
+                        </div>
+                        <div className="h-px w-20 bg-gradient-to-r from-surface-200 to-transparent dark:from-white/10 dark:to-transparent hidden sm:block" />
+                        <span className="text-[9px] font-bold text-surface-400 uppercase tracking-widest">
+                            {squad.habitTemplates?.length || 0} Total
+                        </span>
+                    </div>
                     {isOwner && (
                         <button
                             onClick={() => openHabitModal()}
@@ -243,49 +306,142 @@ export default function SquadDetailPage() {
                     )}
                 </div>
 
-                <div className="space-y-3">
-                    {(squad.habitTemplates || []).map((habit: any, index: number) => (
-                        <div key={index} className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-surface-200/50 bg-white p-4 shadow-sm transition-all hover:border-surface-300 dark:border-white/5 dark:bg-white/[0.02] dark:hover:border-white/10">
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md" style={{ backgroundColor: habit.color || '#8b5cf6' }}>
-                                    <Trophy className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-surface-900 dark:text-white">{habit.title}</h4>
-                                    <p className="text-[11px] font-bold text-surface-400 uppercase tracking-wider">{habit.category} • {habit.frequency.type}</p>
-                                </div>
-                            </div>
-                            {isOwner && (
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button 
-                                        onClick={() => openHabitModal(habit, index)}
-                                        className="p-1.5 text-surface-400 hover:text-primary-600"
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button 
-                                        onClick={() => deleteHabit(index)}
-                                        className="p-1.5 text-surface-400 hover:text-red-500"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                {squad.habitTemplates?.length > 0 ? (
+                    <div className="overflow-hidden rounded-2xl border border-surface-200/50 bg-white shadow-sm dark:border-white/5 dark:bg-[#0A0A0F]">
+                        <div className="overflow-x-auto scrollbar-hide">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="border-b border-surface-100 bg-surface-50/50 dark:border-white/5 dark:bg-white/[0.02]">
+                                        <th className="sticky left-0 z-20 bg-white dark:bg-[#0A0A0F] px-4 py-3 text-left border-r border-surface-100 dark:border-white/5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-surface-400">Habit</span>
+                                        </th>
+                                        {days.map(day => (
+                                            <th key={day.toISOString()} className={cn(
+                                                "px-1 py-3 text-center min-w-[40px] transition-colors",
+                                                isToday(day) && "bg-primary-500/5 dark:bg-primary-500/10"
+                                            )}>
+                                                <div className="flex flex-col items-center">
+                                                    <span className={cn(
+                                                        "text-[8px] font-black uppercase leading-none mb-0.5",
+                                                        isFuture(day) && !isToday(day) ? "text-surface-300" : "text-surface-400"
+                                                    )}>
+                                                        {format(day, "EEE")}
+                                                    </span>
+                                                    <span className={cn(
+                                                        "text-[11px] font-black",
+                                                        isToday(day) ? "text-primary-600" : (isFuture(day) && !isToday(day) ? "text-surface-200" : "text-surface-900 dark:text-white")
+                                                    )}>
+                                                        {format(day, "d")}
+                                                    </span>
+                                                </div>
+                                            </th>
+                                        ))}
+                                        <th className="sticky right-0 z-20 px-3 py-3 text-center bg-surface-50 dark:bg-white/[0.03] border-l border-surface-100 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                                            <TrendingUp className="h-3 w-3 mx-auto text-primary-400" />
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-surface-100 dark:divide-white/5">
+                                    {(squad.habitTemplates || []).map((template: any, index: number) => {
+                                        // Match template with userHabit to get marking capability
+                                        const habit = userHabits.find(h => h.title === template.title);
+                                        const colors = habitColors[template.color as keyof typeof habitColors] || habitColors.purple;
+                                        const habitLogs = habit ? logs.filter(l => l.habitId === habit._id) : [];
+                                        const completedCount = habitLogs.filter(l => l.completed).length;
+                                        const completionRate = Math.round((completedCount / days.filter(d => !isFuture(d) || isToday(d)).length) * 100);
 
-                    {squad.habitTemplates?.length === 0 && (
-                        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-200 p-8 text-center dark:border-surface-800">
-                            <Trophy className="mb-2 h-8 w-8 text-surface-300 dark:text-surface-600" />
-                            <p className="text-sm font-bold text-surface-500">No habits added yet</p>
-                            {isOwner && (
-                                <button onClick={() => openHabitModal()} className="mt-4 text-xs font-bold text-primary-600 hover:underline">
-                                    Add the first habit
-                                </button>
-                            )}
+                                        return (
+                                            <tr key={index} className="group hover:bg-surface-50/50 dark:hover:bg-white/[0.01] transition-colors">
+                                                <td className="sticky left-0 z-10 bg-white dark:bg-[#0A0A0F] px-4 py-2 border-r border-surface-100 dark:border-white/5 group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
+                                                    <div className="flex items-center justify-between gap-2.5">
+                                                        <div className="flex items-center gap-2.5 overflow-hidden">
+                                                            <div className="relative h-8 w-8 flex-shrink-0">
+                                                                <svg className="h-8 w-8 -rotate-90 transform" viewBox="0 0 36 36">
+                                                                    <circle cx="18" cy="18" r="16" fill="none" className="stroke-surface-100 dark:stroke-white/5" strokeWidth="3" />
+                                                                    <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" className={colors.text} />
+                                                                </svg>
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <HabitIcon name={template.icon} size={11} className={colors.text} />
+                                                                </div>
+                                                            </div>
+                                                            <span className="truncate text-[11px] font-black text-surface-900 dark:text-white">{template.title}</span>
+                                                        </div>
+                                                        {isOwner && (
+                                                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button 
+                                                                    onClick={() => openHabitModal(template, index)}
+                                                                    className="p-1 text-surface-400 hover:text-primary-600 transition-colors"
+                                                                >
+                                                                    <Edit2 className="h-3 w-3" />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => deleteHabit(index)}
+                                                                    className="p-1 text-surface-400 hover:text-red-500 transition-colors"
+                                                                >
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                {days.map(day => {
+                                                    const dateStr = format(day, "yyyy-MM-dd");
+                                                    const isCompleted = logs.some(l => l.habitId === habit?._id && format(new Date(l.date), "yyyy-MM-dd") === dateStr);
+                                                    const isFutureDay = isFuture(day) && !isToday(day);
+
+                                                    return (
+                                                        <td key={day.toISOString()} className={cn("px-0.5 py-1 text-center", isToday(day) && "bg-primary-500/[0.02] dark:bg-primary-500/[0.05]")}>
+                                                            <div className="flex items-center justify-center">
+                                                                <motion.button
+                                                                    whileHover={habit && !isFutureDay ? { scale: 1.1 } : undefined}
+                                                                    whileTap={habit && !isFutureDay ? { scale: 0.9 } : undefined}
+                                                                    onClick={() => habit && handleToggle(habit._id, day, isCompleted)}
+                                                                    disabled={!habit || isFutureDay}
+                                                                    className={cn(
+                                                                        "mx-auto h-6 w-6 rounded-[6px] flex items-center justify-center transition-all",
+                                                                        isCompleted 
+                                                                            ? cn("shadow-sm text-white", colors.gradient) 
+                                                                            : (isFutureDay || !habit ? "bg-surface-50 dark:bg-white/[0.02]" : "bg-surface-100 dark:bg-white/[0.05] border border-surface-200/50 dark:border-white/5 hover:bg-surface-200 dark:hover:bg-white/10"),
+                                                                        isToday(day) && !isCompleted && "ring-1 ring-primary-500/30",
+                                                                        !habit && "cursor-wait opacity-50"
+                                                                    )}
+                                                                >
+                                                                    {isCompleted ? (
+                                                                        <Check className="h-3 w-3" strokeWidth={5} />
+                                                                    ) : !isFutureDay && habit ? (
+                                                                        <span className="text-[8px] font-bold text-surface-400">{format(day, "d")}</span>
+                                                                    ) : (
+                                                                        <div className="opacity-10 scale-75">
+                                                                            <HabitIcon name={template.icon} size={10} />
+                                                                        </div>
+                                                                    )}
+                                                                </motion.button>
+                                                            </div>
+                                                        </td>
+                                                    );
+                                                })}
+                                                <td className="sticky right-0 z-10 px-2 py-2 text-center bg-white dark:bg-[#0A0A0F] group-hover:bg-surface-50 dark:group-hover:bg-white/[0.02] border-l border-surface-100 dark:border-white/5 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
+                                                    <span className={cn(
+                                                        "text-[10px] font-black",
+                                                        completionRate >= 80 ? "text-green-500" : completionRate >= 50 ? "text-yellow-500" : "text-red-400"
+                                                    )}>{completionRate}%</span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-200 p-12 text-center dark:border-surface-800">
+                        <Trophy className="mb-3 h-10 w-10 text-surface-200 dark:text-surface-700" />
+                        <p className="text-sm font-bold text-surface-500">No squad habits to track yet</p>
+                        {isOwner && (
+                            <p className="mt-1 text-xs text-surface-400">Add some habits below to get started</p>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Members Modal */}
