@@ -14,7 +14,7 @@ export function PageLoader({ className, fullScreen = true }: PageLoaderProps) {
         <div
             className={cn(
                 "bg-white dark:bg-[#030305]",
-                fullScreen ? "fixed inset-0 z-[100] overflow-y-auto" : "w-full h-full",
+                fullScreen ? "fixed inset-0 z-[100] overflow-y-auto" : "w-full min-h-screen",
                 className
             )}
         >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -21,7 +21,7 @@ export default function SquadsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const fetchSquads = async () => {
+    const fetchSquads = useCallback(async () => {
         try {
             const res = await fetch("/api/squads");
             const data = await res.json();
@@ -31,7 +31,7 @@ export default function SquadsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => { fetchSquads(); }, [fetchSquads]);
 

@@ -37,7 +37,7 @@ export function WeeklyChart({ data }: WeeklyChartProps) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-slate-50 to-white p-6 dark:from-slate-950/20 dark:to-white/[0.02] dark:border-white/5"

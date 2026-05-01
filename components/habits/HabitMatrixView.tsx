@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     format,
@@ -66,7 +66,7 @@ export function HabitMatrixView({
     // Reverse for display (most recent first) if more than 7 days
     const displayDays = days.length > 7 ? [...days].reverse() : days;
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await fetch(
@@ -75,8 +75,10 @@ export function HabitMatrixView({
             const data = await response.json();
             const logs = data.logs || [];
 
+            const currentDays = eachDayOfInterval({ start: startDate, end: endDate });
+
             const habitsWithData: HabitData[] = habits.map((habit) => {
-                const habitLogs: DayLog[] = days.map((day) => {
+                const habitLogs: DayLog[] = currentDays.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
                             log.habitId === habit._id && isSameDay(new Date(log.date), day)
@@ -104,7 +106,7 @@ export function HabitMatrixView({
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [startDate, endDate, habits]);
 
     useEffect(() => {
         fetchLogs();

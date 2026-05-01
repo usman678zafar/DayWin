@@ -108,7 +108,7 @@ export default function DashboardPage() {
             {/* Stats Cards - Modern & Spacious */}
             <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ y: -2 }}
                     className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-blue-50 to-white p-5 dark:from-blue-950/20 dark:to-white/[0.02] dark:border-white/5"
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 </motion.div>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 }}
                     whileHover={{ y: -2 }}
@@ -145,7 +145,7 @@ export default function DashboardPage() {
                 </motion.div>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                     whileHover={{ y: -2 }}
@@ -193,7 +193,7 @@ export default function DashboardPage() {
                     />
 
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={false}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.15 }}
                     >

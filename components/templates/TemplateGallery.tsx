@@ -152,7 +152,7 @@ const RadiantWheel = () => (
         {/* Motivation */}
         <div className="absolute bottom-12 left-10 right-10 flex justify-between items-end border-t border-black/20 pt-6">
             <p className="max-w-xs text-[9px] font-medium leading-relaxed italic opacity-60">
-                "&ldquo;We are what we repeatedly do. Excellence, then, is not an act, but a habit.&rdquo;" — Aristotle
+                &quot;&ldquo;We are what we repeatedly do. Excellence, then, is not an act, but a habit.&rdquo;&quot; — Aristotle
             </p>
             <div className="text-right">
                 <p className="text-[8px] font-black tracking-widest opacity-20 mb-1 uppercase">Printed for personal use</p>

@@ -12,7 +12,7 @@ export function Header() {
 
     return (
         <motion.header
-            initial={{ opacity: 0, y: -20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 md:mb-5 rounded-2xl border border-black/5 bg-white/50 p-4 sm:p-5 backdrop-blur-2xl dark:border-white/[0.02] dark:bg-white/[0.01]"
         >

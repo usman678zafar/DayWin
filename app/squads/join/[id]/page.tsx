@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -21,7 +21,7 @@ export default function PublicJoinPage() {
     const [loading, setLoading] = useState(true);
     const [joining, setJoining] = useState(false);
 
-    const fetchSquadInfo = async () => {
+    const fetchSquadInfo = useCallback(async () => {
         try {
             // We use the same API but it should be accessible or we need a public info API
             // For now let's assume the ID is enough to fetch basic info
@@ -35,7 +35,7 @@ export default function PublicJoinPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router]);
 
     useEffect(() => {
         if (id) fetchSquadInfo();

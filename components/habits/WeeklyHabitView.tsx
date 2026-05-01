@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
     format,
@@ -25,12 +25,12 @@ interface WeeklyHabitViewProps {
 interface WeekLog {
     date: Date;
     completed: boolean;
-    count: number;
 }
 
 interface HabitWeekData {
     habit: HabitWithLog;
     logs: WeekLog[];
+    completionRate?: number;
 }
 
 export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: WeeklyHabitViewProps) {
@@ -39,7 +39,7 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
 
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(weekStart), i));
 
-    const fetchWeekLogs = async () => {
+    const fetchWeekLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const start = startOfWeek(weekStart);
@@ -50,8 +50,10 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
             const data = await response.json();
             const logs = data.logs || [];
 
+            const currentWeekDays = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+
             const habitsWithWeekData: HabitWeekData[] = habits.map((habit) => {
-                const habitLogs: DayLog[] = weekDays.map((day) => {
+                const habitLogs: WeekLog[] = currentWeekDays.map((day) => {
                     const dayLog = logs.find(
                         (log: any) =>
                             log.habitId === habit._id && isSameDay(new Date(log.date), day)
@@ -75,7 +77,7 @@ export function WeeklyHabitView({ habits, weekStart, onToggleCompletion }: Weekl
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [weekStart, habits]);
 
     useEffect(() => {
         fetchWeekLogs();

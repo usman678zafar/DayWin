@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -29,7 +29,7 @@ export default function SquadDetailPage() {
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchSquadDetails = async () => {
+    const fetchSquadDetails = useCallback(async () => {
         try {
             const res = await fetch(`/api/squads/${id}`);
             if (!res.ok) throw new Error("Squad not found");
@@ -42,7 +42,7 @@ export default function SquadDetailPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router]);
 
     useEffect(() => {
         if (id) fetchSquadDetails();

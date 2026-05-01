@@ -31,7 +31,7 @@ export function MotivationalQuote() {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
             className="relative overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-purple-50 to-white p-6 dark:from-purple-950/20 dark:to-white/[0.02] dark:border-white/5"
@@ -57,7 +57,7 @@ export function MotivationalQuote() {
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={quote.text}
-                        initial={{ opacity: 0, scale: 0.98 }}
+                        initial={false}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
                     >

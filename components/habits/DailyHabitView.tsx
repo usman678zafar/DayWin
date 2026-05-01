@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { isSameDay, isToday, isFuture, format } from "date-fns";
 import { Plus, Sparkles } from "lucide-react";
@@ -41,7 +41,7 @@ export function DailyHabitView({
     const isViewingToday = isToday(selectedDate);
     const isViewingFuture = isFuture(selectedDate) && !isToday(selectedDate);
 
-    const fetchDayLogs = async () => {
+    const fetchDayLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await fetch(
@@ -52,7 +52,7 @@ export function DailyHabitView({
 
             const habitsWithStatus: DayHabit[] = habits.map((habit) => {
                 const dayLog = logs.find(
-                    (log) => log.habitId === habit.id && isSameDay(new Date(log.date), selectedDate)
+                    (log: any) => log.habitId === habit._id && isSameDay(new Date(log.date), selectedDate)
                 );
                 return {
                     ...habit,
@@ -66,7 +66,7 @@ export function DailyHabitView({
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [selectedDate, habits]);
 
     useEffect(() => {
         if (isViewingToday) {

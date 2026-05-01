@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
     format,
@@ -41,7 +41,7 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
     const [isLoading, setIsLoading] = useState(true);
     const [expandedHabit, setExpandedHabit] = useState<string | null>(null);
 
-    const fetchMonthLogs = async () => {
+    const fetchMonthLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const start = startOfMonth(month);
@@ -52,12 +52,35 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
             const data = await response.json();
             const logs = data.logs || [];
 
-            const habitsWithLogs = habits.map((habit) => {
-                const habitLogs = logs.filter((log: any) => log.habitId === habit._id);
-                const completedDays = habitLogs.map((log: any) => new Date(log.date));
+            const daysInMonth: Date[] = [];
+            let currentDay = start;
+            while (currentDay <= end) {
+                daysInMonth.push(currentDay);
+                currentDay = addDays(currentDay, 1);
+            }
+
+            const habitsWithLogs: HabitMonthData[] = habits.map((habit) => {
+                const habitLogs: DayLog[] = daysInMonth.map((day) => {
+                    const dayLog = logs.find(
+                        (log: any) => log.habitId === habit._id && isSameDay(new Date(log.date), day)
+                    );
+                    return {
+                        date: day,
+                        completed: dayLog?.completed || false,
+                    };
+                });
+
+                const completedCount = habitLogs.filter((l) => l.completed).length;
+                const validDays = habitLogs.filter(
+                    (l) => !isFuture(l.date) || isToday(l.date)
+                ).length;
+                const completionRate =
+                    validDays > 0 ? Math.round((completedCount / validDays) * 100) : 0;
+
                 return {
-                    ...habit,
-                    completedDays,
+                    habit,
+                    logs: habitLogs,
+                    completionRate,
                 };
             });
 
@@ -68,7 +91,7 @@ export function MonthlyHabitView({ habits, month, onToggleCompletion }: MonthlyH
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [month, habits]);
 
     useEffect(() => {
         fetchMonthLogs();
