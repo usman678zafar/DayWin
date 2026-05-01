@@ -23,6 +23,9 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Modal } from "@/components/ui/Modal";
+import { HabitForm } from "@/components/habits/HabitForm";
+import { Habit } from "@/types";
 
 export default function SquadDetailPage() {
     const { id } = useParams();
@@ -33,18 +36,10 @@ export default function SquadDetailPage() {
     const [loading, setLoading] = useState(true);
     const [showMembersModal, setShowMembersModal] = useState(false);
     
-    // Habit Management State
     const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
     const [editingHabitIndex, setEditingHabitIndex] = useState<number | null>(null);
     const [savingHabit, setSavingHabit] = useState(false);
-    const [habitForm, setHabitForm] = useState({ 
-        title: "", 
-        category: "Health", 
-        color: "#8b5cf6", 
-        icon: "Trophy", 
-        targetCount: 1, 
-        frequency: { type: "daily" } 
-    });
+    const [editingHabitData, setEditingHabitData] = useState<Partial<Habit> | undefined>(undefined);
 
     const fetchSquadDetails = useCallback(async () => {
         try {
@@ -63,23 +58,23 @@ export default function SquadDetailPage() {
 
     const openHabitModal = (habit?: any, index?: number) => {
         if (habit) {
-            setHabitForm(habit);
+            setEditingHabitData(habit);
             setEditingHabitIndex(index as number);
         } else {
-            setHabitForm({ title: "", category: "Health", color: "#8b5cf6", icon: "Trophy", targetCount: 1, frequency: { type: "daily" } });
+            setEditingHabitData(undefined);
             setEditingHabitIndex(null);
         }
         setIsHabitModalOpen(true);
     };
 
-    const saveHabit = async () => {
+    const handleSubmitHabit = async (data: Partial<Habit>) => {
         setSavingHabit(true);
         try {
             const updatedTemplates = [...(squad.habitTemplates || [])];
             if (editingHabitIndex !== null) {
-                updatedTemplates[editingHabitIndex] = habitForm;
+                updatedTemplates[editingHabitIndex] = { ...updatedTemplates[editingHabitIndex], ...data };
             } else {
-                updatedTemplates.push(habitForm);
+                updatedTemplates.push(data);
             }
 
             const res = await fetch(`/api/squads/${id}`, {
@@ -350,75 +345,25 @@ export default function SquadDetailPage() {
             </AnimatePresence>
 
             {/* Habit Modal */}
-            <AnimatePresence>
-                {isHabitModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-2xl dark:border-surface-800 dark:bg-[#0A0A0F]"
-                        >
-                            <div className="flex items-center justify-between border-b border-surface-100 p-6 dark:border-surface-800">
-                                <h3 className="text-lg font-black text-surface-900 dark:text-white">
-                                    {editingHabitIndex !== null ? "Edit Habit" : "Add Squad Habit"}
-                                </h3>
-                                <button
-                                    onClick={() => setIsHabitModalOpen(false)}
-                                    className="rounded-full p-2 text-surface-400 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white transition-colors"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
-                            </div>
-                            <div className="p-6 space-y-4">
-                                <div>
-                                    <label className="text-xs font-bold text-surface-500 uppercase tracking-wider">Habit Title</label>
-                                    <input 
-                                        type="text" 
-                                        value={habitForm.title}
-                                        onChange={(e) => setHabitForm({...habitForm, title: e.target.value})}
-                                        className="mt-1.5 w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-surface-800 dark:bg-[#1A1A20] dark:text-white"
-                                        placeholder="e.g. Read 10 Pages"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-surface-500 uppercase tracking-wider">Category</label>
-                                        <select 
-                                            value={habitForm.category}
-                                            onChange={(e) => setHabitForm({...habitForm, category: e.target.value})}
-                                            className="mt-1.5 w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-surface-800 dark:bg-[#1A1A20] dark:text-white"
-                                        >
-                                            <option value="Health">Health</option>
-                                            <option value="Productivity">Productivity</option>
-                                            <option value="Mindfulness">Mindfulness</option>
-                                            <option value="Learning">Learning</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-surface-500 uppercase tracking-wider">Frequency</label>
-                                        <select 
-                                            value={habitForm.frequency.type}
-                                            onChange={(e) => setHabitForm({...habitForm, frequency: { type: e.target.value }})}
-                                            className="mt-1.5 w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-surface-800 dark:bg-[#1A1A20] dark:text-white"
-                                        >
-                                            <option value="daily">Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={saveHabit}
-                                    disabled={savingHabit || !habitForm.title}
-                                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 py-3.5 text-sm font-black text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
-                                >
-                                    {savingHabit ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Habit"}
-                                </button>
-                            </div>
-                        </motion.div>
+            <Modal 
+                isOpen={isHabitModalOpen} 
+                onClose={() => { setIsHabitModalOpen(false); setEditingHabitData(undefined); }} 
+                title={editingHabitIndex !== null ? "Edit Squad Habit" : "Add Squad Habit"} 
+                size="sm"
+            >
+                {savingHabit ? (
+                    <div className="flex h-40 flex-col items-center justify-center gap-4">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+                        <p className="text-sm font-bold text-surface-500">Saving habit...</p>
                     </div>
+                ) : (
+                    <HabitForm 
+                        habit={editingHabitData} 
+                        onSubmit={handleSubmitHabit} 
+                        onCancel={() => { setIsHabitModalOpen(false); setEditingHabitData(undefined); }} 
+                    />
                 )}
-            </AnimatePresence>
+            </Modal>
         </div>
     );
 }
