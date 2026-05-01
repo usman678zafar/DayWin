@@ -34,7 +34,7 @@ export default function SquadDetailPage() {
             const res = await fetch(`/api/squads/${id}`);
             if (!res.ok) throw new Error("Squad not found");
             const data = await res.json();
-            setSquad(data);
+            setSquad(data.squad);
             setLogs(data.logs || []);
         } catch (error) {
             console.error(error);
@@ -67,10 +67,12 @@ export default function SquadDetailPage() {
         );
     }
 
+    if (!squad) return null;
+
     const isOwner = squad?.ownerId?._id === session?.user?.id;
 
     // Calculate Leaderboard
-    const leaderboard = squad.members.map((member: any) => {
+    const leaderboard = (squad.members || []).map((member: any) => {
         const memberLogs = logs.filter(log => log.userId === member._id && log.completed);
         return {
             ...member,
@@ -125,11 +127,11 @@ export default function SquadDetailPage() {
                                 </div>
                                 <div className="flex items-center gap-2 text-sm font-bold text-surface-400">
                                     <Trophy className="h-4 w-4 text-orange-500" />
-                                    {squad.habitTemplates.length} Active Challenges
+                                    {squad.habitTemplates?.length || 0} Active Challenges
                                 </div>
                                 <div className="flex items-center gap-2 text-sm font-bold text-surface-400">
                                     <Users className="h-4 w-4 text-blue-500" />
-                                    {squad.members.length} Members
+                                    {squad.members?.length || 0} Members
                                 </div>
                             </div>
                         </div>
@@ -214,7 +216,7 @@ export default function SquadDetailPage() {
                     <div className="rounded-[2rem] border border-surface-200/50 bg-white/50 p-6 backdrop-blur-sm dark:border-white/5 dark:bg-white/[0.02]">
                         <p className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-4">Tracking Habits</p>
                         <div className="space-y-4">
-                            {squad.habitTemplates.map((habit: any, i: number) => (
+                            {(squad.habitTemplates || []).map((habit: any, i: number) => (
                                 <div key={i} className="flex items-center gap-3 rounded-2xl bg-surface-50 p-3 dark:bg-white/5">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-white/10">
                                         <Trophy className="h-4 w-4 text-primary-600" />

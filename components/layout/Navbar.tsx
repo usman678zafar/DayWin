@@ -50,7 +50,7 @@ export function Navbar() {
 
                 <nav className="flex-1 space-y-1">
                     {navItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
                         return (
                             <Link
                                 key={item.href}
@@ -107,7 +107,7 @@ export function Navbar() {
                 <div className="rounded-[2rem] border border-white/20 bg-white/90 p-1.5 shadow-2xl backdrop-blur-2xl dark:border-white/[0.1] dark:bg-[#0A0A10]/90">
                     <ul className="flex items-center justify-around">
                         {navItems.slice(0, 5).map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
                             return (
                                 <li key={item.href} className="flex-1">
                                     <Link
