@@ -160,7 +160,7 @@ export default function CalendarPage() {
                     <div className="card p-2">
                         <div className="grid grid-cols-7 mb-1">
                             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
-                                <div key={d} className="text-center py-1 text-[8px] font-black uppercase tracking-widest text-black/20">
+                                <div key={d} className="text-center py-1 text-[8px] font-black uppercase tracking-widest text-black/30 dark:text-white/30">
                                     {d}
                                 </div>
                             ))}
@@ -172,7 +172,7 @@ export default function CalendarPage() {
                             {[{c: "bg-green-500/40", l: "FULL"}, {c: "bg-yellow-500/40", l: "PART"}, {c: "bg-red-500/40", l: "NONE"}].map(item => (
                                 <div key={item.l} className="flex items-center gap-1.5">
                                     <div className={cn("w-2 h-2 rounded-full", item.c)} />
-                                    <span className="text-[9px] font-black text-black/30 tracking-widest">{item.l}</span>
+                                    <span className="text-[9px] font-black text-black/40 dark:text-white/40 tracking-widest">{item.l}</span>
                                 </div>
                             ))}
                         </div>
@@ -208,7 +208,7 @@ export default function CalendarPage() {
                                         <div className="flex-1 min-w-0">
                                             <p className={cn("text-[11px] font-bold truncate", isComp ? "text-black dark:text-white" : "text-black/50 dark:text-white/40")}>{habit.title}</p>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-[8px] font-black uppercase text-black/20">{habit.category}</span>
+                                                <span className="text-[8px] font-black uppercase text-black/30 dark:text-white/30">{habit.category}</span>
                                                 {habit.streak.current > 0 && <div className="flex items-center gap-0.5 text-orange-500"><Flame className="h-2 w-2" /><span className="text-[8px] font-bold">{habit.streak.current}d</span></div>}
                                             </div>
                                         </div>
@@ -217,7 +217,7 @@ export default function CalendarPage() {
                                         </div>
                                     </button>
                                 );
-                            }) : <p className="text-[10px] text-center py-4 text-black/20">No habits</p>}
+                            }) : <p className="text-[10px] text-center py-4 text-black/30 dark:text-white/30">No habits</p>}
                         </div>
 
                         {habits.length > 0 && !isSelectedFuture && (

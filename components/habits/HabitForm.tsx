@@ -423,7 +423,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType, isSquad
                         {/* Habit Type Badge - Mini (hidden for squad habits) */}
                         {!isSquadHabit && (
                         <div className="flex justify-center">
-                            <span className="flex items-center gap-1 rounded bg-black/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40">
+                            <span className="flex items-center gap-1 rounded bg-black/10 dark:bg-white/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
                                 {formData.habitType} ({getPeriodDays()}D)
                             </span>
                         </div>
@@ -533,7 +533,7 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType, isSquad
                     >
                         {/* Frequency Type - Compact */}
                         <div>
-                            <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30">
+                            <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/40">
                                 Cycle Frequency
                             </label>
                             <div className="grid gap-1.5 sm:grid-cols-3">
@@ -564,9 +564,9 @@ export function HabitForm({ habit, onSubmit, onCancel, defaultHabitType, isSquad
                         {/* Days of Week - Compact */}
                         {formData.frequency.type === "weekly" && (
                             <div>
-                                <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30">
-                                    Specific Days
-                                </label>
+                            <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/40">
+                                Specific Days
+                            </label>
                                 <div className="flex justify-between gap-1">
                                     {daysOfWeek.map((day) => (
                                         <button

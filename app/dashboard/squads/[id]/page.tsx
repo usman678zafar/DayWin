@@ -46,7 +46,11 @@ export default function SquadDetailPage() {
     const [userHabits, setUserHabits] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showMembersModal, setShowMembersModal] = useState(false);
-    
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [inviteEmail, setInviteEmail] = useState("");
+    const [inviteLoading, setInviteLoading] = useState(false);
+    const [inviteError, setInviteError] = useState("");
+
     const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
     const [editingHabitIndex, setEditingHabitIndex] = useState<number | null>(null);
     const [savingHabit, setSavingHabit] = useState(false);
@@ -68,6 +72,33 @@ export default function SquadDetailPage() {
             setLoading(false);
         }
     }, [id, router]);
+
+    const handleInvite = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inviteEmail.trim()) return;
+        setInviteLoading(true);
+        setInviteError("");
+        try {
+            const res = await fetch(`/api/squads/${id}/invite`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: inviteEmail.trim() }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setInviteError(data.error || "Something went wrong.");
+            } else {
+                toast.success(data.message);
+                setInviteEmail("");
+                setShowInviteModal(false);
+                fetchSquadDetails();
+            }
+        } catch {
+            setInviteError("Network error. Please try again.");
+        } finally {
+            setInviteLoading(false);
+        }
+    };
 
     const handleToggle = async (habitId: string, date: Date, currentCompleted: boolean) => {
         if (isFuture(date) && !isToday(date)) return;
@@ -279,7 +310,10 @@ export default function SquadDetailPage() {
                                 )}
                             </button>
 
-                            <button className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-900 px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-black dark:bg-white dark:text-black dark:hover:bg-surface-200">
+                            <button
+                                onClick={() => { setShowInviteModal(true); setInviteError(""); setInviteEmail(""); }}
+                                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-900 px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-black dark:bg-white dark:text-black dark:hover:bg-surface-200"
+                            >
                                 <Share2 className="h-3.5 w-3.5" />
                                 Invite Friends
                             </button>
@@ -542,6 +576,93 @@ export default function SquadDetailPage() {
                                     </div>
                                 ))}
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Invite Friends Modal */}
+            <AnimatePresence>
+                {showInviteModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-sm overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-2xl dark:border-surface-800 dark:bg-[#0A0A0F]"
+                        >
+                            <div className="flex items-center justify-between border-b border-surface-100 p-5 dark:border-surface-800">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/20">
+                                        <Share2 className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-black text-surface-900 dark:text-white">Invite to Squad</h3>
+                                        <p className="text-[11px] font-medium text-surface-400">Add a member by email</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowInviteModal(false)}
+                                    className="rounded-full p-2 text-surface-400 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white transition-colors"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleInvite} className="p-5 space-y-4">
+                                <div>
+                                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-widest text-surface-400">
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={inviteEmail}
+                                        onChange={(e) => { setInviteEmail(e.target.value); setInviteError(""); }}
+                                        placeholder="friend@example.com"
+                                        autoFocus
+                                        className="w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-900 outline-none placeholder:text-surface-300 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 dark:border-surface-700 dark:bg-surface-900 dark:text-white dark:placeholder:text-surface-600 dark:focus:border-primary-500 transition-all"
+                                    />
+                                    <AnimatePresence>
+                                        {inviteError && (
+                                            <motion.p
+                                                initial={{ opacity: 0, y: -4 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -4 }}
+                                                className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold text-red-500"
+                                            >
+                                                <X className="h-3 w-3 shrink-0" />
+                                                {inviteError}
+                                            </motion.p>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+
+                                <p className="text-[10px] text-surface-400 dark:text-surface-500 leading-relaxed">
+                                    The person must already have a <span className="font-bold text-surface-500 dark:text-surface-400">Day Win account</span> registered with this email.
+                                </p>
+
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInviteModal(false)}
+                                        className="flex-1 rounded-xl border border-surface-200 bg-transparent py-2.5 text-xs font-bold text-surface-600 transition-all hover:bg-surface-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={inviteLoading || !inviteEmail.trim()}
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600 py-2.5 text-xs font-black text-white shadow-md shadow-primary-500/20 transition-all hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {inviteLoading ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                        ) : (
+                                            <Plus className="h-3.5 w-3.5" />
+                                        )}
+                                        {inviteLoading ? "Adding..." : "Add to Squad"}
+                                    </button>
+                                </div>
+                            </form>
                         </motion.div>
                     </div>
                 )}

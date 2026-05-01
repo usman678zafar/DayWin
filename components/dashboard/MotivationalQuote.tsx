@@ -39,7 +39,7 @@ export function MotivationalQuote() {
             <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-purple-500/10 blur-3xl" />
             <div className="relative">
                 <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-black/30 dark:text-white/20">
+                    <div className="flex items-center gap-2 text-black/30 dark:text-white/40">
                         <div className="rounded-lg bg-purple-500/10 p-2">
                             <Sparkles className="h-4 w-4 text-purple-500" />
                         </div>
@@ -65,7 +65,7 @@ export function MotivationalQuote() {
                         <p className="text-sm sm:text-base font-bold leading-relaxed text-black dark:text-white">
                             &ldquo;{quote.text}&rdquo;
                         </p>
-                        <p className="mt-2 text-xs font-black uppercase tracking-wider text-black/20 dark:text-white/10">- {quote.author}</p>
+                        <p className="mt-2 text-xs font-black uppercase tracking-wider text-black/30 dark:text-white/40">- {quote.author}</p>
                     </motion.div>
                 </AnimatePresence>
             </div>

@@ -137,7 +137,7 @@ export const HabitCard = forwardRef<HTMLDivElement, HabitCardProps>(function Hab
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                             >
-                                <div className="text-xl font-semibold text-black/40 dark:text-white/10">
+                                <div className="text-xl font-semibold text-black/40 dark:text-white/35">
                                     {new Date().getDate()}
                                 </div>
                             </motion.div>
@@ -244,7 +244,7 @@ export const HabitCard = forwardRef<HTMLDivElement, HabitCardProps>(function Hab
             {habit.targetCount > 1 && (
                 <div className="mt-4 sm:mt-5">
                     <div className="mb-2 flex items-center justify-between">
-                        <span className="text-[10px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/20">Momentum</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/45">Momentum</span>
                         <span className={cn("text-xs font-semibold", colors.text)}>
                             {habit.todayLog?.count ?? 0} <span className="opacity-60">/ {habit.targetCount}</span>
                         </span>

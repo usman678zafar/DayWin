@@ -394,7 +394,7 @@ export function TemplateGallery() {
                             Our designers will create a high-resolution PDF tailored for you.
                         </p>
                     </div>
-                    <Button variant="outline" className="text-white border-white/20 hover:bg-white hover:text-black whitespace-nowrap">
+                    <Button variant="outline" className="text-white border-white/20 hover:bg-white hover:text-black dark:text-black dark:border-black/20 dark:hover:bg-black/5 dark:hover:text-black whitespace-nowrap">
                         Upgrade To Pro
                     </Button>
                 </div>

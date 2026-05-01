@@ -70,7 +70,7 @@ export function CtaFooter() {
                                 <a href="#" className="transition hover:text-white">X</a>
                                 <a href="#" className="transition hover:text-white">YouTube</a>
                             </div>
-                            <p className="text-xs text-white/60">Â© 2026 DAY WIN. All rights reserved.</p>
+                            <p className="text-xs text-white/60">© 2026 DAY WIN. All rights reserved.</p>
                         </div>
                     </div>
                 </div>

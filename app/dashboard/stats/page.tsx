@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import {
     AreaChart,
@@ -28,6 +29,8 @@ const defaultRange: DateRange = {
 };
 
 export default function StatsPage() {
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === "dark";
     const [stats, setStats] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [dateRange, setDateRange] = useState<DateRange>(defaultRange);
@@ -107,7 +110,7 @@ export default function StatsPage() {
                                     dataKey="date"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: "600" }}
+                                    tick={{ fill: isDark ? "rgba(255,255,255,0.4)" : "#64748b", fontSize: 10, fontWeight: "600" }}
                                 />
                                 <YAxis hide />
                                 <Tooltip content={<CustomTooltip />} />
@@ -147,7 +150,7 @@ export default function StatsPage() {
                                     dataKey="value"
                                 >
                                     <Cell fill="#a855f7" />
-                                    <Cell fill="#e4e4e7" />
+                                    <Cell fill={isDark ? "rgba(255,255,255,0.1)" : "#e4e4e7"} />
                                 </Pie>
                             </PieChart>
                         </ResponsiveContainer>
