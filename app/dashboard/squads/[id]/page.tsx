@@ -462,7 +462,31 @@ export default function SquadDetailPage() {
                                                                     className={cn(
                                                                         "mx-auto h-6 w-6 rounded-[6px] flex items-center justify-center transition-all",
                                                                         isCompleted 
-                                                                            ? cn("shadow-sm text-white", colors.gradient) 
+                                                                            ? cn("shadow-sm text-white border-2", 
+                                                                                template.color === "lime" || template.color === "yellow" 
+                                                                                    ? "bg-gradient-to-br from-lime-500 to-lime-600 border-lime-600" 
+                                                                                    : template.color === "green"
+                                                                                        ? "bg-gradient-to-br from-green-500 to-green-600 border-green-600"
+                                                                                        : template.color === "blue"
+                                                                                            ? "bg-gradient-to-br from-blue-500 to-blue-600 border-blue-600"
+                                                                                            : template.color === "purple"
+                                                                                                ? "bg-gradient-to-br from-purple-500 to-purple-600 border-purple-600"
+                                                                                                : template.color === "red"
+                                                                                                    ? "bg-gradient-to-br from-red-500 to-red-600 border-red-600"
+                                                                                                    : template.color === "orange"
+                                                                                                        ? "bg-gradient-to-br from-orange-500 to-orange-600 border-orange-600"
+                                                                                                        : template.color === "pink"
+                                                                                                            ? "bg-gradient-to-br from-pink-500 to-pink-600 border-pink-600"
+                                                                                                            : template.color === "cyan"
+                                                                                                                ? "bg-gradient-to-br from-cyan-500 to-cyan-600 border-cyan-600"
+                                                                                                                : template.color === "teal"
+                                                                                                                    ? "bg-gradient-to-br from-teal-500 to-teal-600 border-teal-600"
+                                                                                                                    : template.color === "violet"
+                                                                                                                        ? "bg-gradient-to-br from-violet-500 to-violet-600 border-violet-600"
+                                                                                                                        : template.color === "rose"
+                                                                                                                            ? "bg-gradient-to-br from-rose-500 to-rose-600 border-rose-600"
+                                                                                                                            : "bg-gradient-to-br from-purple-500 to-purple-600 border-purple-600"
+                                                                            ) 
                                                                             : (isFutureDay || !habit ? "bg-black/[0.02] dark:bg-white/[0.02]" : "bg-black/[0.04] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10"),
                                                                         isToday(day) && !isCompleted && "ring-1 ring-primary-500/30",
                                                                         !habit && "cursor-wait opacity-50"
