@@ -56,6 +56,8 @@ export default function SquadDetailPage() {
     const [savingHabit, setSavingHabit] = useState(false);
     const [editingHabitData, setEditingHabitData] = useState<Partial<Habit> | undefined>(undefined);
     const [menuOpenFor, setMenuOpenFor] = useState<number | null>(null);
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [memberToDelete, setMemberToDelete] = useState<{id: string, name: string} | null>(null);
 
     const fetchSquadDetails = useCallback(async () => {
         try {
@@ -207,6 +209,31 @@ export default function SquadDetailPage() {
         }
     };
 
+    const handleRemoveMember = async (memberId: string, memberName: string) => {
+        setMemberToDelete({ id: memberId, name: memberName });
+        setShowDeleteConfirmModal(true);
+    };
+
+    const confirmRemoveMember = async () => {
+        if (!memberToDelete) return;
+        
+        try {
+            const res = await fetch(`/api/squads/${id}/members/${memberToDelete.id}`, { method: "DELETE" });
+            if (res.ok) {
+                toast.success("Member removed successfully");
+                fetchSquadDetails();
+                setShowDeleteConfirmModal(false);
+                setMemberToDelete(null);
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Failed to remove member");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Network error. Please try again.");
+        }
+    };
+
     // Matrix Days - ALL days from squad startDate to endDate
     const days = squad ? eachDayOfInterval({
         start: new Date(squad.startDate),
@@ -310,13 +337,15 @@ export default function SquadDetailPage() {
                                 )}
                             </button>
 
-                            <button
-                                onClick={() => { setShowInviteModal(true); setInviteError(""); setInviteEmail(""); }}
-                                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-900 px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-black dark:bg-white dark:text-black dark:hover:bg-surface-200"
-                            >
-                                <Share2 className="h-3.5 w-3.5" />
-                                Invite Friends
-                            </button>
+                            {isOwner && (
+                                <button
+                                    onClick={() => { setShowInviteModal(true); setInviteError(""); setInviteEmail(""); }}
+                                    className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-900 px-4 py-2 text-xs font-bold text-white shadow-md transition-all hover:bg-black dark:bg-white dark:text-black dark:hover:bg-surface-200"
+                                >
+                                    <Share2 className="h-3.5 w-3.5" />
+                                    Invite Friends
+                                </button>
+                            )}
                         </div>
                     </div>
                     {/* Background decoration */}
@@ -568,13 +597,85 @@ export default function SquadDetailPage() {
                                             <p className="font-bold text-surface-900 dark:text-white">{member.name}</p>
                                             <p className="text-xs text-surface-500">{member.email}</p>
                                         </div>
-                                        {squad.ownerId?._id === member._id && (
-                                            <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-black text-orange-600 dark:bg-orange-500/20">
-                                                OWNER
-                                            </span>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            {squad.ownerId?._id === member._id && (
+                                                <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-black text-orange-600 dark:bg-orange-500/20">
+                                                    OWNER
+                                                </span>
+                                            )}
+                                            {isOwner && squad.ownerId?._id !== member._id && (
+                                                <button
+                                                    onClick={() => handleRemoveMember(member._id, member.name)}
+                                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 transition-colors dark:border-red-900/20 dark:bg-red-900/10 dark:hover:bg-red-900/20"
+                                                    title="Remove member"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {showDeleteConfirmModal && memberToDelete && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="w-full max-w-sm overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-2xl dark:border-surface-800 dark:bg-[#0A0A0F]"
+                        >
+                            <div className="flex items-center justify-between border-b border-surface-100 p-5 dark:border-surface-800">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600 dark:bg-red-900/20">
+                                        <Trash2 className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-black text-surface-900 dark:text-white">Remove Member</h3>
+                                        <p className="text-[11px] font-medium text-surface-400">Confirm member removal</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => { setShowDeleteConfirmModal(false); setMemberToDelete(null); }}
+                                    className="rounded-full p-2 text-surface-400 hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white transition-colors"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <div className="p-5 space-y-4">
+                                <div className="rounded-2xl border border-red-100 bg-red-50 p-4 dark:border-red-900/20 dark:bg-red-900/10">
+                                    <p className="text-sm font-semibold text-red-900 dark:text-red-100">
+                                        Are you sure you want to remove <span className="font-bold">{memberToDelete.name}</span> from the squad?
+                                    </p>
+                                    <p className="mt-2 text-xs text-red-700 dark:text-red-300">
+                                        This action cannot be undone. The member will lose access to all squad habits and progress.
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowDeleteConfirmModal(false); setMemberToDelete(null); }}
+                                        className="flex-1 rounded-xl border border-surface-200 bg-transparent py-2.5 text-xs font-bold text-surface-600 transition-all hover:bg-surface-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={confirmRemoveMember}
+                                        className="flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 text-xs font-black text-white shadow-md shadow-red-500/20 transition-all hover:bg-red-700"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        Remove Member
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
